@@ -17,7 +17,6 @@ const Header = () => {
                 to={'/'}>
                 Về chúng tôi
               </Link>
-
               <Link className="text-lg p-4 text-white"
                 to={'/thuc-don'}>
                 Thực đơn
