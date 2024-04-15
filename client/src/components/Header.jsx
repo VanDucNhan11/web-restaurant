@@ -15,7 +15,7 @@ const Header = () => {
             <div className="flex items-center gap-3">
               <Link className="text-lg p-4 text-white "
                 to={'/'}>
-                Về chúng tôi
+                Trang chủ
               </Link>
               <Link className="text-lg p-4 text-white"
                 to={'/thuc-don'}>
