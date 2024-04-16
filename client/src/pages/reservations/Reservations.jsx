@@ -5,43 +5,55 @@ import  './Reservations.css'
 
 const Reservations = () => {
   return (
-    <div className='datban'>
-        <h1 className="text-4xl text-center  text-white">Đặt lịch trực tuyến</h1>
-        <h3 className="text-center italic text-white">Trang chủ/đặt chỗ</h3>
-        <div className="w-72 h-24 bg-cover bg-no-repeat bg-center flex mt-20 content-center ml-72">
-          <div className=" px-5 pt-5 pd-center bg-white rounded-xl border-2  ml-6">
-            <div className="label">Họ và tên</div>
-            <input type="text" className="form-control ng-pristine ng-untouched ng-empty ng-invalid-required w-64" placeholder="họ và tên" name="full_name" required/>
-          </div>
-          <div className=" px-5 pt-5 pd-center bg-white rounded-xl border-2 ml-6 ">
-            <div className="label">Email</div>
-            <input type="text" className="form-control ng-pristine ng-untouched ng-empty ng-invalid-required w-64" placeholder="Email"  required/>
-          </div>
-          <div className=" px-5 pt-5 pd-center bg-white rounded-xl border-2 ml-6 ">
-            <div className="label">Số điện thoại</div>
-            <input type="text" className="form-control ng-pristine ng-untouched ng-empty ng-invalid-required w-64" placeholder="số điện thoại" required/>
-          </div>
+    <div className="datban flex flex-col items-center justify-center min-h-screen" >
+        <h1 className="text-4xl text-center  text-black">Đặt lịch trực tuyến</h1>
+        <h3 className="text-center italic text-black">Trang chủ/đặt chỗ</h3>
+        <div className="w-full max-w-screen-lg p-5 bg-cover bg-no-repeat bg-center mt-20 flex justify-center">
+            <div className="p-5 bg-white rounded-xl border-2 w-72">
+                <div className="mb-2">Họ và tên</div>
+                <input type="text" className="w-full p-2 border rounded" placeholder="Họ và tên" name="full_name" required/>
+            </div>
+            <div className="p-5 bg-white rounded-xl border-2 ml-4 w-72">
+                <div className="mb-2">Email</div>
+                <input type="text" className="w-full p-2 border rounded" placeholder="Email" required/>
+            </div>
+            <div className="p-5 bg-white rounded-xl border-2 ml-4 w-72">
+                <div className="mb-2">Số điện thoại</div>
+                <input type="text" className="w-full p-2 border rounded" placeholder="Số điện thoại" required/>
+            </div>
         </div>
-        <div className="w-72 h-24 bg-cover bg-no-repeat bg-center flex mt-5 content-center ml-72">
-          <div className=" px-5 pt-5 pd-center bg-white rounded-xl border-2  ml-6">
-            <div className="label">Ngày</div>
-            <input type="date" className="form-control ng-pristine ng-valid ng-isolate-scope ng-not-empty ng-valid-date ng-touched w-64"  name="date" uib-datepicker-popup="dd-MM-yyyy" ng-lick="open($event, date)" is-open="open[date]"
-            datepiker-options="dateOptions" placeholder="dd-MM-yyyy" close-text="Close"/>
-          </div>
-          <div className=" px-5 pt-5 pd-center bg-white rounded-xl border-2 ml-6 ">
-            <div className="label">Thời gian</div>
-            <input type="time" className="form-control ng-pristine ng-untouched ng-empty ng-invalid-required w-64" placeholder="Email"  required/>
-          </div>
-          <div className=" px-5 pt-5 pd-center bg-white rounded-xl border-2 ml-6 ">
-            <div className="label">Số người</div>
-            <input type="text" className="form-control ng-pristine ng-untouched ng-empty ng-invalid-required w-64" placeholder="số điện thoại" required/>
-          </div>
-        </div>
-        <div className="yeucau px-5 pt-5 origin-center bg-white rounded-xl border-2  mt-5">
+        <div className="w-full max-w-screen-lg p-5 bg-cover bg-no-repeat bg-center mt-5 flex justify-center">
+            <div className="p-5 bg-white rounded-xl border-2 w-72">
+              <div className="mb-2">Ngày</div>
+              <input 
+                  type="date" 
+                  className="w-full p-2 border rounded" 
+                  placeholder="date" 
+                  name="full_name" 
+                  required
+                  value={new Date().toISOString().split('T')[0]} 
+              />
+            </div>
+            <div className="p-5 bg-white rounded-xl border-2 ml-4 w-72">
+                <div className="mb-2">Thời gian</div>
+                <input 
+                    type="time" 
+                    className="w-full p-2 border rounded" 
+                    placeholder="time" 
+                    required
+                    value={new Date().toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
+                />
+            </div>
+            <div className="p-5 bg-white rounded-xl border-2 ml-4 w-72">
+                <div className="mb-2">số người</div>
+                <input type="text" className="w-full p-2 border rounded" placeholder="số người" required/>
+            </div>
+       </div>
+        <div className="max-w-screen-lg p-5 bg-cover bg-no-repeat bg-center mt-5  justify-center rounded-xl border-2 bg-white">
             <div className="label">Yêu cầu đặt biệt</div>
             <textarea class="form-control ng-pristine ng-valid ng-empty ng-touched" id="" cols="92" rows="4" name="content" ng-model="formItem.content"></textarea>
         </div>
-        <button className='clickdone'>Hoàn Thành</button>
+        <button className="mt-10 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white mb-10">Hoàn Thành</button>
     </div>
   )
 }
