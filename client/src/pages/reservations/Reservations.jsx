@@ -6,8 +6,8 @@ import  './Reservations.css'
 const Reservations = () => {
   return (
     <div className="datban flex flex-col items-center justify-center min-h-screen" >
-        <h1 className="text-4xl text-center  text-black">Đặt lịch trực tuyến</h1>
-        <h3 className="text-center italic text-black">Trang chủ/đặt chỗ</h3>
+        <h1 className="text-4xl text-center  text-white mt-20">Đặt lịch trực tuyến</h1>
+        <h3 className="text-center italic text-white">Trang chủ/đặt chỗ</h3>
         <div className="w-full max-w-screen-lg p-5 bg-cover bg-no-repeat bg-center mt-20 flex justify-center">
             <div className="p-5 bg-white rounded-xl border-2 w-72">
                 <div className="mb-2">Họ và tên</div>
