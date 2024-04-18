@@ -67,28 +67,6 @@ const Header = () => {
             </div>
             <div className="hidden md:flex">
               <MenuBar />
-              <div className="flex items-center gap-3">
-                <Link className="text-lg p-4 text-white "
-                  to={'/'}>
-                  Trang chủ
-                </Link>
-                <Link className="text-lg p-4 text-white"
-                  to={'/thuc-don'}>
-                  Thực đơn
-                </Link>
-                <Link className="text-lg p-4 text-white "
-                  to={'/dat-cho'}>
-                  Đặt chỗ
-                </Link>
-                <Link className="text-lg p-4 text-white "
-                  to={'/tin-tuc'}>
-                  Tin tức
-                </Link>
-                <Link className="text-lg p-4 text-white "
-                  to={'/tuyen-dung'}>
-                  Tuyển dụng
-                </Link>
-              </div>
               <div className="flex items-center gap-2">
                 <Button
                   size="small"
@@ -114,8 +92,9 @@ const Header = () => {
             </div>
           </div>
         </div >
-      </>
-      )
+      </div>
+    </>
+  )
 }
 
-      export default Header
+export default Header
