@@ -1,54 +1,98 @@
 
+import { useState } from "react";
 import * as React from "react";
 import { Link } from "react-router-dom";
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
+import MenuIcon from '@mui/icons-material/Menu';
 const Header = () => {
 
+  const [open, setOpen] = useState(false);
+
+  const toggleDrawer = (newOpen) => () => {
+    setOpen(newOpen);
+  };
+
+
+  const MenuBar = () => {
+    return (
+      <div className="flex flex-col md:flex-row items-center gap-3">
+        <Link className="text-xl hover:underline sedan-regular p-4 md:text-white "
+          to={'/'}>
+          Về chúng tôi
+        </Link>
+        <Link to={"/thuc-don"}
+          className="text-xl p-4 hover:underline sedan-regular md:text-white ">
+          Thực đơn
+        </Link>
+        <Link className="text-xl p-4 hover:underline sedan-regular md:text-white "
+          to={'/dat-cho'}>
+          Đặt chỗ
+        </Link>
+        <Link className="text-xl p-4 hover:underline sedan-regular md:text-white "
+          to={'/tin-tuc'}>
+          Tin tức
+        </Link>
+        <Link className="text-xl p-4 hover:underline sedan-regular md:text-white "
+          to={'/tuyen-dung'}>
+          Tuyển dụng
+        </Link>
+      </div>
+    )
+  }
+  const DrawerList = (
+    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
+      <div className=" bg-bg-header">
+        <img className=' h-auto w-40 p-3' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
+      </div>
+      <MenuBar />
+    </Box>
+  );
   return (
     <>
-      <div className='border-b bg-bg-header'>
+      <div className='border-b bg-bg-header fixed w-full'>
         <div className='max-w-6xl m-auto '>
-          <div className='flex justify-between pt-3 pb-3'>
+          <div className='flex justify-between p-3'>
             <div>
-              <img className='w-w-logo h-h-logo' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
+              <img className='w-32 h-auto md:w-w-logo md:h-h-logo' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
             </div>
-            <div className="flex items-center gap-3">
-              <Link className="text-lg p-4 text-white "
-                to={'/'}>
-                Về chúng tôi
-              </Link>
-              <Link className="text-lg p-4 text-white"
-                to={'/thuc-don'}>
-                Thực đơn
-              </Link>
-              <Link className="text-lg p-4 text-white "
-                to={'/dat-cho'}>
-                Đặt chỗ
-              </Link>
-              <Link className="text-lg p-4 text-white "
-                to={'/tin-tuc'}>
-                Tin tức
-              </Link>
-              <Link className="text-lg p-4 text-white "
-                to={'/tuyen-dung'}>
-                Tuyển dụng
-              </Link>
+            <div className="hidden md:flex">
+              <MenuBar />
             </div>
-            <div className="flex items-center gap-4">
-              <Button sx={{
-                color: 'white'
-              }}>
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                sx={{
+                  color: 'white',
+                }}>
                 Đăng nhập
               </Button>
-              <Button sx={{
-                color: 'white'
-              }}>
+              <Button
+                size="small"
+                sx={{
+                  color: 'white',
+                }}>
                 Đăng ký
               </Button>
+              <div className="md:hidden">
+                <Button onClick={toggleDrawer(true)}><MenuIcon /></Button>
+                <Drawer open={open} onClose={toggleDrawer(false)}>
+                  {DrawerList}
+                </Drawer>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </div >
     </>
   )
 }
