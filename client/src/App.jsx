@@ -21,7 +21,7 @@ function App() {
           <Route path='/tuyen-dung' element={<Recruitment />} />
         </Routes>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   )
 }

@@ -5,14 +5,6 @@ import { Link } from "react-router-dom";
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 const Header = () => {
 
@@ -21,7 +13,6 @@ const Header = () => {
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };
-
 
   const MenuBar = () => {
     return (
@@ -57,9 +48,10 @@ const Header = () => {
       <MenuBar />
     </Box>
   );
+
   return (
     <>
-      <div className='border-b bg-bg-header fixed w-full'>
+      <div className=' bg-bg-header'>
         <div className='max-w-6xl m-auto '>
           <div className='flex justify-between p-3'>
             <div>
@@ -67,27 +59,27 @@ const Header = () => {
             </div>
             <div className="hidden md:flex">
               <MenuBar />
-              <div className="flex items-center gap-2">
-                <Button
-                  size="small"
-                  sx={{
-                    color: 'white',
-                  }}>
-                  Đăng nhập
-                </Button>
-                <Button
-                  size="small"
-                  sx={{
-                    color: 'white',
-                  }}>
-                  Đăng ký
-                </Button>
-                <div className="md:hidden">
-                  <Button onClick={toggleDrawer(true)}><MenuIcon /></Button>
-                  <Drawer open={open} onClose={toggleDrawer(false)}>
-                    {DrawerList}
-                  </Drawer>
-                </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                size="small"
+                sx={{
+                  color: 'white',
+                }}>
+                Đăng nhập
+              </Button>
+              <Button
+                size="small"
+                sx={{
+                  color: 'white',
+                }}>
+                Đăng ký
+              </Button>
+              <div className="md:hidden">
+                <Button onClick={toggleDrawer(true)}><MenuIcon /></Button>
+                <Drawer open={open} onClose={toggleDrawer(false)}>
+                  {DrawerList}
+                </Drawer>
               </div>
             </div>
           </div>
