@@ -61,20 +61,24 @@ const Header = () => {
               <MenuBar />
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                size="small"
-                sx={{
-                  color: 'white',
-                }}>
-                Đăng nhập
-              </Button>
-              <Button
-                size="small"
-                sx={{
-                  color: 'white',
-                }}>
-                Đăng ký
-              </Button>
+              <Link to={'/dang-nhap'} >
+                  <Button
+                    size="small"
+                    sx={{
+                      color: 'white',
+                    }}>
+                    Đăng nhập
+                  </Button>
+              </Link>
+              <Link to={'/dang-ky'}>
+                <Button
+                  size="small"
+                  sx={{
+                    color: 'white',
+                  }}>
+                  Đăng ký
+                </Button>
+              </Link>
               <div className="md:hidden">
                 <Button onClick={toggleDrawer(true)}><MenuIcon /></Button>
                 <Drawer open={open} onClose={toggleDrawer(false)}>

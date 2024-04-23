@@ -6,6 +6,8 @@ import Reservations from "./pages/reservations/Reservations"
 import Recruitment from "./pages/recruitment/Recruitment"
 import News from "./pages/news/News"
 import Footer from "./components/Footer"
+import Login from "./pages/login-resister/login"
+import Resister from "./pages/login-resister/resister"
 
 function App() {
 
@@ -19,6 +21,8 @@ function App() {
           <Route path='/dat-cho' element={<Reservations />} />
           <Route path='/tin-tuc' element={<News />} />
           <Route path='/tuyen-dung' element={<Recruitment />} />
+          <Route path='/dang-nhap' element={<Login />} />
+          <Route path='/dang-ky' element={<Resister />} />
         </Routes>
       </div>
       {/* <Footer /> */}
