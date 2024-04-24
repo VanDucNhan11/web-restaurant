@@ -25,7 +25,7 @@ function App() {
           <Route path='/dang-ky' element={<Resister />} />
         </Routes>
       </div>
-      {/* <Footer /> */}
+       <Footer /> 
     </>
   )
 }
