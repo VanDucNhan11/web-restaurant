@@ -1,0 +1,14 @@
+.transform-start {
+    transform: translateX(-100%);
+  }
+  
+  /* Trạng thái kết thúc */
+  .transform-end {
+    transform: translateX(0);
+  }
+  
+  /* Transition */
+  .transition-transform {
+    transition-property: transform;
+    transition-duration: 1s;
+  }
