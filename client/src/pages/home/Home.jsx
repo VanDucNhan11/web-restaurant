@@ -43,9 +43,9 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden flex flex-col items-center justify-center">
           <img className="bg-cover bg-no-repeat w-full h-auto" src="https://madamelan.vn/themes/elegant/assets/images/hoa-van-about.png" alt="" />
-          <div className="absolute top-20 left-52 flex">
+          <div className="absolute  flex items-center justify-center">
             <img className="h-96 " src="https://madamelan.vn/storage/ve-chung-toi/tuong-madamelan-min.png" alt="" />
             <div className="ml-10 title font-size-title title-font primary-color  text-left -mt-12 ">
                 <div>
@@ -61,7 +61,7 @@ const Home = () => {
           </div>
       </div>
       <div className="relative pt-10 pb-10 bg-gray-600 text-center text-white">
-          <div className="text-center py-4 text-3xl font-VLCAMILA">Triết lý thương hiệu</div>
+          <div className="text-center py-4 text-3xl ">Triết lý thương hiệu</div>
           <div>
               <p>
                 Madame Lân mang đến trải nghiệm ẩm thực bằng triết lý và niềm tin về tính "
@@ -74,12 +74,12 @@ const Home = () => {
                 " trong trải nghiệm ẩm thực của Madame Lân
               </p>   
           </div>
-          <div className="pt-3 container mx-auto flex justify-center text-left">
+          <div className="pt-3 container mx-auto flex items-center justify-center text-left">
               <div className="row justify-center pl-2 " >
-                <div className="pt-3  mb-10">
+                <div className="pt-3  mb-10" style={{width: "360px", height: "600px"}}>
                   <img style={{ height: "350px", width: "350px" }} src="https://madamelan.vn/storage/222309-mdl-am-thuc-web.jpg" />
-                  <div className="content font-size-content text-white">Ẩm thực</div>
-                  <div>
+                  <div className="mt-4 content font-size-content text-white text-2xl">Ẩm thực</div>
+                  <div className="mt-4">
                     <p>
                         Ẩm thực Việt Nam mang tính kế thừa và tiếp biến  trong tiến trình lịch sử của văn hoá, do đó trải nghiệm ẩm thực "
                         <strong>Trọn Vẹn</strong>
@@ -88,11 +88,11 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="pt-3">
+              <div className="ml-5 pt-3  mb-10 " style={{width: "360px", height: "600px"}}>
                 <div>
                   <img style={{ height: "350px", width: "350px" }} src="https://madamelan.vn/storage/222309-mdl-con-nguoi-2-web.jpg" alt="" />
-                  <div className="content font-size-content text-white">Con người</div>
-                  <div>
+                  <div className="mt-4 content font-size-content text-white text-2xl">Con người</div>
+                  <div className="mt-4">
                     <p>
                         Tính "
                         <strong>Trọn Vẹn</strong>
@@ -101,11 +101,11 @@ const Home = () => {
                   </div>
                 </div>
               </div>
-              <div className="pt-3">
+              <div className="ml-5 pt-3 mb-10" style={{width: "360px", height: "600px"}}>
                 <div>
                   <img style={{ height: "350px", width: "350px" }} src="https://madamelan.vn/storage/222309-mdl-khong-gian-web.jpg" alt="" />
-                  <div className="content font-size-content text-white">Không gian</div>
-                  <div>
+                  <div className="mt-4 text-2xl content font-size-content text-white">Không gian</div>
+                  <div className="mt-4">
                     <p>
                         Với kiến trúc mang nét giao thoa tinh tế giữa xưa và nay cùng không gian chan hoà thiên nhiên, Madame Lân mang đến ý niệm về tính "
                         <strong>Trọn Vẹn</strong>
