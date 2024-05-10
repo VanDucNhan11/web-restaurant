@@ -1,0 +1,90 @@
+.title-font{
+    font-family: VLCAMILA;
+}
+.title{
+    font-size: 36px;
+    color: #a82825;
+    padding: 70px 0 30px 0;
+}
+.font-light{
+    font-family: VL-SOFIAPROSOFT-LIGHT;
+}
+
+.fa{
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 900;
+}
+
+
+.tin-tuc {
+    opacity: 0;
+    transition: opacity 1s;
+  }
+  
+  .tin-tuc.visible {
+    opacity: 1;
+}
+
+.pin{
+    column-count: 3;
+    column-gap: 10px;
+}
+
+.pin a{
+    text-decoration: unset;
+}
+
+.pin-item{
+    margin: 0;
+    
+    grid-template-rows: 1fr auto;
+    margin-bottom: 10px;
+    break-inside: avoid;
+    padding: 15px;
+}
+
+.pin-title{
+    font-size: 24px;
+    line-height: 30px;
+    color: #555252;
+}
+
+.font-size-contnet{
+    font-size: 1.123rem;
+    line-height: 1.5rem;
+}
+
+.date-view{
+    font-size: 18px;
+    color: #38433b;
+}
+
+.fal {
+    font-family: "Font Awesome 5 Pro";
+    font-weight: 300;
+}
+
+.archive label{
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.font-weight-bold{
+    font-weight: 700 !important;
+}
+
+.categories{
+    margin: 50px 0;
+    border: 1px solid;
+    border-right: 0;
+    border-left: 0;
+    padding: 10px 0;
+}
+
+.tag{
+    border-radius: 3px;
+    border: 1px solid #cdcdcd;
+    padding: 5px 10px;
+    margin-left: 15px;
+    color: #737373;
+}

@@ -8,6 +8,8 @@ import News from "./pages/news/News"
 import Footer from "./components/Footer"
 import Login from "./pages/login-resister/login"
 import Resister from "./pages/login-resister/resister"
+import DetailNews from "./pages/news/DetailNews"
+import DetailRecruitment from "./pages/recruitment/DetailRecruitment"
 
 function App() {
 
@@ -20,7 +22,7 @@ function App() {
           <Route path='/thuc-don' element={<FoodMenu />} />
           <Route path='/dat-cho' element={<Reservations />} />
           <Route path='/tin-tuc' element={<News />} />
-          <Route path='/tuyen-dung' element={<Recruitment />} />
+          <Route path='/tuyen-dung' element={<DetailRecruitment />} />
           <Route path='/dang-nhap' element={<Login />} />
           <Route path='/dang-ky' element={<Resister />} />
         </Routes>

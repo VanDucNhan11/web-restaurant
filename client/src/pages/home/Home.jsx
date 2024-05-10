@@ -43,17 +43,16 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="relative overflow-hidden flex flex-col items-center justify-center">
-          <img className="bg-cover bg-no-repeat w-full h-auto" src="https://madamelan.vn/themes/elegant/assets/images/hoa-van-about.png" alt="" />
-          <div className="absolute  flex items-center justify-center">
-            <img className="h-96 " src="https://madamelan.vn/storage/ve-chung-toi/tuong-madamelan-min.png" alt="" />
-            <div className="ml-10 title font-size-title title-font primary-color  text-left -mt-12 ">
+      <div className="b-backround  flex flex-col items-center justify-center">
+          <div className="mt-20 mb-20 flex justify-center items-center md:mx-auto max-w-full md:max-w-3xl xl:max-w-6xl">
+            <img className="h-48 md:h-72 lg:h-96 " src="https://madamelan.vn/storage/ve-chung-toi/tuong-madamelan-min.png" alt="" />
+            <div className="md:ml-10 md:w-1/2 lg:w-2/3 xl:w-3/4 md:text-left md:-mt-12 ">
                 <div>
                   <p>
-                    <span className="font-bold text-3xl text-red-600">Câu chuyện thương hiệu</span>
+                    <span className="font-bold text-3xl md:text-4xl text-red-600 title-font title">Câu chuyện thương hiệu</span>
                   </p>
                 </div>
-                <div className=" mt-3 ">
+                <div className=" mt-3 font-light ">
                     <p>Madame Lân là một người phụ nữ bình dị như bao người phụ nữ Việt Nam <br/> khác. Mẹ Lân đã nuôi sáu người con khôn lớn trưởng thành bằng mớ rau <br/> tươi hái từ vườn, những con cá tươi rói, những con tôm nhảy tanh tách trong <br/> chiếc rá được trải lá tre xanh ngắt. Những nguyên liệu và gia vị trong vườn nhà <br/> được chế biến thành biết bao món ăn trọn vẹn hương vị, đầy ắp yêu thương <br/> bằng niềm say mê ẩm thực Việt Nam được truyền lại từ bao thế hệ. Bữa cơm <br/> nhà mẹ Lân cứ thế rộn rã tiếng cười trong sự đầm ấm cùng hương vị không thể <br/> nào quên.</p>
                     <p className='pt-1 '>Ký ức về những món ăn và khoảnh khắc sum vầy đó đã trở thành nguồn cảm <br/> hứng cho sự ra đời của thương hiệu Nhà hàng Madame Lân. Với mong muốn <br/> lan toả giá trị nhân văn sâu sắc của văn hoá ẩm thực Việt Nam, Madame Lân <br/> tin rằng, sự trọn vẹn trong trải nghiệm ẩm thực có sức mạnh kết nối con người. <br/> Trọn vẹn là khi câu chuyện ẩm thực Việt được người đầu bếp kể lại bằng ngôn <br/> ngữ tươi mới trong từng món ăn; là sự chăm sóc ân cần và năng lượng tích cực <br/> được truyền tải từ những người phục vụ; là những giây phút quây quần bên <br/> nhau trong không gian ấm cúng, thân mật. Khi những sắc thái đó hội tụ cũng <br/> chính là lúc trải nghiệm ẩm thực thăng hoa. Và hành trình viết nên những câu <br/> chuyện về ẩm thực Việt của Madame Lân đã bắt đầu…</p>
                 </div>
@@ -61,8 +60,8 @@ const Home = () => {
           </div>
       </div>
       <div className="relative pt-10 pb-10 bg-gray-600 text-center text-white">
-          <div className="text-center py-4 text-3xl ">Triết lý thương hiệu</div>
-          <div>
+          <div className="text-center py-4 text-3xl title-font ">Triết lý thương hiệu</div>
+          <div className="font-light">
               <p>
                 Madame Lân mang đến trải nghiệm ẩm thực bằng triết lý và niềm tin về tính "
                 <strong>Trọn Vẹn</strong>
@@ -78,8 +77,8 @@ const Home = () => {
               <div className="row justify-center pl-2 " >
                 <div className="pt-3  mb-10" style={{width: "360px", height: "600px"}}>
                   <img style={{ height: "350px", width: "350px" }} src="https://madamelan.vn/storage/222309-mdl-am-thuc-web.jpg" />
-                  <div className="mt-4 content font-size-content text-white text-2xl">Ẩm thực</div>
-                  <div className="mt-4">
+                  <div className="mt-4 content font-size-content text-white text-2xl title-font">Ẩm thực</div>
+                  <div className="mt-4 font-light">
                     <p>
                         Ẩm thực Việt Nam mang tính kế thừa và tiếp biến  trong tiến trình lịch sử của văn hoá, do đó trải nghiệm ẩm thực "
                         <strong>Trọn Vẹn</strong>
@@ -91,8 +90,8 @@ const Home = () => {
               <div className="ml-5 pt-3  mb-10 " style={{width: "360px", height: "600px"}}>
                 <div>
                   <img style={{ height: "350px", width: "350px" }} src="https://madamelan.vn/storage/222309-mdl-con-nguoi-2-web.jpg" alt="" />
-                  <div className="mt-4 content font-size-content text-white text-2xl">Con người</div>
-                  <div className="mt-4">
+                  <div className="mt-4 content font-size-content text-white text-2xl title-font">Con người</div>
+                  <div className="mt-4 font-light">
                     <p>
                         Tính "
                         <strong>Trọn Vẹn</strong>
@@ -104,8 +103,8 @@ const Home = () => {
               <div className="ml-5 pt-3 mb-10" style={{width: "360px", height: "600px"}}>
                 <div>
                   <img style={{ height: "350px", width: "350px" }} src="https://madamelan.vn/storage/222309-mdl-khong-gian-web.jpg" alt="" />
-                  <div className="mt-4 text-2xl content font-size-content text-white">Không gian</div>
-                  <div className="mt-4">
+                  <div className="mt-4 text-2xl content font-size-content text-white title-font">Không gian</div>
+                  <div className="mt-4 font-light">
                     <p>
                         Với kiến trúc mang nét giao thoa tinh tế giữa xưa và nay cùng không gian chan hoà thiên nhiên, Madame Lân mang đến ý niệm về tính "
                         <strong>Trọn Vẹn</strong>
