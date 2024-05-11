@@ -66,6 +66,7 @@ const Header = () => {
                     size="small"
                     sx={{
                       color: 'white',
+                      fontFamily:'sedan-regular'
                     }}>
                     Đăng nhập
                   </Button>
@@ -75,6 +76,7 @@ const Header = () => {
                   size="small"
                   sx={{
                     color: 'white',
+                    fontFamily:'sedan-regular'
                   }}>
                   Đăng ký
                 </Button>
