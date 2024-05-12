@@ -22,7 +22,7 @@ function App() {
           <Route path='/thuc-don' element={<FoodMenu />} />
           <Route path='/dat-cho' element={<Reservations />} />
           <Route path='/tin-tuc' element={<News />} />
-          <Route path='/tuyen-dung' element={<DetailRecruitment />} />
+          <Route path='/tuyen-dung' element={<Recruitment />} />
           <Route path='/dang-nhap' element={<Login />} />
           <Route path='/dang-ky' element={<Resister />} />
         </Routes>
