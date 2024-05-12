@@ -13,15 +13,15 @@ const resister = () => {
             </div>
             <form action="#">
             <div className="mb-6 text-lg">
-                <input className="rounded-lg p-2 w-96 border-none sedan-regular outline-none text-base" 
+                <input className="rounded-lg p-2 md:w-96 w-80 border-none sedan-regular outline-none text-base" 
                 type="text" name="name" placeholder="Username" />
               </div>
               <div className="mb-6 text-lg">
-                <input className="rounded-lg p-2 w-96 border-none sedan-regular outline-none text-base" 
+                <input className="rounded-lg p-2 md:w-96 w-80 border-none sedan-regular outline-none text-base" 
                 type="text" name="email" placeholder="Email" />
               </div>
               <div className="mb-4 text-lg">
-                <input className="rounded-lg p-2 w-96 border-none outline-none sedan-regular text-base" 
+                <input className="rounded-lg p-2 md:w-96 w-80 border-none outline-none sedan-regular text-base" 
                 type="Password" name="password" placeholder="Password" />
               </div>
               <div className="mt-8 flex justify-center">
