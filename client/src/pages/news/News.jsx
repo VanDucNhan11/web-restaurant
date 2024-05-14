@@ -15,7 +15,7 @@ const News = () => {
       // Khi phần tử vào tầm nhìn, thiết lập isVisible thành true sau 1 giây
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, 500);
+      }, 300);
       return () => clearTimeout(timer);
     }
   }, [inView]);

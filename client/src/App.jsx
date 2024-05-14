@@ -10,6 +10,7 @@ import Login from "./pages/login-resister/login"
 import Resister from "./pages/login-resister/resister"
 import DetailNews from "./pages/news/DetailNews"
 import DetailRecruitment from "./pages/recruitment/DetailRecruitment"
+import Abouts from "./pages/about/About"
 
 function App() {
 
@@ -19,11 +20,12 @@ function App() {
       <div className="">
         <Routes>
           <Route path='/' element={<Home />} />
+          <Route path='/ve-chung-toi' element={<Abouts />} />
           <Route path='/thuc-don' element={<FoodMenu />} />
           <Route path='/dat-cho' element={<Reservations />} />
           <Route path='/tin-tuc' element={<News />} />
           <Route path='/tuyen-dung' element={<Recruitment />} />
-          <Route path='/dang-nhap' element={<Login />} />
+          <Route path='/dang-nhap' element={<Login />} /> 
           <Route path='/dang-ky' element={<Resister />} />
         </Routes>
       </div>

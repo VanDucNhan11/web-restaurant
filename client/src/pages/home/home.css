@@ -23,6 +23,16 @@
 .title-font{
   font-family: VLCAMILA;
 }
+
+.font-size-title {
+  font-size: 3rem;
+  line-height: 3.25rem;
+}
+
+.title-color {
+  color: #38433b;
+}
+
 .title{
   font-size: 36px;
   color: #a82825;
@@ -30,4 +40,146 @@
 }
 .font-light{
   font-family: VL-SOFIAPROSOFT-LIGHT;
+}
+
+.custom-size {
+  width: 500px;
+  height: 800px;
+}
+
+.loi-ngo .mdl-button {
+  background: #fff;
+  border: 1px solid #a82825;
+  color: #a82825;
+}
+.btn:not(:disabled):not(.disabled) {
+  cursor: pointer;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  color: #212529;
+  text-align: center;
+  vertical-align: middle;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+.loi-ngo .phoco {
+  margin-left: -90px;
+  width: calc(100% + 90px);
+  bottom: 0;
+}
+
+.parallax {
+  background-image: url(https://madamelan.vn/storage/20220408-madame-lan8972-mdl-web-pc-mobi-dat-ban-thuc-don-eng-vie.jpg);
+  min-height: 500px;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.menu {
+  position: relative;
+  display: grid;
+  align-items: center;
+  text-align: center;
+}
+
+.seperator {
+  width: 1px;
+  height: 70px;
+  background: #cdcdcd;
+}
+
+.bon{
+    background: #a82825;
+    border: 8px solid #a82825;
+    color: #fff; 
+    font-size: 40px;
+    font-family: VL-SOFIAPROSOFT-LIGHT;
+}
+
+.video {
+  background: url(https://madamelan.vn/themes/elegant/assets/images/hoa-van.png) bottom right no-repeat;
+  background-size: contain;
+  background-color: #fffcf4;
+  background-repeat: no-repeat;
+}
+.video .container {
+  position: relative;
+}
+
+.v{
+  width: 1000px;
+}
+
+
+.khang-dinh-chat-luong .title {
+  font-size: 2.8rem;
+  padding: 60px 0;
+}
+
+.thuong-hieu {
+  display: grid;
+  align-items: center;
+}
+
+.col-6 {
+  -ms-flex: 0 0 80%;
+  flex: 0 0 80%;
+  max-width: 80%;
+}
+
+.khang-dinh-chat-luong .van-ban {
+  margin-right: 20px; 
+}
+
+.khang-dinh-chat-luong .thuong-hieu {
+  margin-left: 20px; 
+}
+
+@media (min-width: 992px) {
+  .pt-lg-5, .py-lg-5 {
+      padding-top: 3rem !important;
+  }
+}
+@media (min-width: 992px) {
+  .pl-lg-0, .px-lg-0 {
+      padding-left: 0 !important;
+  }
+}
+@media (min-width: 992px) {
+  .pr-lg-0, .px-lg-0 {
+      padding-right: 0 !important;
+  }
+}
+
+@media (min-width: 992px) {
+  .col-lg-6 {
+      -ms-flex: 0 0 50%;
+      flex: 0 0 50%;
+      max-width: 50%;
+  }
+}
+.col-12 {
+  -ms-flex: 0 0 100%;
+  flex: 0 0 100%;
+  max-width: 100%;
 }

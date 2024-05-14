@@ -18,7 +18,7 @@ const Header = () => {
     return (
       <div className="flex flex-col md:flex-row items-center gap-3">
         <Link className="text-xl hover:underline sedan-regular p-4 md:text-white "
-          to={'/'}>
+          to={'/ve-chung-toi'}>
           Về chúng tôi
         </Link>
         <Link to={"/thuc-don"}
@@ -43,7 +43,9 @@ const Header = () => {
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <div className=" bg-bg-header">
-        <img className=' h-auto w-40 p-3' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
+        <Link to={'/'}>
+          <img className=' h-auto w-40 p-3' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" /> 
+        </Link>
       </div>
       <MenuBar />
     </Box>
@@ -55,7 +57,9 @@ const Header = () => {
         <div className='max-w-6xl m-auto '>
           <div className='flex justify-between p-3'>
             <div>
-              <img className='w-32 h-auto md:w-w-logo md:h-h-logo' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
+              <Link to={'/'}>
+                <img className='w-32 h-auto md:w-w-logo md:h-h-logo' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
+              </Link>
             </div>
             <div className="hidden md:flex">
               <MenuBar />
