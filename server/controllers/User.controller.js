@@ -14,24 +14,23 @@ const userControllers = {
       next(errorHandler(400, 'Tất cả các trường là bắt buộc'));
     }
 
-    try {
-      // kiểm tra email đã tồn tại hay chua
-      const user = await User.findOne({ email });
-      if (user) {
-        return res.status(400).json({
-          message: 'Email đã tồn tại'
-        })
-      }
-      // nếu chưa tồn tại thì tạo mới
-      const newUser = new User({
-        username,
-        email,
-        password
+    // kiểm tra email đã tồn tại hay chua
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email đã tồn tại'
       })
-      const salt = await bcrypt.genSalt(10);
-      newUser.password = await bcrypt.hash(password, salt);
+    }
+    const hashPassword = bcrypt.hashSync(password, 10)
+    const newUser = new User({
+      email: email,
+      username: username,
+      password: hashPassword,
+    })
+    try {
       await newUser.save();
-      res.status(201).json({
+      res.status(200).json({
         message: 'Đăng ký thành công'
       })
     } catch (e) {
