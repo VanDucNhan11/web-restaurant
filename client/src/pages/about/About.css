@@ -1,0 +1,33 @@
+.transform-start {
+    transform: translateX(-100%);
+  }
+  
+  /* Trạng thái kết thúc */
+  .transform-end {
+    transform: translateX(0);
+  }
+  
+  /* Transition */
+  .transition-transform {
+    transition-property: transform;
+    transition-duration: 1s;
+  }
+  .b-backround{
+    padding: 0 0 10px 0;
+    background: url(https://madamelan.vn/themes/elegant/assets/images/hoa-van-about.png) bottom no-repeat;
+    background-color: #f0eee8; 
+    background-size: 100% auto;
+    height: auto;
+}
+
+.title-font{
+  font-family: VLCAMILA;
+}
+.title{
+  font-size: 36px;
+  color: #a82825;
+  padding: 70px 0 30px 0;
+}
+.font-light{
+  font-family: VL-SOFIAPROSOFT-LIGHT;
+}
