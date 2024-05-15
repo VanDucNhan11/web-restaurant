@@ -72,7 +72,8 @@ const resister = () => {
               <div className="mt-8 flex justify-center">
                 <button
                   type="submit"
-                  className="rounded-lg bg-bg-header text-white px-6 py-2 text-xl sedan-regular ">{
+                  className="rounded-lg bg-bg-header text-white px-6 py-2 text-xl sedan-regular ">
+                  {
                     loading ? (
                       <>
                         <Stack

@@ -6,13 +6,33 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useSelector } from "react-redux";
+import Avatar from '@mui/material/Avatar';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 const Header = () => {
 
-  const [open, setOpen] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const { currentUser } = useSelector(state => state.user);
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+
 
   const toggleDrawer = (newOpen) => () => {
-    setOpen(newOpen);
+    setOpenDrawer(newOpen);
   };
+
+
+
 
   const MenuBar = () => {
     return (
@@ -44,7 +64,7 @@ const Header = () => {
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <div className=" bg-bg-header">
         <Link to={'/'}>
-          <img className=' h-auto w-40 p-3' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" /> 
+          <img className=' h-auto w-40 p-3' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
         </Link>
       </div>
       <MenuBar />
@@ -61,33 +81,70 @@ const Header = () => {
                 <img className='w-32 h-auto md:w-w-logo md:h-h-logo' src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="" />
               </Link>
             </div>
+
             <div className="hidden md:flex">
               <MenuBar />
             </div>
-            <div className="flex items-center gap-2">
-              <Link to={'/dang-nhap'} >
-                  <Button
-                    size="small"
-                    sx={{
-                      color: 'white',
-                      fontFamily:'sedan-regular'
-                    }}>
-                    Đăng nhập
-                  </Button>
-              </Link>
-              <Link to={'/dang-ky'}>
-                <Button
-                  size="small"
-                  sx={{
-                    color: 'white',
-                    fontFamily:'sedan-regular'
-                  }}>
-                  Đăng ký
-                </Button>
-              </Link>
+            <div className=" flex items-center">
+
+              {
+                currentUser ? (
+                  <div>
+                    <Button
+                      id="basic-button"
+                      aria-controls={open ? 'basic-menu' : undefined}
+                      aria-haspopup="true"
+                      aria-expanded={open ? 'true' : undefined}
+                      onClick={handleClick}
+                    >
+                      <Avatar
+                        alt="Remy Sharp"
+                        src={currentUser.profilePicture} />
+                    </Button>
+                    <Menu
+                      id="basic-menu"
+                      anchorEl={anchorEl}
+                      open={open}
+                      onClose={handleClose}
+                      MenuListProps={{
+                        'aria-labelledby': 'basic-button',
+                      }}
+                    >
+                      <MenuItem onClick={handleClose}>Profile</MenuItem>
+                      <MenuItem onClick={handleClose}>My account</MenuItem>
+                      <MenuItem onClick={handleClose}>Logout</MenuItem>
+                    </Menu>
+
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Link to={'/dang-nhap'} >
+                      <Button
+                        size="small"
+                        sx={{
+                          color: 'white',
+                          fontFamily: 'sedan-regular'
+                        }}>
+                        Đăng nhập
+                      </Button>
+                    </Link>
+                    <Link to={'/dang-ky'}>
+                      <Button
+                        size="small"
+                        sx={{
+                          color: 'white',
+                          fontFamily: 'sedan-regular'
+                        }}>
+                        Đăng ký
+                      </Button>
+                    </Link>
+                  </div>
+                )
+              }
+
               <div className="md:hidden">
                 <Button onClick={toggleDrawer(true)}><MenuIcon /></Button>
-                <Drawer open={open} onClose={toggleDrawer(false)}>
+                <Drawer open={openDrawer} onClose={toggleDrawer(false)}>
                   {DrawerList}
                 </Drawer>
               </div>
