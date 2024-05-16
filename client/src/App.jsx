@@ -1,19 +1,19 @@
-import Header from "./components/Header"
-import { Route, Routes } from "react-router-dom"
-import Home from "./pages/home/Home"
-import FoodMenu from "./pages/foodMenu/FoodMenu"
-import Reservations from "./pages/reservations/Reservations"
-import Recruitment from "./pages/recruitment/Recruitment"
-import News from "./pages/news/News"
-import Footer from "./components/Footer"
-import Login from "./pages/login-resister/login"
-import Resister from "./pages/login-resister/resister"
-import DetailNews from "./pages/news/DetailNews"
-import DetailRecruitment from "./pages/recruitment/DetailRecruitment"
-import Abouts from "./pages/about/About"
+import React from 'react';
+import { Route, Routes } from 'react-router-dom';
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Home from "./pages/home/Home";
+import FoodMenu from "./pages/foodMenu/FoodMenu";
+import Reservations from "./pages/reservations/Reservations";
+import Recruitment from "./pages/recruitment/Recruitment";
+import News from "./pages/news/News";
+import Login from "./pages/login-resister/login";
+import Resister from "./pages/login-resister/resister";
+import Abouts from "./pages/about/About";
+import Sidebar from "./pages/profile/Sidebar";
+import History from "./pages/profile/Profile"
 
 function App() {
-
   return (
     <>
       <Header />
@@ -27,11 +27,13 @@ function App() {
           <Route path='/tuyen-dung' element={<Recruitment />} />
           <Route path='/dang-nhap' element={<Login />} /> 
           <Route path='/dang-ky' element={<Resister />} />
+          {/* Route cho Sidebar với các trang con */}
+          <Route path='/profile/*' element={<Sidebar />} />
         </Routes>
-      </div>
-       <Footer /> 
+      </div> 
+      <Footer />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
