@@ -17,40 +17,64 @@ const DashSiderbar = () => {
   }, [location.search])
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <div className="w-64 h-screen bg-gray-800 text-white flex flex-col">
-        <div className="p-6 flex flex-col items-center">
-          <img src="https://madamelan.vn/storage/logo-favicon/full-logo-min-1.png" alt="Logo" className="h-16 mb-4"/>
+    <div className=" ">
+      <div className="w-64 h-screen bg-gray-800 text-white">
+        <div className="p-6 flex justify-center items-center">
           <h1 className="text-2xl font-bold">My Admin</h1>
         </div>
-        <nav className="flex-1 mt-10 space-y-2 px-4">
-          <Link to="/profile" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+        <nav className="flex-1 space-y-2 px-4">
+          <Link
+            to="/dashboard?tab=profile"
+            active={tab === 'profile' || !tab}
+            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
             Profile
           </Link>
-          <Link to="/history" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+          <Link to="/dashboard?tab=history"
+            active={tab === 'history' || !tab}
+            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
             Booking History
           </Link>
-          <Link to="/account-management" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
-            Account Management
-          </Link>
-          <Link to="/category-management" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
-            Category Management
-          </Link>
-          <Link to="/employee-management" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
-            Employee Management
-          </Link>
-          <Link to="/post-management" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
-            Post Management
-          </Link>
-          <Link to="/table-management" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
-            Table Management
-          </Link>
-          <Link to="/reports" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
-            Reports
-          </Link>
+          {
+            !currentUser.isAdmin &&
+            (<>
+              <Link
+                to="/dashboard?tab=account-management"
+                active={tab === 'account-management' || !tab}
+                className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+                Account Management
+              </Link>
+              <Link to="/dashboard?tab=category-management"
+                active={tab === 'category-management'}
+                className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+                Category Management
+              </Link>
+              <Link
+                to="/dashboard?tab=employee-management"
+                active={tab === 'employee-management'}
+                className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+                Employee Management
+              </Link>
+              <Link to="/dashboard?tab=post-management"
+                active={tab === 'post-management' || !tab}
+                className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+                Post Management
+              </Link>
+              <Link to="/dashboard?tab=table-management"
+                active={tab === 'table-management' || !tab}
+                className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+                Table Management
+              </Link>
+              <Link to="/dashboard?tab=reports"
+                active={tab === 'reports' || !tab}
+                className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700 hover:text-gray-100">
+                Reports
+              </Link>
+            </>
+            )
+          }
         </nav>
       </div>
-     </div> 
+    </div>
   )
 }
 export default DashSiderbar;

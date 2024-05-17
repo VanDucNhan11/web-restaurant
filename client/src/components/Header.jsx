@@ -113,10 +113,9 @@ const Header = () => {
                       <MenuItem
                         onClick={handleClose}>
                         <Link to={'/dashboard'}>
-                          Profile
+                          Dashboard
                         </Link>
                       </MenuItem>
-                      <MenuItem onClick={handleClose}>Dashboard</MenuItem>
                       <MenuItem onClick={handleClose}>Logout</MenuItem>
                     </Menu>
 

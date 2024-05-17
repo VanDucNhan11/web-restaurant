@@ -2,7 +2,15 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-
+import Profile from './Profile';
+import History from './History';
+import DashSiderbar from './DashSiderbar';
+import AccountManagement from './AccountManagement';
+import CategoryManagement from './CategoryManagement';
+import EmployeeManagement from './EmployeeManagement';
+import PostManagement from './PostManagement';
+import TableManagement from './TableManagement';
+import Reports from './Reports';
 const Dashboard = () => {
 
   const location = useLocation();
@@ -18,8 +26,20 @@ const Dashboard = () => {
   console.log(tab);
 
   return (
-    <div>
-
+    <div className='flex'>
+      <div>
+        <DashSiderbar />
+      </div>
+      <div className='p-3 bg-gray-300 w-full'>
+        {tab === 'profile' && <Profile />}
+        {tab === 'history' && <History />}
+        {tab === 'account-management' && <AccountManagement />}
+        {tab === 'category-management' && <CategoryManagement />}
+        {tab === 'employee-management' && <EmployeeManagement />}
+        {tab === 'post-management' && < PostManagement />}
+        {tab === 'table-management' && <TableManagement />}
+        {tab === 'reports' && <Reports />}
+      </div>
     </div>
   );
 }

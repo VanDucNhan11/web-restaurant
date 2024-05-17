@@ -10,7 +10,8 @@ import News from "./pages/news/News";
 import Login from "./pages/login-resister/login";
 import Resister from "./pages/login-resister/resister";
 import Abouts from "./pages/about/About";
-import DashSidebar from "./pages/admin/components/DashSiderbar"
+
+import Dashboard from './pages/admin/components/Dashboard';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path='/tuyen-dung' element={<Recruitment />} />
           <Route path='/dang-nhap' element={<Login />} />
           <Route path='/dang-ky' element={<Resister />} />
+          <Route path='/dashboard' element={<Dashboard />} />
         </Routes>
       </div>
       <Footer />
