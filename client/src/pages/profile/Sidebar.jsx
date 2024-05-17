@@ -20,6 +20,7 @@ const Sidebar = () => {
         </div>
       </div>
       <div className="flex-1 p-8">
+
         <Routes>
           <Route path="profile" element={<Profile />} />
           <Route path="history" element={<History />} />

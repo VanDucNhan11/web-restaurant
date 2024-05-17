@@ -1,10 +1,12 @@
-
 import React, { useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
-const Dashboard = () => {
 
+export const DashSiderbar = () => {
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector(state => state.user);
   const [tab, setTab] = useState('');
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
@@ -14,14 +16,7 @@ const Dashboard = () => {
     }
   }, [location.search])
 
-  console.log(tab);
-
   return (
-    <div>
-      <h2 className='flex mt-32'>Dashboard</h2>
-      <p>Tóm tắt hệ thống.</p>
-    </div>
-  );
+    <div>DashSiderbar</div>
+  )
 }
-
-export default Dashboard;
