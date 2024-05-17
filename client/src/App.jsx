@@ -10,8 +10,8 @@ import News from "./pages/news/News";
 import Login from "./pages/login-resister/login";
 import Resister from "./pages/login-resister/resister";
 import Abouts from "./pages/about/About";
-import Sidebar from "./pages/profile/Sidebar";
-import Dashboard from './pages/admin/components/Dashboard';
+import DashSidebar from "./pages/admin/components/DashSiderbar"
+
 function App() {
   return (
     <>
@@ -26,9 +26,6 @@ function App() {
           <Route path='/tuyen-dung' element={<Recruitment />} />
           <Route path='/dang-nhap' element={<Login />} />
           <Route path='/dang-ky' element={<Resister />} />
-          {/* Route cho Sidebar với các trang con */}
-          <Route path='/dashboard' element={<Dashboard />} />
-
         </Routes>
       </div>
       <Footer />
