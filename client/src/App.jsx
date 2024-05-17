@@ -11,7 +11,7 @@ import Login from "./pages/login-resister/login";
 import Resister from "./pages/login-resister/resister";
 import Abouts from "./pages/about/About";
 import Sidebar from "./pages/profile/Sidebar";
-import History from "./pages/profile/Profile"
+import History from "./pages/profile/Profile";
 
 function App() {
   return (
