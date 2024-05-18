@@ -15,8 +15,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="a-backround h-full p-4 sm:p-8 flex flex-col items-center">
-      <h2 className="text-3xl font-bold text-center mb-8 text-red-600 title-font">My Profile</h2>
+    <div className=" h-full p-4 sm:p-8 flex flex-col items-center">
+      <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">My Profile</h2>
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
         <div className="flex flex-col items-center mb-4">
           <div className="relative">

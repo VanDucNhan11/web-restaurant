@@ -16,22 +16,19 @@ import Dashboard from './pages/admin/components/Dashboard';
 function App() {
   return (
     <>
-      <Header />
-      <div className="">
-        <Routes>
-          <Route path='/' element={<Home />} />
-          <Route path='/ve-chung-toi' element={<Abouts />} />
-          <Route path='/thuc-don' element={<FoodMenu />} />
-          <Route path='/dat-cho' element={<Reservations />} />
-          <Route path='/tin-tuc' element={<News />} />
-          <Route path='/tuyen-dung' element={<Recruitment />} />
-          <Route path='/dang-nhap' element={<Login />} />
-          <Route path='/dang-ky' element={<Resister />} />
-          <Route path='/dashboard' element={<Dashboard />} />
-        </Routes>
-      </div>
-      <Footer />
+      <Routes>
+        <Route path='/' element={<><Header /><Home /><Footer /></>} />
+        <Route path='/ve-chung-toi' element={<><Header /><Abouts /><Footer /></>} />
+        <Route path='/thuc-don' element={<><Header /><FoodMenu /><Footer /></>} />
+        <Route path='/dat-cho' element={<><Header /><Reservations /><Footer /></>} />
+        <Route path='/tin-tuc' element={<><Header /><News /><Footer /></>} />
+        <Route path='/tuyen-dung' element={<><Header /><Recruitment /><Footer /></>} />
+        <Route path='/dang-nhap' element={<><Header /><Login /><Footer /></>} />
+        <Route path='/dang-ky' element={<><Header /><Resister /><Footer /></>} />
+        <Route path='/dashboard/*' element={<Dashboard />} />
+      </Routes>  
     </>
+    
   );
 }
 

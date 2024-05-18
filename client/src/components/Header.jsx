@@ -1,38 +1,41 @@
-
-import { useState } from "react";
-import * as React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import MenuIcon from '@mui/icons-material/Menu';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux"; // Import useDispatch
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-const Header = () => {
+import { logoutUser } from 'D:/react/Restaurant_Web/client/src/redux/user/userSlide.jsx'; // Đảm bảo đường dẫn đúng
 
+const Header = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const { currentUser } = useSelector(state => state.user);
+  const dispatch = useDispatch(); // Sử dụng useDispatch để lấy dispatch function
+  const navigate = useNavigate(); // Sử dụng useNavigate để điều hướng
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-
+  const handleLogout = () => {
+    dispatch(logoutUser()); // Dispatch action logout
+    handleClose();
+    navigate('/'); // Điều hướng đến trang chủ hoặc trang đăng nhập
+  };
 
   const toggleDrawer = (newOpen) => () => {
     setOpenDrawer(newOpen);
   };
-
-
-
 
   const MenuBar = () => {
     return (
@@ -58,8 +61,9 @@ const Header = () => {
           Tuyển dụng
         </Link>
       </div>
-    )
-  }
+    );
+  };
+
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <div className=" bg-bg-header">
@@ -86,7 +90,6 @@ const Header = () => {
               <MenuBar />
             </div>
             <div className=" flex items-center">
-
               {
                 currentUser ? (
                   <div>
@@ -116,9 +119,8 @@ const Header = () => {
                           Dashboard
                         </Link>
                       </MenuItem>
-                      <MenuItem onClick={handleClose}>Logout</MenuItem>
+                      <MenuItem onClick={handleLogout}>Logout</MenuItem> {/* Gọi handleLogout khi MenuItem được nhấp */}
                     </Menu>
-
                   </div>
                 ) : (
                   <div className="flex items-center gap-2">
@@ -160,4 +162,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default Header;

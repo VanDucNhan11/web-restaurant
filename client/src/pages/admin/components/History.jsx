@@ -2,8 +2,8 @@ import React from 'react';
 
 const History = () => {
   return (
-    <div className="min-h-screen bg-gray-100 p-4 sm:p-8">
-      <h2 className="text-3xl font-bold text-center mb-8">Booking History</h2>
+    <div className=" p-4 sm:p-8">
+      <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Lịch sử đặt bàn</h2>
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-800 text-white">
