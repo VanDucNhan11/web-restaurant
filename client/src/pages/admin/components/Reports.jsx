@@ -13,7 +13,8 @@ const Reports = () => {
       <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-fon">Reports</h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white shadow-md rounded-lg p-6 flex items-center">
-          <IonIcon icon={cashOutline} className="text-4xl text-green-600 mr-4" />
+          <IonIcon icon={cashOutline}
+            className="text-4xl text-green-600 mr-4" />
           <div>
             <h2 className="text-xl font-semibold mb-2">Revenue</h2>
             <p className="text-3xl font-bold">{`$${revenue}`}</p>

@@ -8,8 +8,8 @@ import { useSelector, useDispatch } from "react-redux"; // Import useDispatch
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { logoutUser } from 'D:/react/Restaurant_Web/client/src/redux/user/userSlide.jsx'; // Đảm bảo đường dẫn đúng
-
+// Đảm bảo đường dẫn đúng
+import { logoutUser } from "../redux/user/userSlide";
 const Header = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const { currentUser } = useSelector(state => state.user);
