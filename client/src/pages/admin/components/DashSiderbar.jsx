@@ -53,6 +53,12 @@ const DashSiderbar = () => {
                 Category Management
               </Link>
               <Link
+                to="/dashboard?tab=menu-management"
+                className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'menu-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
+                <ion-icon name="fast-food-outline" class="mr-3"></ion-icon>
+                Menu Management
+              </Link>
+              <Link
                 to="/dashboard?tab=employee-management"
                 className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'employee-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
                 <ion-icon name="people-outline" class="mr-3"></ion-icon>

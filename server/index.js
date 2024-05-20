@@ -4,6 +4,7 @@ const cors = require('cors');
 
 const userRoutes = require('./routes/User.route');
 const categoryRoutes = require('./routes/Category.route'); // Thêm dòng này
+const menuRoutes = require('./routes/Menu.route');
 const app = express();
 
 require('dotenv').config()
@@ -18,6 +19,7 @@ app.use(cors({
 
 app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/categories', categoryRoutes); 
+app.use('/api/v1/menu', menuRoutes);
 
 
 app.use((err, req, res, next) => {

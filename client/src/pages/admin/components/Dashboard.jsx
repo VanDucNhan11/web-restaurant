@@ -11,6 +11,7 @@ import EmployeeManagement from './EmployeeManagement';
 import PostManagement from './PostManagement';
 import TableManagement from './TableManagement';
 import Reports from './Reports';
+import MenuManagement from './MenuManagement';
 const Dashboard = () => {
 
   const location = useLocation();
@@ -35,6 +36,7 @@ const Dashboard = () => {
         {tab === 'history' && <History />}
         {tab === 'account-management' && <AccountManagement />}
         {tab === 'category-management' && <CategoryManagement />}
+        {tab === 'menu-management' && <MenuManagement />}
         {tab === 'employee-management' && <EmployeeManagement />}
         {tab === 'post-management' && < PostManagement />}
         {tab === 'table-management' && <TableManagement />}
