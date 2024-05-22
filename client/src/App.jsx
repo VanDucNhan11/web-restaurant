@@ -10,8 +10,8 @@ import News from "./pages/news/News";
 import Login from "./pages/login-resister/login";
 import Resister from "./pages/login-resister/resister";
 import Abouts from "./pages/about/About";
-
 import Dashboard from './pages/admin/components/Dashboard';
+import DetailNews from './pages/news/DetailNews';
 
 function App() {
   return (
@@ -22,6 +22,7 @@ function App() {
         <Route path='/thuc-don' element={<><Header /><FoodMenu /><Footer /></>} />
         <Route path='/dat-cho' element={<><Header /><Reservations /><Footer /></>} />
         <Route path='/tin-tuc' element={<><Header /><News /><Footer /></>} />
+        <Route path='/news/:id' element={<><Header /><DetailNews /><Footer /></>} />
         <Route path='/tuyen-dung' element={<><Header /><Recruitment /><Footer /></>} />
         <Route path='/dang-nhap' element={<><Header /><Login /><Footer /></>} />
         <Route path='/dang-ky' element={<><Header /><Resister /><Footer /></>} />

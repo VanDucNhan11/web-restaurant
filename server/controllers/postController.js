@@ -5,10 +5,10 @@ const path = require('path');
 // Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'uploads/'); // Save to 'uploads' directory
+    cb(null, 'uploads/');
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname)); // Use original file extension
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   }
 });
 
@@ -67,6 +67,18 @@ const postController = {
       const { id } = req.params;
       await Post.findByIdAndDelete(id);
       res.sendStatus(204);
+    } catch (error) {
+      next(error);
+    }
+  },
+  getPostById: async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const post = await Post.findById(id);
+      if (!post) {
+        return res.status(404).json({ message: 'Post not found' });
+      }
+      res.json(post);
     } catch (error) {
       next(error);
     }

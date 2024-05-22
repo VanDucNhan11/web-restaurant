@@ -1,21 +1,30 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import './News.css';
 
-import { useInView } from 'react-intersection-observer';
-import '../news/News.css';
 
 const DetailNews = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  const [ref, inView] = useInView({ threshold: 0 });
-
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+  
   useEffect(() => {
-    if (inView) {
-      // Khi phần tử vào tầm nhìn, thiết lập isVisible thành true sau 1 giây
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 500);
-      return () => clearTimeout(timer);
+    fetchPost();
+  }, [id]);
+
+  const fetchPost = async () => {
+    try {
+      const response = await axios.get(`http://localhost:3000/api/v1/posts/${id}`);
+      console.log(response); // Kiểm tra response
+      setPost(response.data);
+    } catch (error) {
+      console.error('Error fetching post:', typeof error === 'object' ? error : 'Unknown error');
     }
-  }, [inView]);
+  };
+  
+  
+
+  if (!post) return <div>Loading...</div>;
 
   return (
     <div>
@@ -34,105 +43,81 @@ const DetailNews = () => {
           <span>Tin tức</span>
         </div>
       </div>
-      <section ref={ref} className={`tin-tuc ${isVisible ? 'visible' : ''}`}>
-        <div className=" mx-auto  items-center justify-center md:w-3/4 pb-10 pt-10">
-          <div className=" justify-items-center flex-wrap flex">
-              <div className="col-md-9 w-4/5">
-                <div class="flex items-center space-x-3 ">
-                  <span class="date-view font-light mr-2 flex items-center">
-                    <i class="fal"><ion-icon name="person-outline"></ion-icon></i>
-                    <span class="ml-1">Super Admin</span>
-                  </span>
-                  |
-                  <span class="date-view font-light flex items-center ">
-                    <i class="fal"><ion-icon name="time-outline"></ion-icon></i>
-                    <span class="ml-1 mr-2">06-05-2024</span>
-                  </span>
-                  |
-                  <span class="date-view font-light mx-2 flex items-center">
-                    <i class="fal mb-0"><ion-icon name="eye-outline"></ion-icon></i>  
-                    <span class="ml-1">2282</span>
-                  </span>
+      <section>
+        <div className="mx-auto items-center justify-center md:w-3/4 pb-10 pt-10">
+          <div className="flex justify-items-center flex-wrap">
+            <div className="col-md-9 w-4/5">
+              <div className="flex items-center space-x-3">
+                <span className="date-view font-light mr-2 flex items-center">
+                  <i className="fal">
+                    <ion-icon name="person-outline"></ion-icon>
+                  </i>
+                  <span className="ml-1">Super Admin</span>
+                </span>
+                |
+                <span className="date-view font-light flex items-center">
+                  <i className="fal">
+                    <ion-icon name="time-outline"></ion-icon>
+                  </i>
+                  <span className="ml-1 mr-2">{new Date(post.datePosted).toLocaleDateString()}</span>
+                </span>
+                |
+                <span className="date-view font-light mx-2 flex items-center">
+                  <i className="fal mb-0">
+                    <ion-icon name="eye-outline"></ion-icon>
+                  </i>
+                  <span className="ml-1">2282</span>
+                </span>
+              </div>
+              <div>
+                <div className="text-3xl mt-5 mb-5">{post.title}</div>
+                <img src={`http://localhost:3000/${post.image}`} alt={post.title} />
+                <div className="font-light font-size-content font-weight-bold py-3">
+                  {post.content.substring(0, 100)}...
                 </div>
-                <div>
-                  <div className="text-3xl mt-5 mb-5">
-                    TOP 10 CÁC MÓN ĂN NGON ĐẶC SẢN ĐÀ NẴNG
-                  </div>
-                  <img src="https://madamelan.vn/storage/350950366-643849020964476-7010446790931598520-n.jpg" alt="" />
-                  <div className="font-light font-size-content font-weight-bold py-3">
-                    Du lịch Đà Nẵng nên ăn gì? Món ngon Đà Nẵng phải thử ở đâu? Nhà hàng nào có các món ngon đặc sản Đà Nẵng? Cùng tìm hiểu để chuyến đi thêm phần trọn vẹn nhé.
-                  </div>
-                  <div className="font-light font-size-content">
-                    <p>Món ngon Đà Nẵng là điều khó có thể bỏ qua khi ghé thăm vùng đất xinh đẹp này. Mang đậm phong vị ẩm thực miền Trung nắng gió, ẩm thực xứ Đà mang nhiều đặc sắc của các vùng miền hội tụ.
-                      <br/>
-                      Du lịch Đà Nẵng nên ăn gì? Món ngon Đà Nẵng phải thử ở đâu? Nhà hàng nào có các món ngon đặc sản Đà Nẵng? Bạn không thể bỏ qua Nhà Hàng Madame Lân nằm bên bờ sông Hàn lộng gió, nơi có thể đón trọn view thành phố, lại sở hữu không gian rộng, thoáng mát và món ngon đặc sản ba miền. Chắc chắn rằng bạn sẽ có được trải nghiệm “tròn hương, đậm vị”.
-                    </p>
-                  </div>
-                </div>
-                <div className="categories font-light">
-                    Danh mục
-                    <span className="tag ml-4">Món ăn Madame Lân</span>
-                </div>
-                <div className="title title-font text-3xl pb-12 text-black">Bài viết liên quan</div>
-                <div className="grid justify-items-center grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                  <div className="col-lg-4 col-md-4 col-12 mb-5 mr-6">
-                      <a href="">
-                        <img src="https://madamelan.vn/storage/tin-tuc/211121-mdl-bo-nuong-tang-sot-tieu-den-min.jpg" alt="" />
-                        <div className="text-lg title-font pt-3">
-                          BÒ NƯỚNG TẢNG SỐT TIÊU ĐEN – MỘT SẮC THÁI NỒNG ẤM
-                        </div>
-                      </a>
-                  </div>
-                  <div className="col-lg-4 col-md-4 col-12 mb-5 mr-6">
-                      <a href="">
-                        <img src="https://madamelan.vn/storage/tin-tuc/20211121-mdl-heo-nuong-kieu-tay-bac-final-min.jpg" alt="" />
-                        <div className="text-lg title-font pt-3">
-                          TRẢI NGHIỆM ẨM THỰC GIAO THOA VỚI HEO NƯỚNG KIỂU TÂY BẮC              
-                        </div>
-                      </a>
-                  </div>
+                <div className="font-light font-size-content">
+                  <p>{post.content}</p>
                 </div>
               </div>
-              <div className=" archive pl-10  lg:col-span-1">
-                <label for className="title-font">- Lưu trữ</label>
-                <ul className="text-red-800">
-                  <li className="font-light font-size-content">
-                    <a href="">
-                      <span>Tháng 5, 2024 (1)</span> 
-                    </a>
-                  </li>
-                  <li className="font-light font-size-content">
-                    <a href="">
-                      <span>Tháng 12, 2023 (1)</span> 
-                    </a>
-                  </li>
-                  <li className="font-light font-size-content">
-                    <a href="">
-                      <span>Tháng 4, 2022 (4)</span> 
-                    </a>
-                  </li>
-                  <li className="font-light font-size-content">
-                    <a href="">
-                      <span>Tháng 3, 2022 (4)</span> 
-                    </a>
-                  </li>
-                  <li className="font-light font-size-content">
-                    <a href="">
-                      <span>Tháng 8, 2021 (3)</span> 
-                    </a>
-                  </li>
-                  <li className="font-light font-size-content">
-                    <a href="">
-                      <span>Tháng 7, 2021 (2)</span> 
-                    </a>
-                  </li>
-                </ul>
+              <div className="categories font-light">
+                Danh mục
+                <span className="tag ml-4">Món ăn Madame Lân</span>
               </div>
+              <div className="title title-font text-3xl pb-12 text-black">Bài viết liên quan</div>
+              <div className="grid justify-items-center grid-cols-1 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+                
+              </div>
+            </div>
+            <div className="archive pl-10 lg:col-span-1">
+              <label className="title-font">- Lưu trữ</label>
+              <ul className="text-red-800">
+                <li className="font-light font-size-content">
+                  <a href="">
+                    <span>Tháng 5, 2024 (1)</span>
+                  </a>
+                </li>
+                <li className="font-light font-size-content">
+                  <a href="">
+                    <span>Tháng 12, 2023 (1)</span>
+                  </a>
+                </li>
+                <li className="font-light font-size-content">
+                  <a href="">
+                    <span>Tháng 4, 2022 (4)</span>
+                  </a>
+                </li>
+                <li className="font-light font-size-content">
+                  <a href="">
+                    <span>Tháng 3, 2022 (1)</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default DetailNews
+export default DetailNews;
