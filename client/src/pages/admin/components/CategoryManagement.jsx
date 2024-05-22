@@ -12,7 +12,7 @@ const CategoryTable = ({ categories, onEdit, onDelete }) => {
         <thead>
           <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
             <th className="py-3 px-6 text-left">ID</th>
-            <th className="py-3 px-6 text-left">Name</th>
+            <th className="py-3 px-6 text-left">Tên danh mục</th>
             <th className="py-3 px-6 text-center">Actions</th>
           </tr>
         </thead>
@@ -106,7 +106,7 @@ const CategoryManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Category Management</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Quản lý danh mục</h1>
       <div className="flex justify-end mb-4">
         <button onClick={() => setIsAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Add Category</button>
       </div>

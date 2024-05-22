@@ -1,4 +1,6 @@
 const MenuItem = require('../models/menuItem');
+const fs = require('fs');
+const path = require('path');
 
 exports.getAllMenuItems = async (req, res) => {
   try {
@@ -11,7 +13,13 @@ exports.getAllMenuItems = async (req, res) => {
 
 exports.createMenuItem = async (req, res) => {
   const { tenMon, moTa, gia, danhMucID } = req.body;
-  const image = req.file ? req.file.path : '';
+  let image = req.file ? req.file.path : '';
+
+  if (req.file) {
+    const newImagePath = `${req.file.path}.png`;
+    fs.renameSync(req.file.path, newImagePath);
+    image = newImagePath;
+  }
 
   try {
     const newMenuItem = new MenuItem({
@@ -30,25 +38,30 @@ exports.createMenuItem = async (req, res) => {
 };
 
 exports.updateMenuItem = async (req, res) => {
-    const { id } = req.params;
-    const { tenMon, moTa, gia, danhMucID } = req.body;
-    let image = req.file ? req.file.path : '';
-  
-    try {
-      const updatedMenuItem = await MenuItem.findByIdAndUpdate(id, {
-        tenMon,
-        moTa,
-        gia,
-        image: image || req.body.image, // Duy trì hình ảnh cũ nếu không có hình ảnh mới được tải lên
-        danhMucID
-      }, { new: true });
-  
-      res.json(updatedMenuItem);
-    } catch (error) {
-      res.status(500).json({ error: 'Server error' });
-    }
-  };
-  
+  const { id } = req.params;
+  const { tenMon, moTa, gia, danhMucID } = req.body;
+  let image = req.file ? req.file.path : '';
+
+  if (req.file) {
+    const newImagePath = `${req.file.path}.png`;
+    fs.renameSync(req.file.path, newImagePath);
+    image = newImagePath;
+  }
+
+  try {
+    const updatedMenuItem = await MenuItem.findByIdAndUpdate(id, {
+      tenMon,
+      moTa,
+      gia,
+      image: image || req.body.image,
+      danhMucID
+    }, { new: true });
+
+    res.json(updatedMenuItem);
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
 exports.deleteMenuItem = async (req, res) => {
   const { id } = req.params;

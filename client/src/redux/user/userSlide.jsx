@@ -20,17 +20,30 @@ const userSlice = createSlice({
       state.error = null;
     },
     signInError: (state, action) => {
-      state.loading = true;
+      state.loading = false;
       state.error = action.payload;
     },
-    // Action để đăng xuất người dùng
     logoutUser: (state) => {
       state.currentUser = null;
       state.loading = false;
       state.error = null;
     },
+    // Action để cập nhật thông tin người dùng
+    updateProfileStart: (state) => {
+      state.loading = true;
+      state.error = null;
+    },
+    updateProfileSuccess: (state, action) => {
+      state.currentUser = { ...state.currentUser, ...action.payload };
+      state.loading = false;
+      state.error = null;
+    },
+    updateProfileError: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    },
   }
 });
 
-export const { signInStart, signInSuccess, signInError, logoutUser } = userSlice.actions;
+export const { signInStart, signInSuccess, signInError, logoutUser, updateProfileStart, updateProfileSuccess, updateProfileError } = userSlice.actions;
 export default userSlice.reducer;

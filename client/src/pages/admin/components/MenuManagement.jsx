@@ -9,7 +9,7 @@ const MenuManagement = () => {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState({});
- 
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     fetchMenuItems();
@@ -36,6 +36,7 @@ const MenuManagement = () => {
 
   const handleEdit = (item) => {
     setCurrentItem(item);
+    setImagePreview(`http://localhost:3000/${item.image}`);
     setIsModalOpen(true);
   };
 
@@ -54,19 +55,17 @@ const MenuManagement = () => {
         alert('Vui lòng điền đầy đủ thông tin');
         return;
       }
-  
-      console.log('Saving item:', currentItem); // Kiểm tra dữ liệu đang gửi lên
-  
+
       const formData = new FormData();
       formData.append('tenMon', currentItem.tenMon);
       formData.append('moTa', currentItem.moTa);
       formData.append('gia', currentItem.gia);
       formData.append('danhMucID', currentItem.danhMucID);
-  
+
       if (currentItem.image && currentItem.image instanceof File) {
-        formData.append('image', currentItem.image);
+        formData.append('image', currentItem.image, 'image.png');
       }
-  
+
       if (currentItem._id) {
         await axios.put(`http://localhost:3000/api/v1/menu/${currentItem._id}`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
@@ -77,25 +76,24 @@ const MenuManagement = () => {
         });
         setMenuItems([...menuItems, response.data]);
       }
-  
+
       setIsModalOpen(false);
       setCurrentItem({});
+      setImagePreview(null);
       fetchMenuItems();
     } catch (error) {
       console.error('Có lỗi xảy ra khi lưu món:', error);
     }
   };
-  
-  
+
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setCurrentItem({ ...currentItem, image: file });
-      const imageURL = URL.createObjectURL(file); // Tạo URL cho hình ảnh được chọn
-      setImagePreview(imageURL); // Cập nhật trạng thái để hiển thị hình ảnh trước
+      const imageURL = URL.createObjectURL(file);
+      setImagePreview(imageURL);
     }
   };
-  
 
   return (
     <div className="container mx-auto p-6">
@@ -140,60 +138,61 @@ const MenuManagement = () => {
       </div>
 
       <Modal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
-          contentLabel="Add/Edit Menu Item"
-          className="fixed inset-0 flex items-center justify-center z-50"
-          overlayClassName="fixed inset-0 bg-black bg-opacity-50"
-        >
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-2xl mb-4">{currentItem._id ? 'Edit Menu Item' : 'Add Menu Item'}</h2>
-            <input
-              type="text"
-              value={currentItem.tenMon || ''}
-              onChange={(e) => setCurrentItem({ ...currentItem, tenMon: e.target.value })}
-              className="border p-2 mb-4 w-full"
-              placeholder="Tên món"
-            />
-            <input
-              type="text"
-              value={currentItem.moTa || ''}
-              onChange={(e) => setCurrentItem({ ...currentItem, moTa: e.target.value })}
-              className="border p-2 mb-4 w-full"
-              placeholder="Mô tả"
-            />
-            <input
-              type="number"
-              value={currentItem.gia || ''}
-              onChange={(e) => setCurrentItem({ ...currentItem, gia: e.target.value })}
-              className="border p-2 mb-4 w-full"
-              placeholder="Giá"
-            />
-            <select
-              value={currentItem.danhMucID || ''}
-              onChange={(e) => setCurrentItem({ ...currentItem, danhMucID: e.target.value })}
-              className="border p-2 mb-4 w-full"
-            >
-              <option value="">Chọn danh mục</option>
-              {categories.map(category => (
-                <option key={category._id} value={category._id}>{category.name}</option>
-              ))}
-            </select>
-            <input
-              type="file"
-              onChange={handleImageChange}
-              className="border p-2 mb-4 w-full"
-            />
-            <div className="flex justify-end">
-              <button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
-              <button onClick={handleSave} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Save</button>
-            </div>
+        isOpen={isModalOpen}
+        onRequestClose={() => setIsModalOpen(false)}
+        contentLabel="Add/Edit Menu Item"
+        className="fixed inset-0 flex items-center justify-center z-50"
+        overlayClassName="fixed inset-0 bg-black bg-opacity-50"
+      >
+        <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+          <h2 className="text-2xl mb-4">{currentItem._id ? 'Edit Menu Item' : 'Add Menu Item'}</h2>
+          <input
+            type="text"
+            value={currentItem.tenMon || ''}
+            onChange={(e) => setCurrentItem({ ...currentItem, tenMon: e.target.value })}
+            className="border p-2 mb-4 w-full"
+            placeholder="Tên món"
+          />
+          <input
+            type="text"
+            value={currentItem.moTa || ''}
+            onChange={(e) => setCurrentItem({ ...currentItem, moTa: e.target.value })}
+            className="border p-2 mb-4 w-full"
+            placeholder="Mô tả"
+          />
+          <input
+            type="number"
+            value={currentItem.gia || ''}
+            onChange={(e) => setCurrentItem({ ...currentItem, gia: e.target.value })}
+            className="border p-2 mb-4 w-full"
+            placeholder="Giá"
+          />
+          <select
+            value={currentItem.danhMucID || ''}
+            onChange={(e) => setCurrentItem({ ...currentItem, danhMucID: e.target.value })}
+            className="border p-2 mb-4 w-full"
+          >
+            <option value="">Chọn danh mục</option>
+            {categories.map(category => (
+              <option key={category._id} value={category._id}>{category.name}</option>
+            ))}
+          </select>
+          <input
+            type="file"
+            onChange={handleImageChange}
+            className="border p-2 mb-4 w-full"
+          />
+          {imagePreview && (
+            <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover mb-4" />
+          )}
+          <div className="flex justify-end">
+            <button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
+            <button onClick={handleSave} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Save</button>
           </div>
-        </Modal>
-
+        </div>
+      </Modal>
     </div>
   );
 };
 
 export default MenuManagement;
-
