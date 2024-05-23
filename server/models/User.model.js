@@ -1,30 +1,29 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-
   username: {
-    type: 'string',
+    type: String,
     required: true,
     unique: true,
   },
   email: {
-    type: 'string',
+    type: String,
     required: true,
     unique: true,
   },
   password: {
-    type: 'string',
+    type: String,
     required: true,
   },
   profilePicture: {
-    type: 'string',
+    type: String,
     default: 'https://i0.wp.com/www.stignatius.co.uk/wp-content/uploads/2020/10/default-user-icon.jpg?fit=415%2C415&ssl=1',
   },
-  isAdmin: {
-    type: Boolean,
-    default: false
-  }
-}, { timestamps: true }
-);
+  role: {
+    type: String,
+    enum: ['Customer', 'Employee', 'Admin'], // Các vai trò có thể có
+    default: 'Customer', // Mặc định là Customer
+  },
+}, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

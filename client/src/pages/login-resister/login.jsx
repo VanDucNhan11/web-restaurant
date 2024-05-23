@@ -21,6 +21,7 @@ const Login = () => {
     e.preventDefault();
     if (!formData.password || !formData.email) {
       dispatch(signInError("Hãy điền vào tất cả các trường"));
+      return;
     }
     try {
       dispatch(signInStart());
@@ -36,8 +37,11 @@ const Login = () => {
         dispatch(signInError(data.message));
       }
       if (res.ok) {
-        dispatch(signInSuccess(data));
-        navigate('/')
+        dispatch(signInSuccess({
+          user: data.user,
+          role: data.role, // Bao gồm cả vai trò người dùng
+        }));
+        navigate('/'); // Cập nhật để lấy role
       }
     }
     catch (error) {

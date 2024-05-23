@@ -95,6 +95,10 @@ const Profile = () => {
 
   return (
     <div className="h-full p-4 sm:p-8 flex flex-col items-center">
+      <button onClick={() => navigate('/')} className="absolute top-0 right-0 mt-4 mr-4 bg-red-600 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center" type="button">
+        <ion-icon name="chevron-back-circle-outline" className="text-xl mr-2"/>
+        <span>Back Home</span>
+      </button>
       <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">My Profile</h2>
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
         <div className="flex flex-col items-center mb-4">
@@ -156,54 +160,6 @@ const Profile = () => {
         </div>
         <button onClick={handleSubmit} className="w-full bg-red-600 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline title-font" type="button">
           Cập nhật
-        </button>
-        <div className="mt-6">
-          <h3 className="text-xl font-semibold mb-4 text-center title-1 title-font">Đổi mật khẩu</h3>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="currentPassword">
-              Mật khẩu hiện tại:
-            </label>
-            <input
-              id="currentPassword"
-              type="password"
-              value={passwords.currentPassword}
-              onChange={handlePasswordChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Nhập mật khẩu hiện tại"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="newPassword">
-              Mật khẩu mới:
-            </label>
-            <input
-              id="newPassword"
-              type="password"
-              value={passwords.newPassword}
-              onChange={handlePasswordChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Nhập mật khẩu mới"
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmNewPassword">
-              Xác nhận mật khẩu mới:
-            </label>
-            <input
-              id="confirmNewPassword"
-              type="password"
-              value={passwords.confirmNewPassword}
-              onChange={handlePasswordChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              placeholder="Xác nhận mật khẩu mới"
-            />
-          </div>
-          <button onClick={handleChangePassword} className="w-full bg-red-600 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline title-font" type="button">
-            Đổi mật khẩu
-          </button>
-        </div>
-        <button onClick={handleLogout} className="mt-4 w-full bg-red-600 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline title-font" type="button">
-          Đăng xuất
         </button>
       </div>
     </div>

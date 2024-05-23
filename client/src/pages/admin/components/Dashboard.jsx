@@ -12,17 +12,21 @@ import PostManagement from './PostManagement';
 import TableManagement from './TableManagement';
 import Reports from './Reports';
 import MenuManagement from './MenuManagement';
-const Dashboard = () => {
+import DuyetPhieuDB from './DuyetPhieuDatBan'
+import ChiTietHoaDon from './InvoiceDetails'
 
+// Dashboard.js
+const Dashboard = () => {
   const location = useLocation();
   const [tab, setTab] = useState('');
+
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search);
     const tabFromUrl = urlParams.get('tab');
     if (tabFromUrl) {
       setTab(tabFromUrl);
     }
-  }, [location.search])
+  }, [location.search]);
 
   console.log(tab);
 
@@ -33,17 +37,20 @@ const Dashboard = () => {
       </div>
       <div className='p-3 bg-gray-300 w-full'>
         {tab === 'profile' && <Profile />}
-        {tab === 'history' && <History />}
-        {tab === 'account-management' && <AccountManagement />}
-        {tab === 'category-management' && <CategoryManagement />}
-        {tab === 'menu-management' && <MenuManagement />}
-        {tab === 'employee-management' && <EmployeeManagement />}
-        {tab === 'post-management' && < PostManagement />}
-        {tab === 'table-management' && <TableManagement />}
-        {tab === 'reports' && <Reports />}
+        {tab === 'history' &&  <History />}
+        {tab === 'DuyetPhieuDB' &&  <DuyetPhieuDB />}
+        {tab === 'XuatHoaDon' &&  <ChiTietHoaDon />}
+        {tab === 'account-management' &&  <AccountManagement />}
+        {tab === 'category-management' &&  <CategoryManagement />}
+        {tab === 'menu-management' &&  <MenuManagement />}
+        {tab === 'employee-management' &&  <EmployeeManagement />}
+        {tab === 'post-management' &&  <PostManagement />}
+        {tab === 'table-management' &&  <TableManagement />}
+        {tab === 'reports' &&  <Reports />}
       </div>
     </div>
   );
 }
 
 export default Dashboard;
+

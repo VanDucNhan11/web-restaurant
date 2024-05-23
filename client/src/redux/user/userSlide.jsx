@@ -15,7 +15,10 @@ const userSlice = createSlice({
       state.error = null;
     },
     signInSuccess: (state, action) => {
-      state.currentUser = action.payload;
+      state.currentUser = {
+        ...action.payload.user,
+        role: action.payload.role, // Lưu vai trò người dùng
+      };
       state.loading = false;
       state.error = null;
     },
@@ -28,7 +31,6 @@ const userSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-    // Action để cập nhật thông tin người dùng
     updateProfileStart: (state) => {
       state.loading = true;
       state.error = null;
