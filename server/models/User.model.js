@@ -20,10 +20,11 @@ const userSchema = new mongoose.Schema({
     type: 'string',
     default: 'https://i0.wp.com/www.stignatius.co.uk/wp-content/uploads/2020/10/default-user-icon.jpg?fit=415%2C415&ssl=1',
   },
-  isAdmin: {
-    type: Boolean,
-    default: false
-  }
+  role: {
+    type: String,
+    default: 'client',
+    enum: ['user', 'admin', 'client']
+  },
 }, { timestamps: true }
 );
 

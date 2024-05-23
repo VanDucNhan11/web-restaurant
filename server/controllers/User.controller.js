@@ -6,20 +6,20 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-// Middleware kiểm tra token
-const authenticateToken = (req, res, next) => {
-  const token = req.cookies.access_token;
-  if (!token) {
-    return res.status(401).json({ message: 'Không có token, không được phép truy cập' });
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(403).json({ message: 'Token không hợp lệ' });
-  }
-};
+// // Middleware kiểm tra token
+// const authenticateToken = (req, res, next) => {
+//   const token = req.cookies.access_token;
+//   if (!token) {
+//     return res.status(401).json({ message: 'Không có token, không được phép truy cập' });
+//   }
+//   try {
+//     const decoded = jwt.verify(token, process.env.SECRET_KEY);
+//     req.user = decoded;
+//     next();
+//   } catch (error) {
+//     res.status(403).json({ message: 'Token không hợp lệ' });
+//   }
+// };
 
 const userControllers = {
   signUp: async (req, res, next) => {
@@ -68,7 +68,7 @@ const userControllers = {
         return next(errorHandler(400, 'Mật khẩu không hợp lệ.'));
       }
       const token = jwt.sign(
-        { userId: validUser._id, isAdmin: validUser.isAdmin },
+        { userId: validUser._id, role: validUser.role },
         process.env.SECRET_KEY
       );
       const { password: pass, ...rest } = validUser._doc;
@@ -90,7 +90,7 @@ const userControllers = {
       const user = await User.findOne({ email });
       if (user) {
         const token = jwt.sign(
-          { id: user._id, isAdmin: user.isAdmin },
+          { id: user._id, role: user.role },
           process.env.SECRET_KEY
         );
         const { password, ...rest } = user._doc;
@@ -110,7 +110,7 @@ const userControllers = {
         });
         await newUser.save();
         const token = jwt.sign(
-          { id: newUser._id, isAdmin: newUser.isAdmin },
+          { id: newUser._id, role: newUser.role },
           process.env.SECRET_KEY
         );
         const { password, ...rest } = newUser._doc;
