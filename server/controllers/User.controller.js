@@ -69,7 +69,9 @@ const userControllers = {
         return res.status(400).json({ message: 'Mật khẩu không hợp lệ.' });
       }
       const token = jwt.sign(
+
         { userId: validUser._id, isAdmin: validUser.isAdmin, role: validUser.role },
+
         process.env.SECRET_KEY
       );
       const { password: pass, ...rest } = validUser._doc;

@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 
+
 const authenticateToken = (req, res, next) => {
   const token = req.cookies.access_token;
   if (!token) return res.status(401).json({ message: 'Bạn chưa đăng nhập' });
@@ -12,3 +13,4 @@ const authenticateToken = (req, res, next) => {
 };
 
 module.exports = { authenticateToken };
+
