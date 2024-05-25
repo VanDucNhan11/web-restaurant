@@ -97,7 +97,7 @@ const MenuManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Menu Management</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Cập nhật Menu</h1>
       <div className="flex justify-end mb-4">
         <button onClick={() => { setCurrentItem({}); setIsModalOpen(true); }} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Add Menu Item</button>
       </div>

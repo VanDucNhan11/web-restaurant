@@ -2,12 +2,20 @@ const { authenticateToken } = require('../middlewares/auth');
 const router = require('express').Router();
 const userControllers = require('../controllers/User.controller');
 
+
+
+router.get('/', userControllers.getAllUsers);
 router.post('/signup', userControllers.signUp);
 router.post('/signin', userControllers.signIn);
 router.post('/google', userControllers.google_signIn);
-router.get('/profile', authenticateToken, userControllers.getUserProfile);
-router.put('/profile', authenticateToken, userControllers.updateUserProfile);
-router.put('/change-password', authenticateToken, userControllers.changePassword); 
-router.post('/logout', authenticateToken, userControllers.logout); 
+// Endpoint để cập nhật vai trò của người dùng
+router.put('/:userId/role', userControllers.updateRole);
+// Endpoint để xoá tài khoản của người dùng
+router.delete('/:userId', userControllers.deleteUser);
+
+router.get('/:userId/profile',  userControllers.getUserProfile);
+router.put('/:userId/profile',  userControllers.updateProfile);
+router.put('/:userId/change-password',  userControllers.changePassword);
+
 
 module.exports = router;

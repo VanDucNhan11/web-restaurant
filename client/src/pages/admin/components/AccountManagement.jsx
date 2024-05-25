@@ -1,27 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-// Thành phần UserTable
-const UserTable = ({ users }) => {
+const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
+  const [selectedRole, setSelectedRole] = useState('');
+  const [showDropdownRowId, setShowDropdownRowId] = useState(null); // State để lưu ID của hàng đang hiển thị dropdown menu
+
+  const handleSaveRole = (userId) => {
+    handleUpdateRole(userId, selectedRole);
+    setShowDropdownRowId(null); // Reset state để ẩn dropdown menu của hàng đã được chọn
+    setSelectedRole(''); // Reset selectedRole về trạng thái mặc định
+  };
+
+  const handleCancel = () => {
+    setShowDropdownRowId(null); // Reset state để ẩn dropdown menu khi hủy bỏ
+    setSelectedRole(''); // Reset selectedRole về trạng thái mặc định
+  };
+
   return (
     <div className="overflow-x-auto shadow-md rounded-lg">
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
             <th className="py-3 px-6 text-left">ID</th>
-            <th className="py-3 px-6 text-left">Name</th>
+            <th className="py-3 px-6 text-left">Tên</th>
             <th className="py-3 px-6 text-left">Email</th>
-            <th className="py-3 px-6 text-center">Actions</th>
+            <th className="py-3 px-6 text-left">Quyền</th>
+            <th className="py-3 px-6 text-center">Hành động</th>
           </tr>
         </thead>
         <tbody className="text-gray-600 text-sm font-light">
           {users.map((user) => (
-            <tr key={user.id} className="border-b border-gray-200 hover:bg-gray-100">
-              <td className="py-3 px-6 text-left whitespace-nowrap">{user.id}</td>
-              <td className="py-3 px-6 text-left">{user.name}</td>
+            <tr key={user._id} className="border-b border-gray-200 hover:bg-gray-100">
+              <td className="py-3 px-6 text-left whitespace-nowrap">{user._id}</td>
+              <td className="py-3 px-6 text-left">{user.username}</td>
               <td className="py-3 px-6 text-left">{user.email}</td>
+              <td className="py-3 px-6 text-left">{user.role}</td>
               <td className="py-3 px-6 text-center">
-                <button className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Edit</button>
-                <button className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300">Delete</button>
+                <button onClick={() => setShowDropdownRowId(user._id)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Cập nhật quyền</button>
+                <button onClick={() => handleDeleteUser(user._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300">Xóa tài khoản</button>
+                {/* Dropdown menu để chọn quyền mới */}
+                {showDropdownRowId === user._id && (
+                  <div>
+                    <select className="mt-3 mb-3" value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+                      <option value="">Chọn quyền</option>
+                      <option value="Customer">Customer</option>
+                      <option value="Employee">Employee</option>
+                      <option value="Admin">Admin</option>
+                    </select>
+                    <div className="">
+                      <button onClick={handleCancel} className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
+                      <button onClick={() => handleSaveRole(user._id)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300">Save</button>
+                    </div>
+                  </div>
+                )}
               </td>
             </tr>
           ))}
@@ -31,20 +62,47 @@ const UserTable = ({ users }) => {
   );
 };
 
-// Trang AccountManagement
+
 const AccountManagement = () => {
-  const users = [
-    { id: 1, name: 'John Doe', email: 'john@example.com' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-    { id: 3, name: 'Alice Johnson', email: 'alice@example.com' },
-    { id: 4, name: 'Bob Brown', email: 'bob@example.com' },
-    // Thêm nhiều người dùng khác nếu cần
-  ];
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/user'); 
+      setUsers(response.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  const handleUpdateRole = async (userId, role) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/api/v1/user/${userId}/role`, { role }); 
+      console.log(response.data.message);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating user role:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId) => {
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/v1/user/${userId}`); 
+      console.log(response.data.message);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Quản lý tài khoản</h1>
-      <UserTable users={users} />
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Cập nhật phân quyền tài khoản</h1>
+      <UserTable users={users} handleUpdateRole={handleUpdateRole} handleDeleteUser={handleDeleteUser} />
     </div>
   );
 };

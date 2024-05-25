@@ -4,6 +4,7 @@ const cors = require('cors');
 const path = require('path');
 
 
+
 const userRoutes = require('./routes/User.route');
 const categoryRoutes = require('./routes/Category.route'); 
 const menuRoutes = require('./routes/Menu.route');
@@ -13,6 +14,7 @@ const app = express();
 
 require('dotenv').config();
 app.use(express.json());
+
 
 
 app.use(cors({
@@ -50,4 +52,5 @@ mongoose.connect(process.env.MONGOBD_URL)
 
 app.listen(3000, () => {
   console.log('Server listening on port 3000');
+  
 });

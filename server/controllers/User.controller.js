@@ -6,6 +6,14 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 const userControllers = {
+  getAllUsers: async (req, res, next) => {
+    try {
+      const users = await User.find(); // Lấy tất cả người dùng từ cơ sở dữ liệu
+      res.status(200).json(users); // Trả về danh sách người dùng
+    } catch (error) {
+      next(error);
+    }
+  },
   authorizeRoles: (requiredRole) => {
     return (req, res, next) => {
       if (req.user.role !== requiredRole) {
@@ -118,48 +126,108 @@ const userControllers = {
     }
   },
 
-  getUserProfile: async (req, res, next) => {
+  updateRole: async (req, res, next) => {
+    const { userId } = req.params;
+    const { role } = req.body;
+
     try {
-      const user = await User.findById(req.user.userId).select('-password');
-      if (!user) {
+      // Kiểm tra xem vai trò được cập nhật có hợp lệ không
+      if (!['Customer', 'Employee', 'Admin'].includes(role)) {
+        return res.status(400).json({ message: 'Vai trò không hợp lệ' });
+      }
+
+      // Cập nhật vai trò của người dùng
+      const updatedUser = await User.findByIdAndUpdate(userId, { role }, { new: true });
+
+      // Kiểm tra xem người dùng có tồn tại hay không
+      if (!updatedUser) {
         return res.status(404).json({ message: 'Người dùng không tồn tại' });
       }
-      res.status(200).json(user);
+
+      // Trả về thông tin người dùng sau khi cập nhật
+      res.status(200).json({ message: 'Cập nhật vai trò thành công', user: updatedUser });
     } catch (error) {
       next(error);
     }
   },
 
-  updateUserProfile: async (req, res, next) => {
-    try {
-      const updates = req.body;
-      const user = await User.findByIdAndUpdate(req.user.userId, updates, { new: true }).select('-password');
-      res.status(200).json(user);
-    } catch (error) {
-      next(error);
-    }
-  },
+  // Xoá tài khoản người dùng
+  deleteUser: async (req, res, next) => {
+    const { userId } = req.params;
 
-  changePassword: async (req, res, next) => {
     try {
-      const user = await User.findById(req.user.userId);
-      const { currentPassword, newPassword } = req.body;
-      const validPassword = bcrypt.compareSync(currentPassword, user.password);
-      if (!validPassword) {
-        return res.status(400).json({ message: 'Mật khẩu hiện tại không đúng' });
+      // Xoá tài khoản của người dùng
+      const deletedUser = await User.findByIdAndDelete(userId);
+
+      // Kiểm tra xem người dùng có tồn tại hay không
+      if (!deletedUser) {
+        return res.status(404).json({ message: 'Người dùng không tồn tại' });
       }
-      user.password = bcrypt.hashSync(newPassword, 10);
-      await user.save();
-      res.status(200).json({ message: 'Đổi mật khẩu thành công' });
+
+      // Trả về thông báo thành công
+      res.status(200).json({ message: 'Xoá tài khoản thành công' });
     } catch (error) {
       next(error);
     }
   },
-
-  logout: (req, res) => {
-    res.clearCookie('access_token');
-    res.status(200).json({ message: 'Đăng xuất thành công' });
-  }
+  getUserProfile: async (req, res) => {
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+  
+  // Cập nhật thông tin profile của người dùng
+  updateProfile: async (req, res) => {
+    const { username, email, phone, profilePicture } = req.body;
+  
+    try {
+      const user = await User.findByIdAndUpdate(
+        req.params.userId,
+        { username, email, phone, profilePicture },
+        { new: true, runValidators: true }
+      );
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+  
+  // Đổi mật khẩu của người dùng
+  changePassword: async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+  
+    try {
+      const user = await User.findById(req.params.userId);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const isMatch = await bcrypt.compare(currentPassword, user.password);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'Current password is incorrect' });
+      }
+  
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+  
+      user.password = hashedPassword;
+      await user.save();
+  
+      res.json({ message: 'Password changed successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Server error', error });
+    }
+  },
+  
 };
 
 module.exports = userControllers;
