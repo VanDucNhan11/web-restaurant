@@ -8,39 +8,21 @@ const Profile = () => {
   const { currentUser } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
+  console.log(currentUser)
   const [avatar, setAvatar] = useState('/path/to/default/avatar.jpg');
+
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    name: currentUser.username,
+    email: currentUser.email,
+    phone: currentUser.phone,
   });
+  console.log(formData);
   const [passwords, setPasswords] = useState({
     currentPassword: '',
     newPassword: '',
     confirmNewPassword: '',
   });
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3000/api/v1/user/${currentUser._id}/profile`);
-        const userData = response.data;
-        setAvatar(userData.profilePicture);
-        setFormData({
-          name: userData.username,
-          email: userData.email,
-          phone: userData.phone,
-        });
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    if (currentUser && currentUser._id) {
-      fetchUserProfile();
-    }
-  }, [currentUser]);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -55,20 +37,23 @@ const Profile = () => {
 
   const handleUpdateProfile = async () => {
     try {
-      const response = await axios.put(`http://localhost:3000/api/v1/user/${currentUser._id}/profile`, {
-        username: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        profilePicture: avatar,
-      });
-
-      dispatch({ type: 'UPDATE_USER_PROFILE', payload: response.data });
+      const res = await fetch(`http://localhost:3000/api/v1/user/${currentUser._id}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+      })
+      const data = await res.json();
+      console.log(data);
+      dispatch({ type: 'UPDATE_USER_PROFILE', payload: res.data });
       alert("Profile updated successfully.");
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Error updating profile.");
     }
-  };
+  }
+
 
   const handleChangePassword = async () => {
     if (passwords.newPassword !== passwords.confirmNewPassword) {
@@ -96,7 +81,7 @@ const Profile = () => {
   return (
     <div className="h-full p-4 sm:p-8 flex flex-col items-center relative">
       <button onClick={() => navigate('/')} className="absolute top-0 right-0 mt-4 mr-4 bg-red-600 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center" type="button">
-        <ion-icon name="chevron-back-circle-outline" className="text-xl mr-2"/>
+        <ion-icon name="chevron-back-circle-outline" className="text-xl mr-2" />
         <span>Back Home</span>
       </button>
       <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">My Profile</h2>

@@ -15,10 +15,7 @@ const userSlice = createSlice({
       state.error = null;
     },
     signInSuccess: (state, action) => {
-      state.currentUser = {
-        ...action.payload.user,
-        role: action.payload.role, // Lưu vai trò người dùng
-      };
+      state.currentUser = action.payload;
       state.loading = false;
       state.error = null;
     },

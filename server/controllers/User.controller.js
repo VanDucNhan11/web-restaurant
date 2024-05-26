@@ -22,6 +22,7 @@ const userControllers = {
       next();
     };
   },
+
   signUp: async (req, res, next) => {
     const { username, password, email } = req.body;
     if (!username || !password || !email || email === '' || username === '' || password === '') {
@@ -41,7 +42,7 @@ const userControllers = {
         email,
         username,
         password: hashPassword,
-        role: 'Customer', 
+        role: 'Customer',
       });
       await newUser.save();
       res.status(200).json({
@@ -86,6 +87,7 @@ const userControllers = {
       return res.status(500).json({ message: 'Có lỗi xảy ra khi đăng nhập' });
     }
   },
+
   google_signIn: async (req, res, next) => {
     const { name, email, googlePhotoUrl } = req.body;
     try {
@@ -183,15 +185,19 @@ const userControllers = {
       res.status(500).json({ message: 'Server error', error });
     }
   },
-  
+
   // Cập nhật thông tin profile của người dùng
   updateProfile: async (req, res) => {
-    const { username, email, phone, profilePicture } = req.body;
-  
+    const { name, email, phone, } = req.body;
+
     try {
       const user = await User.findByIdAndUpdate(
         req.params.userId,
-        { username, email, phone, profilePicture },
+        {
+          username: name,
+          email: email,
+          phone: phone
+        },
         { new: true, runValidators: true }
       );
       if (!user) {
@@ -202,34 +208,35 @@ const userControllers = {
       res.status(500).json({ message: 'Server error', error });
     }
   },
-  
+
+
   // Đổi mật khẩu của người dùng
   changePassword: async (req, res) => {
     const { currentPassword, newPassword } = req.body;
-  
+
     try {
       const user = await User.findById(req.params.userId);
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-  
+
       const isMatch = await bcrypt.compare(currentPassword, user.password);
       if (!isMatch) {
         return res.status(400).json({ message: 'Current password is incorrect' });
       }
-  
+
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(newPassword, salt);
-  
+
       user.password = hashedPassword;
       await user.save();
-  
+
       res.json({ message: 'Password changed successfully' });
     } catch (error) {
       res.status(500).json({ message: 'Server error', error });
     }
   },
-  
+
 };
 
 module.exports = userControllers;
