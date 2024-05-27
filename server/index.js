@@ -9,6 +9,8 @@ const userRoutes = require('./routes/User.route');
 const categoryRoutes = require('./routes/Category.route'); 
 const menuRoutes = require('./routes/Menu.route');
 const postRoutes = require('./routes/Post.route');
+const banRoutes = require('./routes/Table.route');
+const employeeRoutes = require('./routes/Employee.route');
 
 const app = express();
 
@@ -30,7 +32,8 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/categories', categoryRoutes); 
 app.use('/api/v1/menu', menuRoutes);
 app.use('/api/v1/posts', postRoutes);
-
+app.use('/api/v1/tables', banRoutes);
+app.use('/api/v1/employees', employeeRoutes);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

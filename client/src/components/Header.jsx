@@ -135,14 +135,6 @@ const Header = () => {
                       </Button>
                     </Link>
                     <Link to={'/dang-ky'}>
-                      <Button
-                        size="small"
-                        sx={{
-                          color: 'white',
-                          fontFamily: 'sedan-regular'
-                        }}>
-                        Đăng ký
-                      </Button>
                     </Link>
                   </div>
                 )

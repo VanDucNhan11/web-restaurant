@@ -1,86 +1,255 @@
-import React, { useState } from 'react';
-
-const TableTable = ({ tables, onEdit, onDelete }) => {
-  return (
-    <div className="overflow-x-auto shadow-md rounded-lg">
-      <table className="min-w-full bg-white border border-gray-200">
-        <thead>
-          <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-            <th className="py-3 px-6 text-left">ID</th>
-            <th className="py-3 px-6 text-left">Seats</th>
-            <th className="py-3 px-6 text-left">Type</th>
-            <th className="py-3 px-6 text-left">Status</th>
-            <th className="py-3 px-6 text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody className="text-gray-600 text-sm font-light">
-          {tables.map((table) => (
-            <tr key={table.id} className="border-b border-gray-200 hover:bg-gray-100">
-              <td className="py-3 px-6 text-left whitespace-nowrap">{table.id}</td>
-              <td className="py-3 px-6 text-left">{table.seats}</td>
-              <td className="py-3 px-6 text-left">{table.type}</td>
-              <td className="py-3 px-6 text-left">{table.status}</td>
-              <td className="py-3 px-6 text-center">
-                <button
-                  onClick={() => onEdit(table)}
-                  className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => onDelete(table.id)}
-                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const TableManagement = () => {
-  const [tables, setTables] = useState([
-    { id: 1, seats: 4, type: 'Standard', status: 'Available' },
-    { id: 2, seats: 6, type: 'VIP', status: 'Booked' },
-    { id: 3, seats: 2, type: 'Standard', status: 'Available' },
-  ]);
+  const [tables, setTables] = useState([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [newTableData, setNewTableData] = useState({ quantity: '', type: '', area: 'A' });
+  const [editTableData, setEditTableData] = useState({});
 
-  const [editTable, setEditTable] = useState(null);
+  useEffect(() => {
+    fetchTables();
+  }, []);
 
-  const handleEdit = (table) => {
-    setEditTable(table);
-    // Add logic to open modal or form to edit table
+  const fetchTables = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/tables');
+      setTables(response.data);
+    } catch (error) {
+      console.error('Error fetching tables:', error);
+    }
   };
 
-  const handleDelete = (id) => {
-    setTables(tables.filter(table => table.id !== id));
-    // Add logic to delete table from server
+  const handleAddTable = async () => {
+    try {
+      const response = await axios.post('http://localhost:3000/api/v1/tables', newTableData);
+      setTables([...tables, response.data]);
+      closeAddModal();
+    } catch (error) {
+      console.error('Error adding table:', error);
+    }
   };
 
-  const handleAddTable = () => {
-    const newTable = { id: tables.length + 1, seats: 4, type: 'Standard', status: 'Available' };
-    setTables([...tables, newTable]);
-    // Add logic to open modal or form to add new table
+  const saveUpdatedTable = async () => {
+    try {
+      const response = await axios.patch(`http://localhost:3000/api/v1/tables/${editTableData._id}`, editTableData);
+      const updatedTableIndex = tables.findIndex(table => table._id === editTableData._id);
+      const updatedTables = [...tables];
+      updatedTables[updatedTableIndex] = response.data;
+      setTables(updatedTables);
+      closeEditModal(); // Đóng modal sau khi lưu dữ liệu thành công
+    } catch (error) {
+      console.error('Error saving updated table:', error);
+    }
+};
+
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/v1/tables/${id}`);
+      setTables(tables.filter(table => table._id !== id));
+    } catch (error) {
+      console.error('Error deleting table:', error);
+    }
+  };
+
+  const openAddModal = () => {
+    setNewTableData({ quantity: '', type: '', area: 'A' }); 
+    setShowAddModal(true);
+  };
+
+  const closeAddModal = () => {
+    setShowAddModal(false);
+  };
+
+  const openEditModal = (table) => {
+    setEditTableData(table);
+    setShowEditModal(true);
+  };
+
+  const closeEditModal = () => {
+    setShowEditModal(false);
+  };
+
+  const handleChange = (e, type) => {
+    const { name, value } = e.target;
+    if (type === 'add') {
+      setNewTableData({ ...newTableData, [name]: value });
+    } else if (type === 'edit') {
+      setEditTableData({ ...editTableData, [name]: value });
+    }
   };
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Table Management</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Cập nhât bàn</h1>
       <div className="flex justify-end mb-4">
         <button
-          onClick={handleAddTable}
+          onClick={openAddModal}
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
         >
-          Add Table
+          Thêm 
         </button>
       </div>
-      <TableTable tables={tables} onEdit={handleEdit} onDelete={handleDelete} />
+      <div className="overflow-x-auto shadow-md rounded-lg">
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+              <th className="py-3 px-6 text-left">ID</th>
+              <th className="py-3 px-6 text-left">Số lượng ghế</th>
+              <th className="py-3 px-6 text-left">Loại bàn</th>
+              <th className="py-3 px-6 text-left">Khu</th>
+              <th className="py-3 px-6 text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm font-light">
+            {tables.map((table) => (
+              <tr key={table._id} className="border-b border-gray-200 hover:bg-gray-100">
+                <td className="py-3 px-6 text-left whitespace-nowrap">{table._id}</td>
+                <td className="py-3 px-6 text-left">{table.quantity}</td>
+                <td className="py-3 px-6 text-left">{table.type}</td>
+                <td className="py-3 px-6 text-left">{table.area}</td>
+                <td className="py-3 px-6 text-center">
+                  <button
+                    onClick={() => openEditModal(table)}
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-300 mr-2"
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    onClick={() => handleDelete(table._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300"
+                  >
+                    Xoá
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {showAddModal && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Add New Table</h2>
+            <label htmlFor="quantity" className="block mb-2">
+              Quantity:
+              <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                value={newTableData.quantity}
+                onChange={(e) => handleChange(e, 'add')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              />
+            </label>
+            <label htmlFor="type" className="block mb-2">
+              Type:
+              <input
+                type="text"
+                id="type"
+                name="type"
+                value={newTableData.type}
+                onChange={(e) => handleChange(e, 'add')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              />
+            </label>
+            <label htmlFor="area" className="block mb-2">
+              Area:
+              <select
+                id="area"
+                name="area"
+                value={newTableData.area}
+                onChange={(e) => handleChange(e, 'add')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              >
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="VIP">VIP</option>
+              </select>
+            </label>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleAddTable}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300 mr-2"
+              >
+                Add
+              </button>
+              <button
+                onClick={closeAddModal}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showEditModal && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg">
+            <h2 className="text-xl font-semibold mb-4">Edit Table</h2>
+            <label htmlFor="quantity" className="block mb-2">
+              Số lượng ghế:
+              <input
+                type="number"
+                id="quantity"
+                name="quantity"
+                value={editTableData.quantity}
+                onChange={(e) => handleChange(e, 'edit')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              />
+            </label>
+            <label htmlFor="type" className="block mb-2">
+              Loại bàn:
+              <input
+                type="text"
+                id="type"
+                name="type"
+                value={editTableData.type}
+                onChange={(e) => handleChange(e, 'edit')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              />
+            </label>
+            <label htmlFor="area" className="block mb-2">
+              Khu:
+              <select
+                id="area"
+                name="area"
+                value={editTableData.area}
+                onChange={(e) => handleChange(e, 'edit')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              >
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="VIP">VIP</option>
+              </select>
+            </label>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={saveUpdatedTable}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 mr-2"
+              >
+                Save
+              </button>
+              <button
+                onClick={closeEditModal}
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 export default TableManagement;
+
