@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { updateProfileStart, updateProfileSuccess, updateProfileError } from '../../../redux/user/userSlide';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const Profile = () => {
   const dispatch = useDispatch();
 
   console.log(currentUser)
-  const [avatar, setAvatar] = useState('/path/to/default/avatar.jpg');
+  const [avatar, setAvatar] = useState(currentUser.profilePicture || '/path/to/default/avatar.jpg');
 
   const [formData, setFormData] = useState({
     name: currentUser.username,
@@ -37,22 +38,27 @@ const Profile = () => {
 
   const handleUpdateProfile = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/api/v1/user/${currentUser._id}/profile`, {
+      const response = await fetch(`http://localhost:3000/api/v1/user/${currentUser._id}/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(formData)
-      })
-      const data = await res.json();
-      console.log(data);
-      dispatch({ type: 'UPDATE_USER_PROFILE', payload: res.data });
-      alert("Profile updated successfully.");
+      });
+      const data = await response.json();
+      if (response.ok) {
+        dispatch(updateProfileSuccess(data.updatedUser));
+        alert("Cập nhật hồ sơ thành công.");
+      } else {
+        dispatch(updateProfileError(data.message));
+        alert("Lỗi khi cập nhật hồ sơ: " + data.message);
+      }
     } catch (error) {
-      console.error("Error updating profile:", error);
-      alert("Error updating profile.");
+      console.error("Lỗi khi cập nhật hồ sơ:", error);
+      dispatch(updateProfileError("Đã xảy ra lỗi khi cập nhật hồ sơ."));
+      alert("Lỗi khi cập nhật hồ sơ.");
     }
-  }
+  };
 
 
   const handleChangePassword = async () => {

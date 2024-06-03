@@ -4,7 +4,7 @@ const path = require('path');
 
 exports.getAllMenuItems = async (req, res) => {
   try {
-    const menuItems = await MenuItem.find().populate('danhMucID');
+    const menuItems = await MenuItem.find().populate('categoryID');
     res.json(menuItems);
   } catch (error) {
     res.status(500).json({ error: 'Server error' });
@@ -12,7 +12,7 @@ exports.getAllMenuItems = async (req, res) => {
 };
 
 exports.createMenuItem = async (req, res) => {
-  const { tenMon, moTa, gia, danhMucID } = req.body;
+  const { itemName, description, price, categoryID } = req.body;
   let image = req.file ? req.file.path : '';
 
   if (req.file) {
@@ -23,11 +23,11 @@ exports.createMenuItem = async (req, res) => {
 
   try {
     const newMenuItem = new MenuItem({
-      tenMon,
-      moTa,
-      gia,
+      itemName,
+      description,
+      price,
       image,
-      danhMucID
+      categoryID
     });
 
     await newMenuItem.save();
@@ -39,7 +39,7 @@ exports.createMenuItem = async (req, res) => {
 
 exports.updateMenuItem = async (req, res) => {
   const { id } = req.params;
-  const { tenMon, moTa, gia, danhMucID } = req.body;
+  const { itemName, description, price, categoryID } = req.body;
   let image = req.file ? req.file.path : '';
 
   if (req.file) {
@@ -50,11 +50,11 @@ exports.updateMenuItem = async (req, res) => {
 
   try {
     const updatedMenuItem = await MenuItem.findByIdAndUpdate(id, {
-      tenMon,
-      moTa,
-      gia,
+      itemName,
+      description,
+      price,
       image: image || req.body.image,
-      danhMucID
+      categoryID
     }, { new: true });
 
     res.json(updatedMenuItem);

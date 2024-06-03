@@ -13,6 +13,10 @@ const tableSchema = new mongoose.Schema({
         type: String,
         enum: ['A', 'B', 'C', 'D', 'VIP'],
         required: true
+    },
+    tableNumber: {
+        type: Number,
+        required: true
     }
 });
 

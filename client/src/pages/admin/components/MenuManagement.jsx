@@ -21,7 +21,7 @@ const MenuManagement = () => {
       const response = await axios.get('http://localhost:3000/api/v1/menu');
       setMenuItems(response.data);
     } catch (error) {
-      console.error('Có lỗi xảy ra khi lấy danh sách menu:', error);
+      console.error('Error fetching menu items:', error);
     }
   };
 
@@ -30,7 +30,7 @@ const MenuManagement = () => {
       const response = await axios.get('http://localhost:3000/api/v1/categories');
       setCategories(response.data);
     } catch (error) {
-      console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
+      console.error('Error fetching categories:', error);
     }
   };
 
@@ -45,22 +45,22 @@ const MenuManagement = () => {
       await axios.delete(`http://localhost:3000/api/v1/menu/${id}`);
       setMenuItems(menuItems.filter(item => item._id !== id));
     } catch (error) {
-      console.error('Có lỗi xảy ra khi xóa món:', error);
+      console.error('Error deleting menu item:', error);
     }
   };
 
   const handleSave = async () => {
     try {
-      if (!currentItem.tenMon || !currentItem.moTa || !currentItem.gia || !currentItem.danhMucID) {
-        alert('Vui lòng điền đầy đủ thông tin');
+      if (!currentItem.itemName || !currentItem.description || !currentItem.price || !currentItem.categoryID) {
+        alert('Please fill in all the fields');
         return;
       }
 
       const formData = new FormData();
-      formData.append('tenMon', currentItem.tenMon);
-      formData.append('moTa', currentItem.moTa);
-      formData.append('gia', currentItem.gia);
-      formData.append('danhMucID', currentItem.danhMucID);
+      formData.append('itemName', currentItem.itemName);
+      formData.append('description', currentItem.description);
+      formData.append('price', currentItem.price);
+      formData.append('categoryID', currentItem.categoryID);
 
       if (currentItem.image && currentItem.image instanceof File) {
         formData.append('image', currentItem.image, 'image.png');
@@ -82,7 +82,7 @@ const MenuManagement = () => {
       setImagePreview(null);
       fetchMenuItems();
     } catch (error) {
-      console.error('Có lỗi xảy ra khi lưu món:', error);
+      console.error('Error saving menu item:', error);
     }
   };
 
@@ -97,7 +97,7 @@ const MenuManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Cập nhật Menu</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Menu Management</h1>
       <div className="flex justify-end mb-4">
         <button onClick={() => { setCurrentItem({}); setIsModalOpen(true); }} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Add Menu Item</button>
       </div>
@@ -105,12 +105,12 @@ const MenuManagement = () => {
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">MonID</th>
-              <th className="py-3 px-6 text-left">DanhMucID</th>
-              <th className="py-3 px-6 text-left">Tên Món</th>
-              <th className="py-3 px-6 text-left">Mô Tả</th>
+              <th className="py-3 px-6 text-left">ID</th>
+              <th className="py-3 px-6 text-left">Danh mục</th>
+              <th className="py-3 px-6 text-left">Tên món</th>
+              <th className="py-3 px-6 text-left">Mô tả</th>
               <th className="py-3 px-6 text-left">Giá</th>
-              <th className="py-3 px-6 text-left">Hình Ảnh</th>
+              <th className="py-3 px-6 text-left">Hình ảnh</th>
               <th className="py-3 px-6 text-center">Actions</th>
             </tr>
           </thead>
@@ -118,13 +118,13 @@ const MenuManagement = () => {
             {menuItems.map((item) => (
               <tr key={item._id} className="border-b border-gray-200 hover:bg-gray-100">
                 <td className="py-3 px-6 text-left whitespace-nowrap">{item._id}</td>
-                <td className="py-3 px-6 text-left">{item.danhMucID.name}</td>
-                <td className="py-3 px-6 text-left">{item.tenMon}</td>
-                <td className="py-3 px-6 text-left">{item.moTa}</td>
-                <td className="py-3 px-6 text-left">{item.gia}</td>
+                <td className="py-3 px-6 text-left">{item.categoryID.name}</td>
+                <td className="py-3 px-6 text-left">{item.itemName}</td>
+                <td className="py-3 px-6 text-left">{item.description}</td>
+                <td className="py-3 px-6 text-left">{item.price}</td>
                 <td className="py-3 px-6 text-left">
                   {item.image && (
-                    <img src={`http://localhost:3000/${item.image}`} alt={item.tenMon} className="w-16 h-16 object-cover" />
+                    <img src={`http://localhost:3000/${item.image}`} alt={item.itemName} className="w-16 h-16 object-cover" />
                   )}
                 </td>
                 <td className="py-3 px-6 text-center">
@@ -148,51 +148,52 @@ const MenuManagement = () => {
           <h2 className="text-2xl mb-4">{currentItem._id ? 'Edit Menu Item' : 'Add Menu Item'}</h2>
           <input
             type="text"
-            value={currentItem.tenMon || ''}
-            onChange={(e) => setCurrentItem({ ...currentItem, tenMon: e.target.value })}
+            value={currentItem.itemName || ''}
+            onChange={(e) => setCurrentItem({ ...currentItem, itemName: e.target.value })}
             className="border p-2 mb-4 w-full"
             placeholder="Tên món"
           />
           <input
             type="text"
-            value={currentItem.moTa || ''}
-            onChange={(e) => setCurrentItem({ ...currentItem, moTa: e.target.value })}
+            value={currentItem.description || ''}
+            onChange={(e) => setCurrentItem({ ...currentItem, description: e.target.value })}
             className="border p-2 mb-4 w-full"
             placeholder="Mô tả"
-          />
-          <input
-            type="number"
-            value={currentItem.gia || ''}
-            onChange={(e) => setCurrentItem({ ...currentItem, gia: e.target.value })}
-            className="border p-2 mb-4 w-full"
-            placeholder="Giá"
-          />
-          <select
-            value={currentItem.danhMucID || ''}
-            onChange={(e) => setCurrentItem({ ...currentItem, danhMucID: e.target.value })}
-            className="border p-2 mb-4 w-full"
-          >
-            <option value="">Chọn danh mục</option>
-            {categories.map(category => (
-              <option key={category._id} value={category._id}>{category.name}</option>
-            ))}
-          </select>
-          <input
-            type="file"
-            onChange={handleImageChange}
-            className="border p-2 mb-4 w-full"
-          />
-          {imagePreview && (
-            <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover mb-4" />
-          )}
-          <div className="flex justify-end">
-            <button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
-            <button onClick={handleSave} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Save</button>
+            />
+            <input
+              type="number"
+              value={currentItem.price || ''}
+              onChange={(e) => setCurrentItem({ ...currentItem, price: e.target.value })}
+              className="border p-2 mb-4 w-full"
+              placeholder="Giá"
+            />
+            <select
+              value={currentItem.categoryID || ''}
+              onChange={(e) => setCurrentItem({ ...currentItem, categoryID: e.target.value })}
+              className="border p-2 mb-4 w-full"
+            >
+              <option value="">Chọn danh mục</option>
+              {categories.map(category => (
+                <option key={category._id} value={category._id}>{category.name}</option>
+              ))}
+            </select>
+            <input
+              type="file"
+              onChange={handleImageChange}
+              className="border p-2 mb-4 w-full"
+            />
+            {imagePreview && (
+              <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover mb-4" />
+            )}
+            <div className="flex justify-end">
+              <button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
+              <button onClick={handleSave} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Save</button>
+            </div>
           </div>
-        </div>
-      </Modal>
-    </div>
-  );
-};
-
-export default MenuManagement;
+        </Modal>
+      </div>
+    );
+  };
+  
+  export default MenuManagement;
+  

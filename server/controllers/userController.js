@@ -188,24 +188,23 @@ const userControllers = {
 
   // Cập nhật thông tin profile của người dùng
   updateProfile: async (req, res) => {
-    const { name, email, phone, } = req.body;
+    const { name, email, phone } = req.body;
 
     try {
       const user = await User.findByIdAndUpdate(
         req.params.userId,
-        {
-          username: name,
-          email: email,
-          phone: phone
-        },
+        { username: name, email, phone },
         { new: true, runValidators: true }
       );
+
       if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: 'Không tìm thấy người dùng' });
       }
-      res.json(user);
+
+      res.json({ message: 'Cập nhật thông tin người dùng thành công', updatedUser: user });
     } catch (error) {
-      res.status(500).json({ message: 'Server error', error });
+      console.error("Lỗi khi cập nhật thông tin người dùng:", error);
+      res.status(500).json({ message: 'Đã xảy ra lỗi khi cập nhật thông tin người dùng' });
     }
   },
 

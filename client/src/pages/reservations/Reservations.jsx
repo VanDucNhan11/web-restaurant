@@ -1,59 +1,113 @@
-import React from 'react'
-import './Reservations.css'
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import './Reservations.css';
 
 const Reservations = () => {
+  const [message, setMessage] = useState(null);
+  const currentUser = useSelector(state => state.user.currentUser);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!currentUser) {
+      console.error('User is not logged in');
+      return;
+    }
+
+    const reservationData = {
+      userID: currentUser._id, // Assuming userID is stored in _id field
+      fullName: event.target.full_name.value,
+      email: event.target.email.value,
+      phone: event.target.phone.value,
+      bookingDate: event.target.bookingDate.value,
+      bookingTime: event.target.bookingTime.value,
+      numberOfGuests: event.target.numberOfGuests.value,
+      note: event.target.content.value,
+    };
+
+    try {
+      const response = await fetch('http://localhost:3000/api/v1/reservations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(reservationData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Something went wrong');
+      }
+
+      const result = await response.json();
+      console.log('Reservation created:', result);
+      setMessage('Đặt bàn thành công! Vui lòng chờ xác nhận.');
+
+      // Refresh the page after 3 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessage('Có lỗi xảy ra. Vui lòng thử lại.');
+    }
+  };
+
   return (
-    <div className="datban flex flex-col items-center justify-center min-h-screen ">
+    <div className="datban flex flex-col items-center justify-center min-h-screen">
       <h1 className="text-4xl text-center text-white mt-20">Đặt lịch trực tuyến</h1>
       <h3 className="text-center italic text-white">Trang chủ/đặt chỗ</h3>
-      <div className="flex flex-wrap justify-center mt-20 gap-4 px-4 sm:px-0">
-        <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
-          <div className="mb-2">Họ và tên</div>
-          <input type="text" className="w-full p-2 border rounded" placeholder="Họ và tên" name="full_name" required />
+      <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center mt-20 gap-4 px-4 sm:px-0">
+        <div className="flex flex-wrap justify-between w-full gap-4">
+          <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
+            <div className="mb-2">Họ và tên</div>
+            <input type="text" className="w-full p-2 border rounded" placeholder="Họ và tên" name="full_name" required />
+          </div>
+          <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
+            <div className="mb-2">Email</div>
+            <input type="text" className="w-full p-2 border rounded" placeholder="Email" name="email" required />
+          </div>
+          <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
+            <div className="mb-2">Số điện thoại</div>
+            <input type="text" className="w-full p-2 border rounded" placeholder="Số điện thoại" name="phone" required />
+          </div>
         </div>
-        <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
-          <div className="mb-2">Email</div>
-          <input type="text" className="w-full p-2 border rounded" placeholder="Email" required />
+        <div className="flex flex-wrap justify-between w-full gap-4">
+          <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
+            <div className="mb-2">Ngày</div>
+            <input
+              type="date"
+              className="w-full p-2 border rounded"
+              placeholder="date"
+              name="bookingDate"
+              required
+              defaultValue={new Date().toISOString().split('T')[0]}
+            />
+          </div>
+          <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
+            <div className="mb-2">Thời gian</div>
+            <input
+              type="time"
+              className="w-full p-2 border rounded"
+              placeholder="time"
+              name="bookingTime"
+              required
+              defaultValue={new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            />
+          </div>
+          <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
+            <div className="mb-2">Số người</div>
+            <input type="text" className="w-full p-2 border rounded" placeholder="số người" name="numberOfGuests" required />
+          </div>
         </div>
-        <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
-          <div className="mb-2">Số điện thoại</div>
-          <input type="text" className="w-full p-2 border rounded" placeholder="Số điện thoại" required />
+        <div className="p-5 bg-white rounded-xl border-2 w-full">
+          <div className="label mb-2">Yêu cầu đặc biệt</div>
+          <textarea className="w-full p-2 border rounded" id="" cols="30" rows="4" name="content" />
         </div>
-      </div>
-      <div className="flex flex-wrap justify-center mt-5 gap-4 px-4 sm:px-0">
-        <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
-          <div className="mb-2">Ngày</div>
-          <input
-            type="date"
-            className="w-full p-2 border rounded"
-            placeholder="date"
-            name="full_name"
-            required
-            value={new Date().toISOString().split('T')[0]}
-          />
-        </div>
-        <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
-          <div className="mb-2">Thời gian</div>
-          <input
-            type="time"
-            className="w-full p-2 border rounded"
-            placeholder="time"
-            required
-            value={new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-          />
-        </div>
-        <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
-          <div className="mb-2">số người</div>
-          <input type="text" className="w-full p-2 border rounded" placeholder="số người" required />
-        </div>
-      </div>
-      <div className="max-w-screen-lg p-5 bg-cover bg-no-repeat bg-center mt-5 rounded-xl border-2 bg-white">
-        <div className="label">Yêu cầu đặt biệt</div>
-        <textarea className="w-full p-2 border rounded" id="" cols="30" rows="4" name="content" />
-      </div>
-      <button className="mt-10 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white mb-10">Hoàn Thành</button>
+        <button type="submit" className="mt-10 mb-10 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white">Hoàn Thành</button>
+      </form>
+      {message && <div className="mt-5 p-3 bg-green-500 text-white rounded">{message}</div>}
     </div>
-  )
-}
+  );
+};
 
-export default Reservations
+export default Reservations;

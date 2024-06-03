@@ -52,20 +52,10 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
-  const [editEmployee, setEditEmployee] = useState(null);
+  const [editEmployee, setEditEmployee] = useState({});
   const [detailEmployee, setDetailEmployee] = useState(null);
-
-  const [name, setName] = useState('');
-  const [dob, setDob] = useState('');
-  const [gender, setGender] = useState('');
-  const [position, setPosition] = useState('');
-  const [startDate, setStartDate] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [address, setAddress] = useState('');
-  const [status, setStatus] = useState('');
-  const [photo, setPhoto] = useState(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
 
   useEffect(() => {
     fetchEmployees();
@@ -76,86 +66,13 @@ const EmployeeManagement = () => {
       const response = await axios.get('http://localhost:3000/api/v1/employees');
       setEmployees(response.data);
     } catch (error) {
-      console.error('Error fetching employees:', error);
+      console.error('Có lỗi xảy ra khi lấy danh sách nhân viên:', error);
     }
   };
 
   const handleEdit = (employee) => {
     setEditEmployee(employee);
-    setName(employee.name);
-    setDob(employee.dob);
-    setGender(employee.gender);
-    setPosition(employee.position);
-    setStartDate(employee.startDate);
-    setPhone(employee.phone);
-    setEmail(employee.email);
-    setAddress(employee.address);
-    setStatus(employee.status);
-    setPhoto(employee.photo);
-    setIsModalOpen(true);
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await axios.delete(`http://localhost:3000/api/v1/employees/${id}`);
-      setEmployees(employees.filter(employee => employee._id !== id));
-    } catch (error) {
-      console.error('Error deleting employee:', error);
-    }
-  };
-
-  const handleSave = async (e) => {
-    e.preventDefault();
-    const employeeData = new FormData();
-    employeeData.append('name', name);
-    employeeData.append('dob', dob);
-    employeeData.append('gender', gender);
-    employeeData.append('position', position);
-    employeeData.append('startDate', startDate);
-    employeeData.append('phone', phone);
-    employeeData.append('email', email);
-    employeeData.append('address', address);
-    employeeData.append('status', status);
-    if (photo) {
-      employeeData.append('photo', photo);
-    }
-
-    try {
-      if (editEmployee) {
-        await axios.put(`http://localhost:3000/api/v1/employees/${editEmployee._id}`, employeeData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        console.log('Employee updated successfully');
-      } else {
-        await axios.post('http://localhost:3000/api/v1/employees', employeeData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        console.log('Employee added successfully');
-      }
-      setEditEmployee(null);
-      setIsModalOpen(false);
-      fetchEmployees();
-    } catch (error) {
-      console.error('Error saving employee:', error);
-    }
-  };
-
-  const handleAddEmployee = () => {
-    setEditEmployee(null);
-    setName('');
-    setDob('');
-    setGender('');
-    setPosition('');
-    setStartDate('');
-    setPhone('');
-    setEmail('');
-    setAddress('');
-    setStatus('');
-    setPhoto(null);
+    setImagePreview(`http://localhost:3000/${employee.photo}`);
     setIsModalOpen(true);
   };
 
@@ -164,163 +81,74 @@ const EmployeeManagement = () => {
     setIsDetailModalOpen(true);
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:3000/api/v1/employees/${id}`);
+      setEmployees(employees.filter(employee => employee._id !== id));
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi xóa nhân viên:', error);
+    }
+  };
+
+  const handleSave = async (event) => {
+    event.preventDefault();
+
+    try {
+      if (!editEmployee.name || !editEmployee.dob || !editEmployee.gender || !editEmployee.position || !editEmployee.startDate || !editEmployee.phone || !editEmployee.email || !editEmployee.address || !editEmployee.status) {
+        alert('Vui lòng điền đầy đủ thông tin');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('name', editEmployee.name);
+      formData.append('dob', editEmployee.dob);
+      formData.append('gender', editEmployee.gender);
+      formData.append('position', editEmployee.position);
+      formData.append('startDate', editEmployee.startDate);
+      formData.append('phone', editEmployee.phone);
+      formData.append('email', editEmployee.email);
+      formData.append('address', editEmployee.address);
+      formData.append('status', editEmployee.status);
+
+      if (editEmployee.photo && editEmployee.photo instanceof File) {
+        formData.append('photo', editEmployee.photo);
+      }
+
+      if (editEmployee._id) {
+        await axios.put(`http://localhost:3000/api/v1/employees/${editEmployee._id}`, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+      } else {
+        const response = await axios.post('http://localhost:3000/api/v1/employees', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        setEmployees([...employees, response.data]);
+      }
+
+      setIsModalOpen(false);
+      setEditEmployee({});
+      setImagePreview(null);
+      fetchEmployees();
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi lưu nhân viên:', error);
+    }
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditEmployee({ ...editEmployee, photo: file });
+      const imageURL = URL.createObjectURL(file);
+      setImagePreview(imageURL);
+    }
+  };
+
   return (
-    <div className="container mx-auto w-full p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center">Quản lý nhân viên</h1>
+    <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Quản lý nhân viên</h1>
       <div className="flex justify-end mb-4">
-        <button
-          onClick={handleAddEmployee}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
-        >
-          Thêm nhân viên
-        </button>
+        <button onClick={() => { setEditEmployee({}); setIsModalOpen(true); }} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Thêm nhân viên</button>
       </div>
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editEmployee ? 'Chỉnh sửa nhân viên' : 'Thêm nhân viên'}>
-        <form onSubmit={handleSave} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Họ và Tên:</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Ngày sinh:</label>
-            <input
-              type="date"
-              value={dob}
-              onChange={(e) => setDob(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Giới tính:</label>
-            <select
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            >
-              <option value="">Chọn giới tính</option>
-              <option value="Male">Nam</option>
-              <option value="Female">Nữ</option>
-              <option value="Other">Khác</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Chức vụ:</label>
-            <input
-              type="text"
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Ngày bắt đầu:</label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Số điện thoại:</label>
-            <input
-              type="text"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email:</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Địa chỉ:</label>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Trạng thái:</label>
-            <input
-              type="text"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Ảnh:</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setPhoto(e.target.files[0])}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-            />
-          </div>
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="mr-2 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-400 hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray"
-            >
-              Hủy bỏ
-            </button>
-            <button
-              type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-            >
-              {editEmployee ? 'Lưu thay đổi' : 'Thêm nhân viên'}
-            </button>
-          </div>
-        </form>
-      </Modal>
-
-      <Modal isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} title="Chi tiết nhân viên">
-        {detailEmployee && (
-          <div>
-            <p><strong>ID:</strong> {detailEmployee._id}</p>
-            <p><strong>Họ và Tên:</strong> {detailEmployee.name}</p>
-            <p><strong>Ngày sinh:</strong> {detailEmployee.dob}</p>
-            <p><strong>Giới tính:</strong> {detailEmployee.gender}</p>
-            <p><strong>Chức vụ:</strong> {detailEmployee.position}</p>
-            <p><strong>Ngày bắt đầu:</strong> {detailEmployee.startDate}</p>
-            <p><strong>Số điện thoại:</strong> {detailEmployee.phone}</p>
-            <p><strong>Email:</strong> {detailEmployee.email}</p>
-            <p><strong>Địa chỉ:</strong> {detailEmployee.address}</p>
-            <p><strong>Trạng thái:</strong> {detailEmployee.status}</p>
-            {detailEmployee.photo && (
-              <div>
-                <strong>Ảnh:</strong>
-                <img src={`data:image/jpeg;base64,${detailEmployee.photo}`} alt="Employee" />
-              </div>
-            )}
-          </div>
-        )}
-      </Modal>
-
       <div className="overflow-x-auto shadow-md rounded-lg">
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
@@ -342,33 +170,161 @@ const EmployeeManagement = () => {
                 <td className="py-3 px-6 text-left">{employee.phone}</td>
                 <td className="py-3 px-6 text-left">{employee.status}</td>
                 <td className="py-3 px-6 text-center">
-                  <button
-                    onClick={() => handleViewDetails(employee)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300"
-                  >
-                    Xem chi tiết
-                  </button>
-                  <button
-                    onClick={() => handleEdit(employee)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300"
-                  >
-                    Sửa
-                  </button>
-                  <button
-                    onClick={() => handleDelete(employee._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300"
-                  >
-                    Xóa
-                  </button>
+                  <button onClick={() => handleViewDetails(employee)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Xem chi tiết</button>
+                  <button onClick={() => handleEdit(employee)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Sửa</button>
+                  <button onClick={() => handleDelete(employee._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300">Xóa</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editEmployee._id ? "Chỉnh sửa nhân viên" : "Thêm nhân viên"}>
+        <form onSubmit={handleSave} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Họ và Tên:</label>
+            <input
+              type="text"
+              value={editEmployee.name || ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, name: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Ngày sinh:</label>
+            <input
+              type="date"
+              value={editEmployee.dob ? editEmployee.dob.split('T')[0] : ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, dob: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+          <label className="block text-sm font-medium text-gray-700">Giới tính:</label>
+            <input
+              type="text"
+              value={editEmployee.gender || ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, gender: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              list="gender-options"
+              required
+            />
+            <datalist id="gender-options">
+              <option value="Nam" />
+              <option value="Nữ" />
+            </datalist>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Chức vụ:</label>
+            <input
+              type="text"
+              value={editEmployee.position || ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, position: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Ngày bắt đầu:</label>
+            <input
+              type="date"
+              value={editEmployee.startDate ? editEmployee.startDate.slice(0, 10) : ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, startDate: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Số điện thoại:</label>
+            <input
+              type="text"
+              value={editEmployee.phone || ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, phone: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Email:</label>
+            <input
+              type="email"
+              value={editEmployee.email || ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, email: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Địa chỉ:</label>
+            <input
+              type="text"
+              value={editEmployee.address || ''}
+              onChange={(e) => setEditEmployee({ ...editEmployee, address: e.target.value })}
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              required
+            />
+          </div>
+          <div>
+          <label className="block text-sm font-medium text-gray-700">Trạng thái:</label>
+          <input
+            type="text"
+            value={editEmployee.status || ''}
+            onChange={(e) => setEditEmployee({ ...editEmployee, status: e.target.value })}
+            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            list="status-options"
+            required
+          />
+          <datalist id="status-options">
+            <option value="Đang làm việc" />
+            <option value="Tạm nghỉ" />
+            <option value="Nghỉ việc" />
+          </datalist>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Ảnh:</label>
+            <input
+              type="file"
+              onChange={handleImageChange}
+              className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-600 hover:file:bg-indigo-100"
+            />
+            {imagePreview && (
+              <img src={imagePreview} alt="Preview" className="w-16 h-16 object-cover mt-2" />
+            )}
+          </div>
+          <div className="flex justify-end">
+            <button onClick={() => setIsModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Hủy</button>
+            <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Lưu</button>
+          </div>
+        </form>
+      </Modal>
+
+      {detailEmployee && (
+          <Modal isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} title="Chi tiết nhân viên">
+            <div>
+              <p><strong>ID:</strong> {detailEmployee._id}</p>
+              <p><strong>Họ và Tên:</strong> {detailEmployee.name}</p>
+              <p><strong>Ngày sinh:</strong> {detailEmployee.dob ? new Date(detailEmployee.dob).toLocaleDateString() : ''}</p>
+              <p><strong>Giới tính:</strong> {detailEmployee.gender}</p>
+              <p><strong>Chức vụ:</strong> {detailEmployee.position}</p>
+              <p><strong>Ngày bắt đầu:</strong> {detailEmployee.startDate ? new Date(detailEmployee.startDate).toLocaleDateString() : ''}</p>
+              <p><strong>Số điện thoại:</strong> {detailEmployee.phone}</p>
+              <p><strong>Email:</strong> {detailEmployee.email}</p>
+              <p><strong>Địa chỉ:</strong> {detailEmployee.address}</p>
+              <p><strong>Trạng thái:</strong> {detailEmployee.status}</p>
+              {detailEmployee.photo && (
+                <img src={`http://localhost:3000/${detailEmployee.photo}`} alt={detailEmployee.name} className=" object-cover mt-2" />
+              )}
+            </div>
+        </Modal>
+      )}
     </div>
   );
 };
 
 export default EmployeeManagement;
+
+
 

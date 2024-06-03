@@ -33,10 +33,7 @@ const userSlice = createSlice({
       state.error = null;
     },
     updateProfileSuccess: (state, action) => {
-      state.currentUser = {
-        ...state.currentUser,
-        ...action.payload.updatedUser, // Thông tin người dùng được cập nhật
-      };
+      state.currentUser = action.payload;
       state.loading = false;
       state.error = null;
     },

@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const employeeController = require('../controllers/employeeController');
 const multer = require('multer');
-const upload = multer({ storage: multer.memoryStorage() });
 
+const upload = multer({ dest: 'uploads/' });
 
 router.get('/', employeeController.getAllEmployees);
 router.post('/', upload.single('photo'), employeeController.createEmployee);

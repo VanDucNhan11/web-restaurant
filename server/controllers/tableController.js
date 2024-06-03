@@ -15,7 +15,8 @@ exports.createTable = async (req, res) => {
     const table = new Table({
         quantity: req.body.quantity,
         type: req.body.type,
-        area: req.body.area
+        area: req.body.area,
+        tableNumber: req.body.tableNumber
     });
 
     try {
@@ -28,20 +29,21 @@ exports.createTable = async (req, res) => {
 
 // Update a table
 exports.updateTable = async (req, res) => {
-  const { id } = req.params;
-  const { quantity, type, area } = req.body;
+    const { id } = req.params;
+    const { quantity, type, area, tableNumber } = req.body;
 
-  try {
-    const updatedTable = await Table.findByIdAndUpdate(id, {
-      quantity,
-      type,
-      area
-    }, { new: true });
+    try {
+        const updatedTable = await Table.findByIdAndUpdate(id, {
+            quantity,
+            type,
+            area,
+            tableNumber
+        }, { new: true });
 
-    res.json(updatedTable);
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
+        res.json(updatedTable);
+    } catch (error) {
+        res.status(500).json({ error: 'Server error' });
+    }
 };
 
 // Delete a table

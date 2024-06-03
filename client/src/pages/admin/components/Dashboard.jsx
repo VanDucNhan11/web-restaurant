@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import Profile from './Profile';
-import History from './History';
+import History from './ReservationHistory';
 import DashSiderbar from './DashSiderbar';
 import AccountManagement from './AccountManagement';
 import CategoryManagement from './CategoryManagement';

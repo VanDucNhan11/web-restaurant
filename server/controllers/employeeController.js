@@ -1,4 +1,6 @@
 const Employee = require('../models/Employee.model');
+const fs = require('fs');
+const path = require('path');
 
 // Lấy danh sách tất cả nhân viên
 exports.getAllEmployees = async (req, res) => {
@@ -13,7 +15,13 @@ exports.getAllEmployees = async (req, res) => {
 // Tạo mới một nhân viên
 exports.createEmployee = async (req, res) => {
   const { name, dob, gender, position, startDate, phone, email, address, status } = req.body;
-  const photo = req.file ? req.file.buffer.toString('base64') : null; // Chuyển ảnh thành chuỗi base64
+  let photo = req.file ? req.file.path : '';
+
+  if (req.file) {
+    const newImagePath = `${req.file.path}.png`;
+    fs.renameSync(req.file.path, newImagePath);
+    photo = newImagePath;
+  }
 
   const employee = new Employee({
     name,
@@ -49,20 +57,42 @@ exports.getEmployee = async (req, res) => {
 
 // Cập nhật thông tin nhân viên
 exports.updateEmployee = async (req, res) => {
-    try {
-      const employee = await Employee.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!employee) return res.status(404).json({ message: 'Không tìm thấy nhân viên' });
-      res.json(employee);
-    } catch (err) {
-      res.status(400).json({ message: err.message });
-    }
-  };
+  const { id } = req.params;
+  const { name, dob, gender, position, startDate, phone, email, address, status } = req.body;
+  let photo = req.file ? req.file.path : '';
+
+  if (req.file) {
+    const newImagePath = `${req.file.path}.png`;
+    fs.renameSync(req.file.path, newImagePath);
+    photo = newImagePath;
+  }
+
+  try {
+    const updatedEmployee = await Employee.findByIdAndUpdate(id, {
+      name,
+      dob,
+      gender,
+      position,
+      startDate,
+      phone,
+      email,
+      address,
+      status,
+      photo: photo || req.body.photo
+    }, { new: true });
+
+    res.json(updatedEmployee);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
 // Xóa một nhân viên
 exports.deleteEmployee = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const employee = await Employee.findByIdAndDelete(req.params.id);
-    if (!employee) return res.status(404).json({ message: 'Không tìm thấy nhân viên' });
+    await Employee.findByIdAndDelete(id);
     res.json({ message: 'Đã xóa nhân viên' });
   } catch (err) {
     res.status(500).json({ message: err.message });

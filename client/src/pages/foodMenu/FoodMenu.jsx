@@ -30,12 +30,12 @@ const FoodMenu = () => {
 
   const renderMenuItems = (categoryId) => {
     return menuItems
-      .filter(item => item.danhMucID._id === categoryId)
+      .filter(item => item.categoryID._id === categoryId)
       .map(item => (
         <div key={item._id} className="bg-gray-100 p-4 rounded-lg shadow-md flex flex-col items-center mt-5">
-          <img className="h-80" src={`http://localhost:3000/${item.image}`} alt={item.tenMon} />
-          <h2 className="text-lg font-semibold">{item.tenMon}</h2>
-          <p className="text-gray-600">{item.gia} VNĐ</p>
+          <img className="h-80" src={`http://localhost:3000/${item.image}`} alt={item.itemName} />
+          <h2 className="text-lg font-semibold">{item.itemName}</h2>
+          <p className="text-gray-600">{item.price.toLocaleString('vi-VN')} VNĐ</p>
         </div>
       ));
   };

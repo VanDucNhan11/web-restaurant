@@ -5,7 +5,7 @@ const TableManagement = () => {
   const [tables, setTables] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [newTableData, setNewTableData] = useState({ quantity: '', type: '', area: 'A' });
+  const [newTableData, setNewTableData] = useState({ quantity: '', type: '', area: 'A', tableNumber: '' });
   const [editTableData, setEditTableData] = useState({});
 
   useEffect(() => {
@@ -42,8 +42,7 @@ const TableManagement = () => {
     } catch (error) {
       console.error('Error saving updated table:', error);
     }
-};
-
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -55,7 +54,7 @@ const TableManagement = () => {
   };
 
   const openAddModal = () => {
-    setNewTableData({ quantity: '', type: '', area: 'A' }); 
+    setNewTableData({ quantity: '', type: '', area: 'A', tableNumber: '' }); 
     setShowAddModal(true);
   };
 
@@ -97,9 +96,10 @@ const TableManagement = () => {
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
               <th className="py-3 px-6 text-left">ID</th>
-              <th className="py-3 px-6 text-left">Số lượng ghế</th>
-              <th className="py-3 px-6 text-left">Loại bàn</th>
-              <th className="py-3 px-6 text-left">Khu</th>
+              <th className="py-3 px-6 text-center">Số lượng ghế</th>
+              <th className="py-3 px-6 text-center">Loại bàn</th>
+              <th className="py-3 px-6 text-center">Khu</th>
+              <th className="py-3 px-6 text-center">Bàn số</th>
               <th className="py-3 px-6 text-center">Actions</th>
             </tr>
           </thead>
@@ -107,9 +107,10 @@ const TableManagement = () => {
             {tables.map((table) => (
               <tr key={table._id} className="border-b border-gray-200 hover:bg-gray-100">
                 <td className="py-3 px-6 text-left whitespace-nowrap">{table._id}</td>
-                <td className="py-3 px-6 text-left">{table.quantity}</td>
-                <td className="py-3 px-6 text-left">{table.type}</td>
-                <td className="py-3 px-6 text-left">{table.area}</td>
+                <td className="py-3 px-6 text-center">{table.quantity}</td>
+                <td className="py-3 px-6 text-center">{table.type}</td>
+                <td className="py-3 px-6 text-center">{table.area}</td>
+                <td className="py-3 px-6 text-center">{table.tableNumber}</td>
                 <td className="py-3 px-6 text-center">
                   <button
                     onClick={() => openEditModal(table)}
@@ -171,6 +172,17 @@ const TableManagement = () => {
                 <option value="VIP">VIP</option>
               </select>
             </label>
+            <label htmlFor="tableNumber" className="block mb-2">
+              Bàn số:
+              <input
+                type="number"
+                id="tableNumber"
+                name="tableNumber"
+                value={newTableData.tableNumber}
+                onChange={(e) => handleChange(e, 'add')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              />
+            </label>
             <div className="flex justify-end mt-4">
               <button
                 onClick={handleAddTable}
@@ -230,6 +242,17 @@ const TableManagement = () => {
                 <option value="VIP">VIP</option>
               </select>
             </label>
+            <label htmlFor="tableNumber" className="block mb-2">
+              Bàn số:
+              <input
+                type="number"
+                id="tableNumber"
+                name="tableNumber"
+                value={editTableData.tableNumber}
+                onChange={(e) => handleChange(e, 'edit')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              />
+            </label>
             <div className="flex justify-end mt-4">
               <button
                 onClick={saveUpdatedTable}
@@ -252,4 +275,3 @@ const TableManagement = () => {
 };
 
 export default TableManagement;
-

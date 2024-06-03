@@ -12,6 +12,8 @@ import Resister from "./pages/login-resister/resister";
 import Abouts from "./pages/about/About";
 import Dashboard from './pages/admin/components/Dashboard';
 import DetailNews from './pages/news/DetailNews';
+import PaymentDetail from './pages/reservations/PaymentDetail';
+import ChatIcons from './components/ChatIcons';
 
 function App() {
   return (
@@ -27,7 +29,9 @@ function App() {
         <Route path='/dang-nhap' element={<><Header /><Login /><Footer /></>} />
         <Route path='/dang-ky' element={<><Header /><Resister /><Footer /></>} />
         <Route path='/dashboard/*' element={<Dashboard />} />
+        <Route path='/payment-detail/:qrCodeUrl' element={<><Header /><PaymentDetail /><Footer /></>} />
       </Routes>  
+      <ChatIcons />
     </>
     
   );
