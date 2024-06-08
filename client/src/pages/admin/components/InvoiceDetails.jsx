@@ -8,7 +8,9 @@ import {
   MenuItem as MuiMenuItem, Select as MuiSelect, Dialog, DialogTitle, DialogContent,
   DialogContentText, DialogActions, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField
 } from '@mui/material';
-pdfMake.vfs = pdfFonts.pdfMake.vfs
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
 const InvoiceDetails = () => {
   const currentUser = useSelector(state => state.user.currentUser);
   const [currentArea, setCurrentArea] = useState('');
@@ -19,6 +21,7 @@ const InvoiceDetails = () => {
   const [selectedTables, setSelectedTables] = useState({});
   const [openInvoice, setOpenInvoice] = useState(false);
   const [invoiceData, setInvoiceData] = useState({});
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchTables();
@@ -91,11 +94,13 @@ const InvoiceDetails = () => {
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
   };
+
   const handleDeleteTable = (tableId) => {
     const updatedTables = { ...selectedTables };
     delete updatedTables[tableId];
     setSelectedTables(updatedTables);
   };
+
   const generateBill = (tableId) => {
     const table = tables.find(table => table.tableNumber === parseInt(tableId));
     const items = Object.values(selectedTables[tableId]);
@@ -168,12 +173,16 @@ const InvoiceDetails = () => {
         console.error('Error exporting PDF:', error);
         // Xử lý lỗi khi gửi dữ liệu hoá đơn lên backend
     }
-};
+  };
 
+  const filteredMenuItems = menuItems.filter(item =>
+    item.itemName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Container>
       <Typography variant="h4" gutterBottom className="title-1 title-font">Hệ thống thanh toán nhà hàng</Typography>
+      <Typography variant="h6" gutterBottom>Chọn khu</Typography>
       <Box mb={2}>
         <MuiSelect
           value={currentArea}
@@ -190,6 +199,7 @@ const InvoiceDetails = () => {
       </Box>
       {currentArea && (
         <Box mb={2}>
+          <Typography variant="h6" gutterBottom>Chọn bàn số mấy:</Typography>
           <MuiSelect
             value={currentTable}
             onChange={handleTableChange}
@@ -206,6 +216,15 @@ const InvoiceDetails = () => {
       )}
       {currentTable && (
         <Box mb={2}>
+          <Typography variant="h6" gutterBottom>Chọn món ăn:</Typography>
+          <TextField
+            label="Tìm kiếm món ăn"
+            variant="outlined"
+            fullWidth
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ mb: 2 }}
+          />
           <MuiSelect
             value=""
             onChange={(e) => handleItemChange(e.target.value, selectedItems[e.target.value]?.quantity || 1)}
@@ -214,7 +233,7 @@ const InvoiceDetails = () => {
             inputProps={{ 'aria-label': 'Select menu item' }}
           >
             <MuiMenuItem value="" disabled>Chọn Món</MuiMenuItem>
-            {menuItems.map(item => (
+            {filteredMenuItems.map(item => (
               <MuiMenuItem key={item._id} value={item._id}>
                 {item.itemName} {selectedItems[item._id] ? `- Số lượng: ${selectedItems[item._id].quantity}` : ''}
               </MuiMenuItem>
@@ -244,7 +263,7 @@ const InvoiceDetails = () => {
               Số bàn: {table.tableNumber} - Khu: {table.area}
             </Typography>
             <List>
-            {Object.values(selectedTables[tableId]).map((item, index) => (
+              {Object.values(selectedTables[tableId]).map((item, index) => (
                 <ListItem key={index}>
                   <ListItemText primary={`${item.itemName} - Số lượng: ${item.quantity} - Đơn giá: ${formatCurrency(item.price)}`} />
                 </ListItem>
@@ -254,8 +273,8 @@ const InvoiceDetails = () => {
                 <ListItemText primary={`Tổng tiền: ${formatCurrency(calculateTotalPrice(tableId))}`} />
               </ListItem>
             </List>
-            <Button  variant="outlined" color="secondary" onClick={() => generateBill(tableId)} sx={{ marginRight: 3 }}>Xuất hoá đơn</Button>
-            <Button  variant="outlined" color="secondary" onClick={() => handleDeleteTable(tableId)}>Xoá thông tin bàn</Button>
+            <Button variant="outlined" color="secondary" onClick={() => generateBill(tableId)} sx={{ marginRight: 3 }}>Xuất hoá đơn</Button>
+            <Button variant="outlined" color="secondary" onClick={() => handleDeleteTable(tableId)}>Xoá thông tin bàn</Button>
           </Paper>
         );
       })}
@@ -312,4 +331,3 @@ const InvoiceDetails = () => {
 };
 
 export default InvoiceDetails;
- 

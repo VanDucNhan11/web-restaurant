@@ -1,5 +1,3 @@
-// models/Reservation.model.js
-
 const mongoose = require('mongoose');
 
 const reservationSchema = new mongoose.Schema({
@@ -40,7 +38,12 @@ const reservationSchema = new mongoose.Schema({
     type: String,
     enum: ['chưa xác nhận', 'đã xác nhận'],
     default: 'chưa xác nhận'
-  }
+  },
+  selectedItems: [{
+    itemName: String,
+    price: Number,
+    quantity: Number
+  }]
 });
 
 module.exports = mongoose.model('Reservation', reservationSchema);

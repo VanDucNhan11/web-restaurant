@@ -11,47 +11,55 @@ exports.createInvoice = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
-const startOfDay = (date) => {
-    const start = new Date(date);
-    start.setUTCHours(0, 0, 0, 0); // Đặt giờ bắt đầu của ngày trong múi giờ UTC
-    return start;
-};
-
-const endOfDay = (date) => {
-    const end = new Date(date);
-    end.setUTCHours(23, 59, 59, 999); // Đặt giờ kết thúc của ngày trong múi giờ UTC
-    return end;
-};
-
 exports.getRevenue = async (req, res) => {
-    try {
-        const { timeFrame, date } = req.query;
-        const currentDate = new Date(date);
-        let start, end;
+  const { filter, date } = req.query;
+  let startDate;
+  let endDate = new Date(); // endDate là hôm nay theo mặc định
 
-        switch (timeFrame) {
-            case 'weekly':
-                // Xử lý tuần
-                break;
-            case 'monthly':
-                // Xử lý tháng
-                break;
-            case 'daily':
-            default:
-                // Xử lý ngày
-                start = startOfDay(currentDate);
-                end = endOfDay(currentDate);
-                break;
-        }
+  switch (filter) {
+    case 'daily':
+      startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    case 'weekly':
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
+      break;
+    case 'monthly':
+      startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 1);
+      startDate.setHours(0, 0, 0, 0);
+      break;
+    case 'quarterly':
+      startDate = new Date();
+      startDate.setMonth(startDate.getMonth() - 3);
+      startDate.setHours(0, 0, 0, 0);
+      break;
+    case 'yearly':
+      startDate = new Date();
+      startDate.setFullYear(startDate.getFullYear() - 1);
+      startDate.setHours(0, 0, 0, 0);
+      break;
+    case 'specificDate':
+      startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+      endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+      break;
+    default:
+      startDate = new Date();
+      startDate.setHours(0, 0, 0, 0);
+  }
 
-        const invoices = await Invoice.find({ date: { $gte: start, $lte: end } });
-        const totalRevenue = invoices.reduce((total, invoice) => total + invoice.total, 0);
-
-        res.status(200).json({ totalRevenue, invoices });
-    } catch (error) {
-        console.error('Error fetching revenue:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+  try {
+    const invoices = await Invoice.find({ date: { $gte: startDate, $lte: endDate } });
+    const totalRevenue = invoices.reduce((acc, invoice) => acc + invoice.total, 0);
+    res.json({ totalRevenue, invoices });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching revenue', error });
+  }
 };
   
   

@@ -6,18 +6,16 @@ const PostTable = ({ posts, onEdit, onDelete }) => (
     <table className="min-w-full bg-white border border-gray-200">
       <thead>
         <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-          <th className="py-3 px-6 text-left">ID</th>
           <th className="py-3 px-6 text-left">Tiêu đề</th>
           <th className="py-3 px-6 text-left">Nội dung</th>
           <th className="py-3 px-6 text-left">Ngày đăng</th>
           <th className="py-3 px-6 text-left">Hình ảnh</th>
-          <th className="py-3 px-6 text-center">Actions</th>
+          <th className="py-3 px-6 text-center">Hành động</th>
         </tr>
       </thead>
       <tbody className="text-gray-600 text-sm font-light">
         {posts.map((post) => (
           <tr key={post._id} className="border-b border-gray-200 hover:bg-gray-100">
-            <td className="py-3 px-6 text-left whitespace-nowrap">{post._id}</td>
             <td className="py-3 px-6 text-left">{post.title}</td>
             <td className="py-3 px-6 text-left">{post.content}</td>
             <td className="py-3 px-6 text-left">{new Date(post.datePosted).toLocaleDateString()}</td>
@@ -27,15 +25,15 @@ const PostTable = ({ posts, onEdit, onDelete }) => (
             <td className="py-3 px-6 text-center">
               <button
                 onClick={() => onEdit(post)}
-                className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300"
+                className="bg-blue-500 text-white px-3 py-1 rounded  hover:bg-blue-700 transition duration-300"
               >
-                Edit
+                Sửa
               </button>
               <button
                 onClick={() => onDelete(post._id)}
-                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300"
+                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300 mt-2"
               >
-                Delete
+                Xoá
               </button>
             </td>
           </tr>
@@ -134,7 +132,7 @@ const PostManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-fon">Quản lý bài viết</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-fon">Danh sách bài viết</h1>
       <div className="flex justify-end mb-4">
         <button
           onClick={() => {
@@ -149,28 +147,28 @@ const PostManagement = () => {
           }}
           className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
         >
-          Add Post
+          Thêm bài
         </button>
       </div>
       <PostTable posts={posts} onEdit={handleEdit} onDelete={handleDelete} />
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-2xl mb-4">{editPost ? 'Edit Post' : 'Add New Post'}</h2>
+            <h2 className="text-2xl mb-4">{editPost ? 'Sửa bài viết' : 'Thêm bài viết mới'}</h2>
             <input
               type="text"
               name="title"
               value={postData.title}
               onChange={handleInputChange}
               className="border p-2 mb-4 w-full"
-              placeholder="Title"
+              placeholder="Tiêu đề"
             />
             <textarea
               name="content"
               value={postData.content}
               onChange={handleInputChange}
               className="border p-2 mb-4 w-full"
-              placeholder="Content"
+              placeholder="Nội dung"
             />
             <input
               type="file"
@@ -182,13 +180,13 @@ const PostManagement = () => {
               onClick={handleSavePost}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
             >
-              Save
+             Lưu
             </button>
             <button
               onClick={() => setIsModalOpen(false)}
               className="bg-gray-500 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700 transition duration-300"
             >
-              Cancel
+              thoát
             </button>
           </div>
         </div>

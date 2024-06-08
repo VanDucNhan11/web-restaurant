@@ -1,8 +1,8 @@
+// Trong component Login.jsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-
-import { signInError, signInStart, signInSuccess } from '../../redux/user/userSlide'
+import { signInError, signInStart, signInSuccess } from '../../redux/user/userSlide';
 import Alert from '@mui/material/Alert';
 import Stack from '@mui/material/Stack';
 import { OAuth } from '../../components/OAuth';
@@ -10,13 +10,12 @@ import { OAuth } from '../../components/OAuth';
 const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({});
-  const { loading, error: errorMessage } = useSelector(state => state.user)
-
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const { loading, error: errorMessage } = useSelector(state => state.user);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() });
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,22 +35,19 @@ const Login = () => {
       const data = await res.json();
       console.log(data);
 
-      if (data.success === false) {
-        dispatch(signInError(data.message));
-      }
-      if (res.ok) {
+      if (!res.ok || data.success === false) {
+        dispatch(signInError(data.message || "Đăng nhập không thành công"));
+      } else {
         dispatch(signInSuccess({
           user: data.user,
-          role: data.role, // Bao gồm cả vai trò người dùng
+          role: data.role,
         }));
-        navigate('/'); // Cập nhật để lấy role
+        navigate('/');
       }
-    }
-    catch (error) {
+    } catch (error) {
       dispatch(signInError(error.message));
     }
-  }
-
+  };
   return (
     <>
       <div className="flex h-screen w-full items-center justify-center bg-gray-900 bg-cover bg-no-repeat"
@@ -109,7 +105,6 @@ const Login = () => {
               <div className="w-full h-[1px] bg-gray-300"></div>
             </div>
             <OAuth />
-
           </div>
         </div>
       </div>
@@ -118,3 +113,4 @@ const Login = () => {
 }
 
 export default Login;
+

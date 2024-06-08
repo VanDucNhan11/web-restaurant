@@ -11,19 +11,17 @@ const CategoryTable = ({ categories, onEdit, onDelete }) => {
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-            <th className="py-3 px-6 text-left">ID</th>
-            <th className="py-3 px-6 text-left">Tên danh mục</th>
-            <th className="py-3 px-6 text-center">Actions</th>
+            <th className="py-3 px-6 text-center">Tên danh mục</th>
+            <th className="py-3 px-6 text-center">Hành động</th>
           </tr>
         </thead>
         <tbody className="text-gray-600 text-sm font-light">
           {categories.map((category) => (
             <tr key={category._id} className="border-b border-gray-200 hover:bg-gray-100">
-              <td className="py-3 px-6 text-left whitespace-nowrap">{category._id}</td>
-              <td className="py-3 px-6 text-left">{category.name}</td>
+              <td className="py-3 px-6 text-center">{category.name}</td>
               <td className="py-3 px-6 text-center">
-                <button onClick={() => onEdit(category)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Edit</button>
-                <button onClick={() => onDelete(category._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300">Delete</button>
+                <button onClick={() => onEdit(category)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Sửa</button>
+                <button onClick={() => onDelete(category._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300">Xoá</button>
               </td>
             </tr>
           ))}
@@ -106,9 +104,9 @@ const CategoryManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Quản lý danh mục</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách danh mục</h1>
       <div className="flex justify-end mb-4">
-        <button onClick={() => setIsAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Add Category</button>
+        <button onClick={() => setIsAddModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Thêm danh mục</button>
       </div>
       <CategoryTable categories={categories} onEdit={handleEdit} onDelete={handleDelete} />
 
@@ -120,17 +118,17 @@ const CategoryManagement = () => {
           overlayClassName="fixed inset-0 bg-black bg-opacity-50"
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-2xl mb-4">Add New Category</h2>
+            <h2 className="text-2xl mb-4">Thêm danh mục mới</h2>
             <input
               type="text"
               value={newCategoryName}
               onChange={(e) => setNewCategoryName(e.target.value)}
               className="border p-2 mb-4 w-full"
-              placeholder="Enter category name"
+              placeholder="Nhập tên danh mục"
             />
             <div className="flex justify-end">
-              <button onClick={() => setIsAddModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
-              <button onClick={handleAddCategory} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Add</button>
+              <button onClick={() => setIsAddModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Thoát</button>
+              <button onClick={handleAddCategory} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Thêm</button>
             </div>
           </div>
         </Modal>
@@ -143,7 +141,7 @@ const CategoryManagement = () => {
           overlayClassName="fixed inset-0 bg-black bg-opacity-50"
         >
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-2xl mb-4">Edit Category</h2>
+            <h2 className="text-2xl mb-4">Sửa danh mục</h2>
             <input
               type="text"
               value={editCategoryName}
@@ -152,8 +150,8 @@ const CategoryManagement = () => {
               placeholder="Enter new category name"
             />
             <div className="flex justify-end">
-              <button onClick={() => setIsEditModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
-              <button onClick={handleSaveEdit} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Save</button>
+              <button onClick={() => setIsEditModalOpen(false)} className="bg-gray-500 text-white px-4 py-2 rounded mr-2 hover:bg-gray-700 transition duration-300">Thoát</button>
+              <button onClick={handleSaveEdit} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Lưu</button>
             </div>
           </div>
         </Modal>

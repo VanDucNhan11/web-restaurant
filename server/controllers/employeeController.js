@@ -98,3 +98,25 @@ exports.deleteEmployee = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+// Lấy tổng số nhân viên
+exports.getTotalEmployees = async (req, res) => {
+  try {
+    const totalEmployees = await Employee.countDocuments();
+    res.json({ totalEmployees });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching employee count', error });
+  }
+};
+
+// Lấy nhân viên theo vị trí
+exports.getEmployeesByPosition = async (req, res) => {
+  const { position } = req.query;
+
+  try {
+    const employees = await Employee.find({ position });
+    const totalEmployeesByPosition = employees.length;
+    res.json({ totalEmployeesByPosition, employees });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching employees by position', error });
+  }
+};

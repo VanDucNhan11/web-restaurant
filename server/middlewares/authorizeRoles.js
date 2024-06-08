@@ -8,7 +8,7 @@ router.post('/signin', userControllers.signIn);
 router.post('/google', userControllers.google_signIn);
 
 // Route chỉ dành cho Admin
-router.get('/admin-route', authenticateToken, userControllers.authorizeRoles('Admin'), (req, res) => {
+router.get('/admin-route', authenticateToken, userControllers.authorizeRoles('Quản trị viên'), (req, res) => {
   res.status(200).json({ message: 'Welcome Admin' });
 });
 

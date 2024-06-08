@@ -116,10 +116,10 @@ const Header = () => {
                       <MenuItem
                         onClick={handleClose}>
                         <Link to={'/dashboard'}>
-                          Dashboard
+                          Bảng điều khiển
                         </Link>
                       </MenuItem>
-                      <MenuItem onClick={handleLogout}>Logout</MenuItem> {/* Gọi handleLogout khi MenuItem được nhấp */}
+                      <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem> {/* Gọi handleLogout khi MenuItem được nhấp */}
                     </Menu>
                   </div>
                 ) : (

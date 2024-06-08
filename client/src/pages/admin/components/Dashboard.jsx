@@ -14,6 +14,7 @@ import Reports from './Reports';
 import MenuManagement from './MenuManagement';
 import DuyetPhieuDB from './DuyetPhieuDatBan'
 import ChiTietHoaDon from './InvoiceDetails'
+import RecruitmentUpdate from './RecruitmentUpdate'
 
 // Dashboard.js
 const Dashboard = () => {
@@ -46,6 +47,7 @@ const Dashboard = () => {
         {tab === 'employee-management' &&  <EmployeeManagement />}
         {tab === 'post-management' &&  <PostManagement />}
         {tab === 'table-management' &&  <TableManagement />}
+        {tab === 'recruitment-update' &&  <RecruitmentUpdate />}
         {tab === 'reports' &&  <Reports />}
       </div>
     </div>

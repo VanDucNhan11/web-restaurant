@@ -19,8 +19,8 @@ const DashSiderbar = () => {
     <div className="w-64 h-screen bg-white-100 text-black">
       <div className="p-6 flex justify-center items-center">
         <div className="flex items-center">
-          <ion-icon name="home"></ion-icon>
-          <h1 className="ml-2 text-2xl font-bold">My Home</h1>
+          <ion-icon name="card-outline"></ion-icon>
+          <h1 className="ml-2 text-2xl title-1 title-font">Bảng điều khiển</h1>
         </div>
       </div>
       <nav className="flex-1 space-y-2 px-4">
@@ -28,10 +28,10 @@ const DashSiderbar = () => {
           to="/dashboard?tab=profile"
           className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'profile' || !tab ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
           <ion-icon name="person-circle-outline" class="mr-3"></ion-icon>
-          Profile
+          Thông tin cá nhân
         </Link>
 
-        {currentUser.role === 'Customer' && (
+        {currentUser.role === 'Khách hàng' && (
           <Link
             to="/dashboard?tab=history"
             className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'history' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
@@ -40,7 +40,7 @@ const DashSiderbar = () => {
           </Link>
         )}
 
-        {currentUser.role === 'Employee' && (
+        {currentUser.role === 'Nhân viên' && (
           <>
             <Link
               to="/dashboard?tab=DuyetPhieuDB"
@@ -52,54 +52,60 @@ const DashSiderbar = () => {
               to="/dashboard?tab=XuatHoaDon"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'XuatHoaDon' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="documents-outline" class="mr-3"></ion-icon>
-              Chi tiết hoá đơn
+              Hệ thông thanh toán
             </Link>
           </>
         )}
 
-        {currentUser.role === 'Admin' && (
+        {currentUser.role === 'Quản trị viên' && (
           <>
             <Link
               to="/dashboard?tab=account-management"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'account-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="settings-outline" class="mr-3"></ion-icon>
-              Account Management
+              Cập nhật phân quyền tài khoản
             </Link>
             <Link
               to="/dashboard?tab=category-management"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'category-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="list-outline" class="mr-3"></ion-icon>
-              Category Management
+              Cập nhật danh mục menu
             </Link>
             <Link
               to="/dashboard?tab=menu-management"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'menu-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="fast-food-outline" class="mr-3"></ion-icon>
-              Menu Management
+              Cập nhật menu
             </Link>
             <Link
               to="/dashboard?tab=employee-management"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'employee-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="people-outline" class="mr-3"></ion-icon>
-              Employee Management
+              Quản lý nhân viên
             </Link>
             <Link
               to="/dashboard?tab=post-management"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'post-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="document-text-outline" class="mr-3"></ion-icon>
-              Post Management
+              Cập nhật bài viết
             </Link>
             <Link
               to="/dashboard?tab=table-management"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'table-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="grid-outline" class="mr-3"></ion-icon>
-              Table Management
+              Quản lý bàn
+            </Link>
+            <Link
+              to="/dashboard?tab=recruitment-update"
+              className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'recruitment-update' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
+              <ion-icon name="document-text-outline" class="mr-3"></ion-icon>
+              Cập nhật bài tuyển dụng
             </Link>
             <Link
               to="/dashboard?tab=reports"
               className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'reports' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
               <ion-icon name="bar-chart-outline" class="mr-3"></ion-icon>
-              Reports
+              Thống kê
             </Link>
           </>
         )}

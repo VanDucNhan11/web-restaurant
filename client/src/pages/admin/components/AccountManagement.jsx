@@ -21,7 +21,6 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
       <table className="min-w-full bg-white border border-gray-200">
         <thead>
           <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-            <th className="py-3 px-6 text-left">ID</th>
             <th className="py-3 px-6 text-left">Tên</th>
             <th className="py-3 px-6 text-left">Email</th>
             <th className="py-3 px-6 text-left">Quyền</th>
@@ -31,7 +30,6 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
         <tbody className="text-gray-600 text-sm font-light">
           {users.map((user) => (
             <tr key={user._id} className="border-b border-gray-200 hover:bg-gray-100">
-              <td className="py-3 px-6 text-left whitespace-nowrap">{user._id}</td>
               <td className="py-3 px-6 text-left">{user.username}</td>
               <td className="py-3 px-6 text-left">{user.email}</td>
               <td className="py-3 px-6 text-left">{user.role}</td>
@@ -43,9 +41,9 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
                   <div>
                     <select className="mt-3 mb-3" value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
                       <option value="">Chọn quyền</option>
-                      <option value="Customer">Customer</option>
-                      <option value="Employee">Employee</option>
-                      <option value="Admin">Admin</option>
+                      <option value="Khách hàng">Khách hàng</option>
+                      <option value="Nhân viên">Nhân viên</option>
+                      <option value="Quản trị viên">Quản trị viên</option>
                     </select>
                     <div className="">
                       <button onClick={handleCancel} className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
@@ -101,7 +99,7 @@ const AccountManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Cập nhật phân quyền tài khoản</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách tài khoản</h1>
       <UserTable users={users} handleUpdateRole={handleUpdateRole} handleDeleteUser={handleDeleteUser} />
     </div>
   );

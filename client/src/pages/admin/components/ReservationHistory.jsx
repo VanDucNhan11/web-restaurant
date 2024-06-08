@@ -74,7 +74,7 @@ const ReservationHistory = () => {
         <table className="min-w-full bg-white">
           <thead className="bg-gray-800 text-white">
             <tr>
-              <th className="w-1/5 py-3 px-4 uppercase font-semibold text-sm text-center">Đặt nhày</th>
+              <th className="w-1/5 py-3 px-4 uppercase font-semibold text-sm text-center">Đặt ngày</th>
               <th className="w-1/5 py-3 px-4 uppercase font-semibold text-sm text-center">Thời gian</th>
               <th className="w-1/5 py-3 px-4 uppercase font-semibold text-sm text-center">Số lượng khách</th>
               <th className="w-1/5 py-3 px-4 uppercase font-semibold text-sm text-center">Trạng thái</th>
@@ -108,9 +108,33 @@ const ReservationHistory = () => {
 };
 
 const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
+  const [cancelError, setCancelError] = useState(null);
+
   const handleCancel = () => {
-    onCancel(reservation._id);
+    // Combine bookingDate and bookingTime to create a Date object for the booking
+    const [hours, minutes] = reservation.bookingTime.split(':').map(Number);
+    const bookingDateTime = new Date(reservation.bookingDate);
+    bookingDateTime.setHours(hours, minutes);
+
+    // Calculate the time difference between now and the booking time
+    const now = new Date();
+    const timeDifference = (bookingDateTime - now) / (1000 * 60 * 60); // Time difference in hours
+
+    if (timeDifference < 5) {
+      setCancelError('Bạn không thể huỷ đặt bàn trong vòng 5 tiếng trước thời gian đặt bàn');
+    } else {
+      onCancel(reservation._id);
+    }
   };
+
+  // Combine bookingDate and bookingTime to create a Date object for the booking
+  const [hours, minutes] = reservation.bookingTime.split(':').map(Number);
+  const bookingDateTime = new Date(reservation.bookingDate);
+  bookingDateTime.setHours(hours, minutes);
+
+  // Calculate the time difference between now and the booking time
+  const now = new Date();
+  const timeDifference = (bookingDateTime - now) / (1000 * 60 * 60); // Time difference in hours
 
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-50 flex items-center justify-center">
@@ -132,7 +156,19 @@ const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
           <p><strong>Số lượng khách:</strong> {reservation.numberOfGuests}</p>
           <p><strong>Ghi chú:</strong> {reservation.note}</p>
           <p><strong>Trạng thái:</strong> {reservation.status}</p>
-          <button onClick={handleCancel} className="mt-4 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white">Huỷ đặt bàn</button>
+          <h3 className="text-lg font-semibold mt-4">Danh sách món ăn:</h3>
+          <ul className="list-disc pl-5">
+            {reservation.selectedItems.map((item, index) => (
+              <li key={index}>
+                {item.itemName} - Số lượng: {item.quantity} - Giá: {item.price}
+              </li>
+            ))}
+          </ul>
+          {timeDifference < 5 ? (
+            <p className="text-red-500 mt-4">Bạn không thể huỷ đặt bàn trong vòng 5 tiếng trước thời gian đặt bàn</p>
+          ) : (
+            <button onClick={handleCancel} className="mt-4 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white">Huỷ đặt bàn</button>
+          )}
         </div>
       </div>
     </div>
@@ -140,4 +176,3 @@ const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
 };
 
 export default ReservationHistory;
-

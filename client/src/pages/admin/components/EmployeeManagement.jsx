@@ -153,7 +153,6 @@ const EmployeeManagement = () => {
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">ID</th>
               <th className="py-3 px-6 text-left">Họ và Tên</th>
               <th className="py-3 px-6 text-left">Chức vụ</th>
               <th className="py-3 px-6 text-left">Số điện thoại</th>
@@ -164,7 +163,6 @@ const EmployeeManagement = () => {
           <tbody className="text-gray-600 text-sm font-light">
             {employees.map((employee) => (
               <tr key={employee._id} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left whitespace-nowrap">{employee._id}</td>
                 <td className="py-3 px-6 text-left">{employee.name}</td>
                 <td className="py-3 px-6 text-left">{employee.position}</td>
                 <td className="py-3 px-6 text-left">{employee.phone}</td>
@@ -304,7 +302,6 @@ const EmployeeManagement = () => {
       {detailEmployee && (
           <Modal isOpen={isDetailModalOpen} onClose={() => setIsDetailModalOpen(false)} title="Chi tiết nhân viên">
             <div>
-              <p><strong>ID:</strong> {detailEmployee._id}</p>
               <p><strong>Họ và Tên:</strong> {detailEmployee.name}</p>
               <p><strong>Ngày sinh:</strong> {detailEmployee.dob ? new Date(detailEmployee.dob).toLocaleDateString() : ''}</p>
               <p><strong>Giới tính:</strong> {detailEmployee.gender}</p>

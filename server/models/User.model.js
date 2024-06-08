@@ -26,8 +26,8 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['Customer', 'Employee', 'Admin'], // Các vai trò có thể có
-    default: 'Customer', // Mặc định là Customer
+    enum: ['Khách hàng', 'Nhân viên', 'Quản trị viên'], // Các vai trò có thể có
+    default: 'Khách hàng', // Mặc định là Customer
   },
 }, { timestamps: true });
 

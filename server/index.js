@@ -13,6 +13,7 @@ const banRoutes = require('./routes/Table.route');
 const employeeRoutes = require('./routes/Employee.route');
 const reservationRoutes = require('./routes/Reservation.route');
 const invoiceRoute = require('./routes/Invoice.Route');
+const recruitmentRoute = require('./routes/Recruitment.route');
 
 
 const app = express();
@@ -39,6 +40,9 @@ app.use('/api/v1/tables', banRoutes);
 app.use('/api/v1/employees', employeeRoutes);
 app.use('/api/v1/reservations', reservationRoutes);
 app.use('/api/v1/invoices', invoiceRoute);
+app.use('/api/v1/recruitments', recruitmentRoute);
+
+
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

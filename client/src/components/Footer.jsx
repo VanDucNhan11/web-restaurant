@@ -8,15 +8,15 @@ const Footer = () => {
       </div>
       <div className="text-white mb-5 lg:mb-0 lg:ml-20 pr-5 " style={{ fontFamily: "VLCAMILA" }}>
         <h1 className="text-xl">Địa chỉ</h1>
-        <h3>số 48 Cao Thắng, <br /> Quận Hải Châu, TP. Đà Nẵng</h3>
+        <h3>Số 04 Bạch Đằng, Phường<br /> Quận Hải Châu, TP. Đà Nẵng</h3>
       </div>
       <div className="text-white mb-5 lg:mb-0 lg:ml-20 " style={{ fontFamily: "VLCAMILA" }}>
         <h1 className="text-xl">Giờ mở cửa</h1>
         <h3>6:30 - 21:30<br />Monday - Sunday</h3>
       </div>
-      <div className="flex flex-col items-center justify-center text-white mb-5 lg:mb-0 lg:ml-20" style={{ fontFamily: "VLCAMILA" }}>
+      <div className="flex flex-col  text-white mb-5 lg:mb-0 lg:ml-20" style={{ fontFamily: "VLCAMILA" }}>
         <h1 className="text-xl">Liên hệ</h1>
-        <h3>vanducnhan1102@gmail.com<br />0899885260</h3>
+        <h3>madamelann@gmail.com<br />0899885260</h3>
       </div>
       <div className="flex flex-col items-center justify-center text-white mb-5 lg:mb-0 lg:ml-20" style={{ fontFamily: "VLCAMILA" }}>
         <h1 className="text-xl">Theo dõi</h1>

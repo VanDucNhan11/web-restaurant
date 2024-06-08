@@ -42,7 +42,7 @@ const userControllers = {
         email,
         username,
         password: hashPassword,
-        role: 'Customer',
+        role: 'Khách hàng',
       });
       await newUser.save();
       res.status(200).json({
@@ -55,36 +55,38 @@ const userControllers = {
 
   signIn: async (req, res, next) => {
     const { email, password } = req.body;
-    if (!email || !password || email === '' || password === '') {
-      return res.status(400).json({ message: 'Tất cả các trường là bắt buộc' });
-    }
     try {
-      const validUser = await User.findOne({ email });
-      if (!validUser) {
-        return res.status(400).json({
-          message: 'Không tìm thấy người dùng.'
-        });
+      // Kiểm tra dữ liệu đầu vào
+      if (!email || !password || email === '' || password === '') {
+        return res.status(400).json({ message: 'Tất cả các trường là bắt buộc' });
       }
-      const validPassword = bcrypt.compareSync(password, validUser.password);
+      
+      // Kiểm tra xem người dùng tồn tại và mật khẩu hợp lệ
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(400).json({ message: 'Không tìm thấy người dùng.' });
+      }
+      const validPassword = bcrypt.compareSync(password, user.password);
       if (!validPassword) {
         return res.status(400).json({ message: 'Mật khẩu không hợp lệ.' });
       }
+      
+      // Tạo token và trả về thông tin người dùng
       const token = jwt.sign(
-
-        { userId: validUser._id, isAdmin: validUser.isAdmin, role: validUser.role },
-
+        { userId: user._id, isAdmin: user.isAdmin, role: user.role },
         process.env.SECRET_KEY
       );
-      const { password: pass, ...rest } = validUser._doc;
+      const { password: pass, ...rest } = user._doc;
       return res.status(200)
         .cookie('access_token', token, {
           httpOnly: true,
           secure: true,
           sameSite: 'strict',
         })
-        .json({ ...rest, role: validUser.role }); // Trả về role
+        .json({ ...rest, role: user.role });
     } catch (error) {
-      return res.status(500).json({ message: 'Có lỗi xảy ra khi đăng nhập' });
+      // Xử lý lỗi
+      next(error);
     }
   },
 
@@ -111,7 +113,7 @@ const userControllers = {
           email,
           password: hashedPassword,
           profilePicture: googlePhotoUrl,
-          role: 'Customer'  // Đặt mặc định vai trò là 'Customer'
+          role: 'Khách hàng'  // Đặt mặc định vai trò là 'Customer'
         });
         await newUser.save();
         const token = jwt.sign(
@@ -136,7 +138,7 @@ const userControllers = {
 
     try {
       // Kiểm tra xem vai trò được cập nhật có hợp lệ không
-      if (!['Customer', 'Employee', 'Admin'].includes(role)) {
+      if (!['Khách hàng', 'Nhân viên', 'Quản trị viên'].includes(role)) {
         return res.status(400).json({ message: 'Vai trò không hợp lệ' });
       }
 

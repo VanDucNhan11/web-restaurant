@@ -82,7 +82,7 @@ const TableManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Cập nhât bàn</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách bàn</h1>
       <div className="flex justify-end mb-4">
         <button
           onClick={openAddModal}
@@ -95,7 +95,6 @@ const TableManagement = () => {
         <table className="min-w-full bg-white border border-gray-200">
           <thead>
             <tr className="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
-              <th className="py-3 px-6 text-left">ID</th>
               <th className="py-3 px-6 text-center">Số lượng ghế</th>
               <th className="py-3 px-6 text-center">Loại bàn</th>
               <th className="py-3 px-6 text-center">Khu</th>
@@ -106,7 +105,6 @@ const TableManagement = () => {
           <tbody className="text-gray-600 text-sm font-light">
             {tables.map((table) => (
               <tr key={table._id} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left whitespace-nowrap">{table._id}</td>
                 <td className="py-3 px-6 text-center">{table.quantity}</td>
                 <td className="py-3 px-6 text-center">{table.type}</td>
                 <td className="py-3 px-6 text-center">{table.area}</td>
@@ -133,9 +131,9 @@ const TableManagement = () => {
       {showAddModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-8 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Add New Table</h2>
+            <h2 className="text-xl font-semibold mb-4">Thêm bàn mới</h2>
             <label htmlFor="quantity" className="block mb-2">
-              Quantity:
+              Số ghế:
               <input
                 type="number"
                 id="quantity"
@@ -146,7 +144,7 @@ const TableManagement = () => {
               />
             </label>
             <label htmlFor="type" className="block mb-2">
-              Type:
+              Loại bàn:
               <input
                 type="text"
                 id="type"
@@ -157,7 +155,7 @@ const TableManagement = () => {
               />
             </label>
             <label htmlFor="area" className="block mb-2">
-              Area:
+              Khu:
               <select
                 id="area"
                 name="area"
@@ -188,13 +186,13 @@ const TableManagement = () => {
                 onClick={handleAddTable}
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300 mr-2"
               >
-                Add
+                Thêm
               </button>
               <button
                 onClick={closeAddModal}
                 className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
               >
-                Cancel
+                Thoát
               </button>
             </div>
           </div>
@@ -203,7 +201,7 @@ const TableManagement = () => {
       {showEditModal && (
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="bg-white p-8 rounded-lg">
-            <h2 className="text-xl font-semibold mb-4">Edit Table</h2>
+            <h2 className="text-xl font-semibold mb-4">Sửa bàn</h2>
             <label htmlFor="quantity" className="block mb-2">
               Số lượng ghế:
               <input
@@ -258,13 +256,13 @@ const TableManagement = () => {
                 onClick={saveUpdatedTable}
                 className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 mr-2"
               >
-                Save
+                Lưu
               </button>
               <button
                 onClick={closeEditModal}
                 className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
               >
-                Cancel
+                Thoát
               </button>
             </div>
           </div>
