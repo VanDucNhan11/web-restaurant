@@ -12,6 +12,7 @@ const DuyetPhieuDatBan = () => {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedDetailReservation, setSelectedDetailReservation] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
+  const [filterType, setFilterType] = useState('all'); // New state for filter type
 
   const handleCancelReasonChange = (event) => {
     setCancelReason(event.target.value);
@@ -147,7 +148,7 @@ const DuyetPhieuDatBan = () => {
                 <ul className="list-disc pl-5">
                   {selectedDetailReservation.selectedItems.map((item, index) => (
                     <li key={index}>
-                      {item.itemName} - Số lượng: {item.quantity} 
+                      {item.itemName} - Số lượng: {item.quantity}
                     </li>
                   ))}
                 </ul>
@@ -174,9 +175,39 @@ const DuyetPhieuDatBan = () => {
     return <div>{error}</div>;
   }
 
+  const now = new Date();
+  
+  // Filter reservations based on filterType
+  const filteredReservations = reservations.filter(reservation => {
+    const reservationDate = new Date(reservation.bookingDate);
+    return filterType === 'all' ||
+           (filterType === 'overdue' && now > reservationDate) ||
+           (filterType === 'new' && now <= reservationDate);
+  });
+
   return (
     <div className="p-4 sm:p-8">
       <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách phiếu đặt bàn</h2>
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={() => setFilterType('all')}
+          className={`px-4 py-2 rounded-full ${filterType === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} mr-2`}
+        >
+          Tất cả
+        </button>
+        <button
+          onClick={() => setFilterType('overdue')}
+          className={`px-4 py-2 rounded-full ${filterType === 'overdue' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} mr-2`}
+        >
+          Quá hạn
+        </button>
+        <button
+          onClick={() => setFilterType('new')}
+          className={`px-4 py-2 rounded-full ${filterType === 'new' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
+        >
+          Mới
+        </button>
+      </div>
       <div className="bg-white shadow-md rounded-lg overflow-hidden">
         <table className="min-w-full bg-white">
           <thead className="bg-gray-800 text-white">
@@ -190,27 +221,38 @@ const DuyetPhieuDatBan = () => {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {reservations.map((reservation, index) => (
-              <tr key={index} className="hover:bg-gray-200 transition duration-200">
-                <td className="w-1/6 py-3 px-4 text-center">{new Date(reservation.bookingDate).toLocaleDateString()}</td>
-                <td className="w-1/6 py-3 px-4 text-center">{reservation.bookingTime}</td>
-                <td className="w-1/6 py-3 px-4 text-center">{reservation.numberOfGuests}</td>
-                <td className={`w-1/6 py-3 px-4 text-center ${reservation.status === 'chưa xác nhận' ? 'text-red-500' : 'text-green-500'}`}>{reservation.status}</td>
-                <td className="py-3 text-center">
-                  {reservation.status === 'chưa xác nhận' ? (
-                    <>
+            {filteredReservations.map((reservation, index) => {
+              const reservationDate = new Date(reservation.bookingDate);
+              const reservationTimeParts = reservation.bookingTime.split(':');
+              const reservationHour = parseInt(reservationTimeParts[0], 10);
+              const reservationMinute = parseInt(reservationTimeParts[1], 10);
+              const reservationDateTime = new Date(reservationDate);
+              reservationDateTime.setHours(reservationHour);
+              reservationDateTime.setMinutes(reservationMinute);
+
+              const canApprove = now < reservationDateTime;
+              const canCancel = now < reservationDateTime && (reservationDateTime - now > 60 * 60 * 1000);
+
+              return (
+                <tr key={index} className="hover:bg-gray-200 transition duration-200">
+                  <td className="w-1/6 py-3 px-4 text-center">{reservationDate.toLocaleDateString()}</td>
+                  <td className="w-1/6 py-3 px-4 text-center">{reservation.bookingTime}</td>
+                  <td className="w-1/6 py-3 px-4 text-center">{reservation.numberOfGuests}</td>
+                  <td className={`w-1/6 py-3 px-4 text-center ${reservation.status === 'chưa xác nhận' ? 'text-red-500' : 'text-green-500'}`}>{reservation.status}</td>
+                  <td className="py-3 text-center">
+                    {reservation.status === 'chưa xác nhận' && canApprove ? (
                       <button onClick={() => handleApproveReservation(reservation._id)} className="bg-green-500 hover:bg-green-700 text-white py-2 px-2 rounded focus:outline-none focus:shadow-outline mr-2 border-2 border-transparent">Duyệt</button>
+                    ) : null}
+                    {canCancel ? (
                       <button onClick={() => handleCancelReservation(reservation._id)} className="bg-red-500 hover:bg-red-700 text-white py-2 px-2 rounded focus:outline-none focus:shadow-outline border-2 border-transparent">Huỷ đặt bàn</button>
-                    </>
-                  ) : (
-                    <button onClick={() => handleCancelReservation(reservation._id)} className="bg-red-500 hover:bg-red-700 text-white py-2 px-2 rounded focus:outline-none focus:shadow-outline border-2 border-transparent">Huỷ đặt bàn</button>
-                  )}
-                </td>
-                <td className="w-1/6 py-3 px-4 text-center">
-                  <button onClick={() => handleViewDetail(reservation._id)} className="text-blue-500 hover:text-blue-700 focus:outline-none">Xem chi tiết</button>
-                </td>
-              </tr>
-            ))}
+                    ) : null}
+                  </td>
+                  <td className="w-1/6 py-3 px-4 text-center">
+                    <button onClick={() => handleViewDetail(reservation._id)} className="text-blue-500 hover:text-blue-700 focus:outline-none">Xem chi tiết</button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

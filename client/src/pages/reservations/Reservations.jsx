@@ -58,6 +58,9 @@ const Reservations = () => {
       console.log('Reservation created:', result);
       setMessage('Đặt bàn thành công! Vui lòng chờ xác nhận.');
   
+      // Reset selectedItems to empty array
+      setSelectedItems([]);
+  
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -66,6 +69,7 @@ const Reservations = () => {
       setMessage('Có lỗi xảy ra. Vui lòng thử lại.');
     }
   };
+  
 
   const handleViewSelectedItems = () => {
     navigate('/thuc-don', { state: { selectedItems: selectedItems } });
@@ -83,6 +87,7 @@ const Reservations = () => {
     setSelectedItems(updatedItems);
     localStorage.setItem('selectedItems', JSON.stringify(updatedItems));
   };
+  
 
   return (
     <div className="datban flex flex-col items-center justify-center min-h-screen">
@@ -107,14 +112,14 @@ const Reservations = () => {
         <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
             <div className="mb-2">Ngày</div>
             <input
-              type="date"
-              className="w-full p-2 border rounded"
-              placeholder="date"
-              name="bookingDate"
-              required
-              min={new Date().toISOString().split('T')[0]} // Chỉ cho phép chọn từ ngày hiện tại trở đi
-              defaultValue={new Date().toISOString().split('T')[0]}
-            />
+                type="date"
+                className="w-full p-2 border rounded"
+                placeholder="date"
+                name="bookingDate"
+                required
+                min={new Date().toISOString().split('T')[0]} // Chỉ cho phép chọn từ ngày hiện tại trở đi
+                defaultValue={new Date().toISOString().split('T')[0]}
+              />
           </div>
           <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
             <div className="mb-2">Thời gian</div>

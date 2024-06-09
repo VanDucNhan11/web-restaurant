@@ -181,8 +181,8 @@ const InvoiceDetails = () => {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom className="title-1 title-font">Hệ thống thanh toán nhà hàng</Typography>
-      <Typography variant="h6" gutterBottom>Chọn khu</Typography>
+      <Typography variant="h4" gutterBottom className="title-1 title-font text-center">Hệ thống thanh toán</Typography>
+      <Typography variant="h6" gutterBottom>Vui lòng chọn khu khách đang ăn</Typography>
       <Box mb={2}>
         <MuiSelect
           value={currentArea}
@@ -197,63 +197,59 @@ const InvoiceDetails = () => {
           ))}
         </MuiSelect>
       </Box>
-      {currentArea && (
-        <Box mb={2}>
-          <Typography variant="h6" gutterBottom>Chọn bàn số mấy:</Typography>
-          <MuiSelect
-            value={currentTable}
-            onChange={handleTableChange}
-            fullWidth
-            displayEmpty
-            inputProps={{ 'aria-label': 'Select table' }}
-          >
-            <MuiMenuItem value="" disabled>Số bàn</MuiMenuItem>
-            {tables.filter(table => table.area === currentArea).map(table => (
-              <MuiMenuItem key={table._id} value={table.tableNumber}>{table.tableNumber}</MuiMenuItem>
-            ))}
-          </MuiSelect>
-        </Box>
-      )}
-      {currentTable && (
-        <Box mb={2}>
-          <Typography variant="h6" gutterBottom>Chọn món ăn:</Typography>
-          <TextField
-            label="Tìm kiếm món ăn"
-            variant="outlined"
-            fullWidth
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            sx={{ mb: 2 }}
-          />
-          <MuiSelect
-            value=""
-            onChange={(e) => handleItemChange(e.target.value, selectedItems[e.target.value]?.quantity || 1)}
-            fullWidth
-            displayEmpty
-            inputProps={{ 'aria-label': 'Select menu item' }}
-          >
-            <MuiMenuItem value="" disabled>Chọn Món</MuiMenuItem>
-            {filteredMenuItems.map(item => (
-              <MuiMenuItem key={item._id} value={item._id}>
-                {item.itemName} {selectedItems[item._id] ? `- Số lượng: ${selectedItems[item._id].quantity}` : ''}
-              </MuiMenuItem>
-            ))}
-          </MuiSelect>
-          {Object.keys(selectedItems).map(itemId => (
-            <Box key={itemId} display="flex" alignItems="center" mt={1}>
-              <ListItemText primary={selectedItems[itemId].itemName} />
-              <TextField
-                type="number"
-                value={selectedItems[itemId].quantity}
-                onChange={(e) => handleItemChange(itemId, parseInt(e.target.value))}
-                inputProps={{ min: 1 }}
-                sx={{ width: 50, ml: 2 }}
-              />
-            </Box>
+      <Box mb={2}>
+        <Typography variant="h6" gutterBottom>Chọn bàn số mấy:</Typography>
+        <MuiSelect
+          value={currentTable}
+          onChange={handleTableChange}
+          fullWidth
+          displayEmpty
+          inputProps={{ 'aria-label': 'Select table' }}
+        >
+          <MuiMenuItem value="" disabled>Số bàn</MuiMenuItem>
+          {tables.filter(table => table.area === currentArea).map(table => (
+            <MuiMenuItem key={table._id} value={table.tableNumber}>{table.tableNumber}</MuiMenuItem>
           ))}
-          <Button variant="contained" color="primary" onClick={handleAddItems} sx={{ mt: 1 }}>Add</Button>
-        </Box>
-      )}
+        </MuiSelect>
+      </Box>
+      <Box mb={2}>
+        <Typography variant="h6" gutterBottom>Chọn món ăn khách đã oder:</Typography>
+        <TextField
+          label="Tìm kiếm món ăn"
+          variant="outlined"
+          fullWidth
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ mb: 2 }}
+        />
+        <MuiSelect
+          value=""
+          onChange={(e) => handleItemChange(e.target.value, selectedItems[e.target.value]?.quantity || 1)}
+          fullWidth
+          displayEmpty
+          inputProps={{ 'aria-label': 'Select menu item' }}
+        >
+          <MuiMenuItem value="" disabled>Chọn Món</MuiMenuItem>
+          {filteredMenuItems.map(item => (
+            <MuiMenuItem key={item._id} value={item._id}>
+              {item.itemName} {selectedItems[item._id] ? `- Số lượng: ${selectedItems[item._id].quantity}` : ''}
+            </MuiMenuItem>
+          ))}
+        </MuiSelect>
+        {Object.keys(selectedItems).map(itemId => (
+          <Box key={itemId} display="flex" alignItems="center" mt={1}>
+            <ListItemText primary={selectedItems[itemId].itemName} />
+            <TextField
+              type="number"
+              value={selectedItems[itemId].quantity}
+              onChange={(e) => handleItemChange(itemId, parseInt(e.target.value))}
+              inputProps={{ min: 1 }}
+              sx={{ width: 50, ml: 2 }}
+            />
+          </Box>
+        ))}
+        <Button variant="contained" color="primary" onClick={handleAddItems} sx={{ mt: 1 }}>Add</Button>
+      </Box>
       {Object.keys(selectedTables).map(tableId => {
         const table = tables.find(table => table.tableNumber === parseInt(tableId));
         if (!table) return null;
