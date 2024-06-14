@@ -29,7 +29,12 @@ const userSchema = new mongoose.Schema({
     enum: ['Khách hàng', 'Nhân viên', 'Quản trị viên'], // Các vai trò có thể có
     default: 'Khách hàng', // Mặc định là Customer
   },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
+  },
 }, { timestamps: true });
-
 
 module.exports = mongoose.model('User', userSchema);

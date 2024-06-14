@@ -10,6 +10,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 // Đảm bảo đường dẫn đúng
 import { logoutUser } from "../redux/user/userSlide";
+
 const Header = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const { currentUser } = useSelector(state => state.user);
@@ -101,9 +102,11 @@ const Header = () => {
                       onClick={handleClick}
                     >
                       <Avatar
-                        alt="Remy Sharp"
-                        src={currentUser.profilePicture} />
+                        alt={currentUser.username}
+                        src={currentUser.profilePicture}
+                      />
                     </Button>
+                    <span className="text-white">{currentUser.username}</span>
                     <Menu
                       id="basic-menu"
                       anchorEl={anchorEl}
@@ -113,12 +116,31 @@ const Header = () => {
                         'aria-labelledby': 'basic-button',
                       }}
                     >
-                      <MenuItem
-                        onClick={handleClose}>
-                        <Link to={'/dashboard'}>
-                          Bảng điều khiển
-                        </Link>
-                      </MenuItem>
+                      {
+                        currentUser.role === 'Khách hàng' ? (
+                          <>
+                            <MenuItem
+                              onClick={handleClose}>
+                              <Link to={'/profile'}>
+                                Thông tin cá nhân
+                              </Link>
+                            </MenuItem>
+                            <MenuItem
+                              onClick={handleClose}>
+                              <Link to={'/historyss'}>
+                                Lịch sử đặt bàn
+                              </Link>
+                            </MenuItem>
+                          </>
+                        ) : (
+                          <MenuItem
+                            onClick={handleClose}>
+                            <Link to={'/dashboard'}>
+                              Bảng điều khiển
+                            </Link>
+                          </MenuItem>
+                        )
+                      }
                       <MenuItem onClick={handleLogout}>Đăng xuất</MenuItem> {/* Gọi handleLogout khi MenuItem được nhấp */}
                     </Menu>
                   </div>

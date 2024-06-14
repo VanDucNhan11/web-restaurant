@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const DuyetPhieuDatBan = () => {
   const currentUser = useSelector(state => state.user.currentUser);
@@ -13,11 +15,14 @@ const DuyetPhieuDatBan = () => {
   const [selectedDetailReservation, setSelectedDetailReservation] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
   const [filterType, setFilterType] = useState('all'); // New state for filter type
+  const detailRef = useRef(null); // Ref for detail content
 
+  // Function to handle cancel reason change
   const handleCancelReasonChange = (event) => {
     setCancelReason(event.target.value);
   };
 
+  // Fetch reservations on component mount
   useEffect(() => {
     const fetchReservations = async () => {
       try {
@@ -37,22 +42,70 @@ const DuyetPhieuDatBan = () => {
     fetchReservations();
   }, []);
 
+  const printToPdf = async () => {
+    try {
+      const content = detailRef.current.innerHTML;
+
+      // Tạo canvas từ nội dung HTML sử dụng html2canvas
+      const canvas = await html2canvas(detailRef.current, {
+        scale: 2, // Tăng tỷ lệ để đảm bảo chất lượng hình ảnh cao hơn
+        useCORS: true, // Sử dụng CORS để tránh lỗi về bảo mật khi tạo ảnh canvas
+      });
+
+      // Lấy đối tượng jsPDF mới
+      const pdf = new jsPDF('p', 'px', 'a4');
+
+      // Tính toán kích thước của PDF dựa trên kích thước của canvas
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+      // Thêm ảnh từ canvas vào PDF
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      // Tính toán chiều cao của văn bản
+      const lineHeight = 12; // Chiều cao của mỗi dòng văn bản
+      const textLines = pdf.splitTextToSize(content, pdfWidth); // Tách văn bản thành từng dòng với chiều rộng tối đa là pdfWidth
+
+      // Chiều cao của văn bản
+      const textHeight = textLines.length * lineHeight;
+
+      // Kiểm tra nếu chiều cao văn bản vượt quá chiều cao trang, thêm trang mới và in lại
+      let currentY = pdfHeight + 10; // Đặt vị trí y bắt đầu in văn bản
+      if (currentY + textHeight > pdf.internal.pageSize.getHeight()) {
+        pdf.addPage(); // Thêm trang mới
+        currentY = 10; // Đặt lại vị trí y bắt đầu in văn bản ở trang mới
+      }
+
+      // Thêm văn bản vào PDF
+
+      // Lưu file PDF với tên reservation_detail.pdf
+      pdf.save('reservation_detail.pdf');
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      // Xử lý lỗi khi xuất PDF
+    }
+  };
+ 
+  // Function to handle approval of a reservation
   const handleApproveReservation = (reservationId) => {
     setSelectedReservation(reservationId);
     setApproveConfirmation(true);
   };
 
+  // Function to handle cancellation of a reservation
   const handleCancelReservation = (reservationId) => {
     setSelectedReservation(reservationId);
     setCancelConfirmation(true);
   };
 
+  // Function to view details of a reservation
   const handleViewDetail = (reservationId) => {
     const selected = reservations.find(reservation => reservation._id === reservationId);
     setSelectedDetailReservation(selected);
     setDetailModalOpen(true);
   };
 
+  // Function to confirm approval of a reservation
   const confirmApprove = async () => {
     try {
       const response = await fetch(`http://localhost:3000/api/v1/reservations/${selectedReservation}/approve`, {
@@ -68,6 +121,7 @@ const DuyetPhieuDatBan = () => {
     }
   };
 
+  // Function to confirm cancellation of a reservation
   const confirmCancel = async () => {
     try {
       const response = await fetch(`http://localhost:3000/api/v1/reservations/${selectedReservation}/cancel`, {
@@ -75,7 +129,7 @@ const DuyetPhieuDatBan = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cancelReason }), // Gửi lý do huỷ đặt bàn
+        body: JSON.stringify({ cancelReason }), // Send cancellation reason
       });
       if (!response.ok) {
         throw new Error('Failed to cancel reservation');
@@ -89,6 +143,7 @@ const DuyetPhieuDatBan = () => {
     }
   };
 
+  // JSX for approval confirmation dialog
   const approveConfirmationDialog = (
     <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-50 flex items-center justify-center">
       <div className="relative bg-white w-96 rounded-lg shadow-lg">
@@ -104,13 +159,13 @@ const DuyetPhieuDatBan = () => {
     </div>
   );
 
+  // JSX for cancellation confirmation dialog
   const cancelConfirmationDialog = (
     <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-50 flex items-center justify-center">
       <div className="relative bg-white w-96 rounded-lg shadow-lg">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Xác nhận huỷ đặt bàn</h2>
           <p>Bạn có chắc chắn muốn huỷ phiếu đặt bàn này không?</p>
-          
           <div className="mt-4">
             <textarea
               className="w-full h-24 border border-gray-300 rounded-lg p-2 focus:outline-none focus:border-gray-500"
@@ -119,7 +174,6 @@ const DuyetPhieuDatBan = () => {
               onChange={handleCancelReasonChange}
             />
           </div>
-          
           <div className="mt-4 flex justify-end">
             <button onClick={() => setCancelConfirmation(false)} className="mr-4 bg-gray-300 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-400">Hủy</button>
             <button onClick={confirmCancel} className="bg-red-500 text-white px-4 py-2 rounded-full hover:bg-red-600">Huỷ đặt bàn</button>
@@ -129,12 +183,13 @@ const DuyetPhieuDatBan = () => {
     </div>
   );
 
+  // JSX for detail modal
   const detailModal = (
     <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-50 flex items-center justify-center">
       <div className="relative bg-white w-96 rounded-lg shadow-lg">
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Chi tiết phiếu đặt bàn</h2>
-          <div className="mb-4">
+          <div ref={detailRef} className="mb-4">
             {selectedDetailReservation && (
               <>
                 <p><span className="font-semibold">Người đặt:</span> {selectedDetailReservation.fullName}</p>
@@ -144,8 +199,8 @@ const DuyetPhieuDatBan = () => {
                 <p><span className="font-semibold">Thời gian đặt:</span> {selectedDetailReservation.bookingTime}</p>
                 <p><span className="font-semibold">Số lượng khách:</span> {selectedDetailReservation.numberOfGuests}</p>
                 <p><span className="font-semibold">Ghi chú:</span> {selectedDetailReservation.note}</p>
-                <h3 className="text-lg font-semibold mt-4">Danh sách món ăn:</h3>
-                <ul className="list-disc pl-5">
+                <h3 className="text-lg font-semibold mt-4 ">Danh sách món ăn:</h3>
+                <ul className="list-disc pl-5 mb-5">
                   {selectedDetailReservation.selectedItems.map((item, index) => (
                     <li key={index}>
                       {item.itemName} - Số lượng: {item.quantity}
@@ -157,12 +212,15 @@ const DuyetPhieuDatBan = () => {
           </div>
           <div className="flex justify-end">
             <button onClick={() => setDetailModalOpen(false)} className="bg-gray-300 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-400">Đóng</button>
+            <button onClick={printToPdf} className="bg-blue-500 ml-3 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-400">Xuất PDF</button>
           </div>
         </div>
       </div>
     </div>
   );
+  
 
+  // Conditional rendering based on user authentication, loading state, and errors
   if (!currentUser) {
     return <div>Vui lòng đăng nhập để duyệt phiếu đặt bàn</div>;
   }
@@ -176,15 +234,16 @@ const DuyetPhieuDatBan = () => {
   }
 
   const now = new Date();
-  
+
   // Filter reservations based on filterType
   const filteredReservations = reservations.filter(reservation => {
     const reservationDate = new Date(reservation.bookingDate);
     return filterType === 'all' ||
-           (filterType === 'overdue' && now > reservationDate) ||
-           (filterType === 'new' && now <= reservationDate);
+      (filterType === 'overdue' && now > reservationDate) ||
+      (filterType === 'new' && now <= reservationDate);
   });
 
+  // JSX for reservations table
   return (
     <div className="p-4 sm:p-8">
       <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách phiếu đặt bàn</h2>
@@ -264,3 +323,4 @@ const DuyetPhieuDatBan = () => {
 };
 
 export default DuyetPhieuDatBan;
+

@@ -48,13 +48,14 @@ exports.createEmployee = async (req, res) => {
 exports.getEmployee = async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id);
-    if (!employee) return res.status(404).json({ message: 'Không tìm thấy nhân viên' });
+    if (!employee) {
+      return res.status(404).json({ message: 'Employee not found' });
+    }
     res.json(employee);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching employee', error });
   }
 };
-
 // Cập nhật thông tin nhân viên
 exports.updateEmployee = async (req, res) => {
   const { id } = req.params;
@@ -98,25 +99,12 @@ exports.deleteEmployee = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
-// Lấy tổng số nhân viên
-exports.getTotalEmployees = async (req, res) => {
-  try {
-    const totalEmployees = await Employee.countDocuments();
-    res.json({ totalEmployees });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching employee count', error });
-  }
-};
-
-// Lấy nhân viên theo vị trí
 exports.getEmployeesByPosition = async (req, res) => {
   const { position } = req.query;
-
   try {
     const employees = await Employee.find({ position });
-    const totalEmployeesByPosition = employees.length;
-    res.json({ totalEmployeesByPosition, employees });
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching employees by position', error });
+    res.json(employees);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };

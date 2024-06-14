@@ -40,7 +40,7 @@ const DetailNews = () => {
         <div className="absolute mt-10 top-1/2 left-1/2 transform -translate-x-1/2 flex items-center text-white text-2xl font-light">
           <a href="/">Trang chủ</a>
           <span className="mx-2">/</span>
-          <span>Tin tức</span>
+          <span>Chi tiết tin tức</span>
         </div>
       </div>
       <section>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Home from "./pages/home/Home";
@@ -13,9 +14,14 @@ import Abouts from "./pages/about/About";
 import Dashboard from './pages/admin/components/Dashboard';
 import DetailNews from './pages/news/DetailNews';
 import ChatIcons from './components/ChatIcons';
-import DetailRecruitment from './pages/recruitment/DetailRecruitment'
+import DetailRecruitment from './pages/recruitment/DetailRecruitment';
+import Profile from './pages/admin/components/Profile';
+import Historys from './pages/admin/components/ReservationHistory';
 
 function App() {
+  const location = useLocation();
+  // Kiểm tra xem trang hiện tại có phải là trang dashboard không
+  const isDashboardPage = location.pathname.startsWith('/dashboard');;
   return (
     <>
       <Routes>
@@ -29,9 +35,11 @@ function App() {
         <Route path='/tuyen-dung/:id' element={<><Header /><DetailRecruitment /><Footer /></>} />
         <Route path='/dang-nhap' element={<><Header /><Login /><Footer /></>} />
         <Route path='/dang-ky' element={<><Header /><Resister /><Footer /></>} />
+        <Route path='/profile' element={<><Header /><Profile /><Footer /></>} />
+        <Route path='/historyss' element={<><Header /><Historys /></>} />
         <Route path='/dashboard/*' element={<Dashboard />} />
       </Routes>  
-      <ChatIcons />
+      {!isDashboardPage && <ChatIcons />}
     </>
     
   );

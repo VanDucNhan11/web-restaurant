@@ -140,9 +140,9 @@ const Reservations = () => {
           </div>
         </div>
         <div className="flex flex-wrap justify-between w-full gap-4">
-          <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
+          <div className="p-5 bg-white rounded-xl border-2 w-full ">
             <div className="label mb-2">Đặt món ăn</div>
-            <button type="button" className="w-full p-2 border rounded bg-blue-500 text-white" onClick={handleSelectFood}>
+            <button type="button" className="w-full p-2 border rounded bg-red-600 text-white" onClick={handleSelectFood}>
               Chọn món ăn
             </button>
             {/* Phần hiển thị các món đã chọn */}
@@ -167,9 +167,7 @@ const Reservations = () => {
                     </li>
                   ))}
                 </ul>
-                <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-full" onClick={handleViewSelectedItems}>
-                  Xem món đã chọn
-                </button>
+                
               </div>
             )}
           </div>

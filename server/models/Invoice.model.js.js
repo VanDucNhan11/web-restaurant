@@ -6,6 +6,7 @@ const invoiceSchema = new mongoose.Schema({
     date: Date,
     total: Number,
     username: String,
+    customerName: String, 
 });
 
 const Invoice = mongoose.model('Invoice', invoiceSchema);

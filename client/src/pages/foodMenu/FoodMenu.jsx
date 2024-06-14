@@ -124,7 +124,7 @@ const FoodMenu = () => {
       </div>
 
       {selectedItems.length > 0 && (
-        <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-5" onClick={handleFinishSelection}>Đã chọn món xong</button>
+        <button className="bg-red-600 text-white font-bold py-2 px-4  mt-5 mb-5 mx-auto block" onClick={handleFinishSelection}>Đã chọn món xong</button>
       )}
 
       {/* Modal */}

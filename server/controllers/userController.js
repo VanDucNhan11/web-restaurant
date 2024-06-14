@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const { errorHandler } = require('../utils/error');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
+const nodemailer = require('nodemailer');
+const { v4: uuidv4 } = require('uuid');
 
 dotenv.config();
 const userControllers = {
@@ -70,8 +72,6 @@ const userControllers = {
       if (!validPassword) {
         return res.status(400).json({ message: 'Mật khẩu không hợp lệ.' });
       }
-      
-      // Tạo token và trả về thông tin người dùng
       const token = jwt.sign(
         { userId: user._id, isAdmin: user.isAdmin, role: user.role },
         process.env.SECRET_KEY
@@ -238,6 +238,105 @@ const userControllers = {
     }
   },
 
+  forgotPassword: async (req, res, next) => {
+    const { email } = req.body;
+  
+    try {
+      // Tìm người dùng với email được cung cấp từ request
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'Người dùng không tồn tại' });
+      }
+  
+      // Tạo mã OTP ngẫu nhiên gồm 6 chữ số
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      user.resetPasswordToken = otp;
+      user.resetPasswordExpires = Date.now() + 3600000; // 1 giờ
+      await user.save();
+  
+      // Gửi email chứa mã OTP
+      const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+          user: 'madamelann@gmail.com',
+          pass: 'k t x f p b z g e j b k y z b j' // Sử dụng mật khẩu ứng dụng ở đây
+        }
+      });
+  
+      const mailOptions = {
+        from: process.env.EMAIL_USER, // Địa chỉ email người gửi
+        to: email, // Địa chỉ email người nhận
+        subject: 'Reset Password', // Chủ đề email
+        text: `Mã OTP để lấy lại mật khẩu của bạn là: ${otp}`, // Nội dung email
+      };
+  
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log(error);
+          return res.status(500).json({ message: 'Đã xảy ra lỗi khi gửi email.' });
+        } else {
+          console.log('Email sent: ' + info.response);
+          return res.status(200).json({ message: 'Mã OTP đã được gửi đến email của bạn.' });
+        }
+      });
+  
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  resetPassword: async (req, res, next) => {
+    const { email, otp, newPassword } = req.body;
+
+    try {
+      // Tìm người dùng với email được cung cấp từ request
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'Người dùng không tồn tại' });
+      }
+
+      // Kiểm tra tính hợp lệ của OTP
+      if (otp !== user.resetPasswordToken || Date.now() > user.resetPasswordExpires) {
+        return res.status(400).json({ message: 'Mã OTP không hợp lệ hoặc đã hết hạn' });
+      }
+
+      // Đổi mật khẩu mới
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+      user.password = hashedPassword;
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+
+      return res.status(200).json({ message: 'Đổi mật khẩu thành công' });
+
+    } catch (error) {
+      next(error);
+    }
+  },
+  verifyOtp: async (req, res, next) => {
+    const { email, otp } = req.body;
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'Người dùng không tồn tại' });
+      }
+  
+      console.log("OTP từ request:", otp);
+      console.log("OTP từ cơ sở dữ liệu:", user.resetPasswordToken);
+      console.log("Thời gian hết hạn OTP:", user.resetPasswordExpires);
+      
+      if (otp !== user.resetPasswordToken || Date.now() > user.resetPasswordExpires) {
+        return res.status(400).json({ message: 'Mã OTP không hợp lệ hoặc đã hết hạn' });
+      }
+  
+      // OTP hợp lệ, tiếp tục xử lý hoặc trả về thành công
+      return res.status(200).json({ message: 'OTP hợp lệ' });
+    } catch (error) {
+      next(error);
+    }
+  },
 };
 
 module.exports = userControllers;

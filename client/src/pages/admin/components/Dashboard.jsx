@@ -19,6 +19,7 @@ import RecruitmentUpdate from './RecruitmentUpdate'
 // Dashboard.js
 const Dashboard = () => {
   const location = useLocation();
+  const { currentUser } = useSelector(state => state.user);
   const [tab, setTab] = useState('');
 
   useEffect(() => {
@@ -26,17 +27,20 @@ const Dashboard = () => {
     const tabFromUrl = urlParams.get('tab');
     if (tabFromUrl) {
       setTab(tabFromUrl);
+    } else {
+        setTab('profile');
+      
     }
-  }, [location.search]);
+  }, [location.search, currentUser]);
 
   console.log(tab);
 
   return (
     <div className='flex'>
-      <div>
+      <div className='fixed bg-gray-300 top-0 left-0 h-full'>
         <DashSiderbar />
       </div>
-      <div className='p-3 bg-gray-300 w-full'>
+      <div className='pl-64 p-3 w-full  pt-24'>
         {tab === 'profile' && <Profile />}
         {tab === 'history' &&  <History />}
         {tab === 'DuyetPhieuDB' &&  <DuyetPhieuDB />}

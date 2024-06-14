@@ -2,8 +2,8 @@ const Invoice = require('../models/Invoice.model.js');
 
 exports.createInvoice = async (req, res) => {
     try {
-        const { area, tableNumber, date, total, username } = req.body;
-        const newInvoice = new Invoice({ area, tableNumber, date, total, username });
+        const { area, tableNumber, date, total, username, customerName } = req.body; 
+        const newInvoice = new Invoice({ area, tableNumber, date, total, username, customerName }); 
         await newInvoice.save();
         res.status(201).json(newInvoice);
     } catch (error) {
@@ -11,6 +11,7 @@ exports.createInvoice = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
 exports.getRevenue = async (req, res) => {
   const { filter, date } = req.query;
   let startDate;

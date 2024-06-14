@@ -46,8 +46,8 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
                       <option value="Quản trị viên">Quản trị viên</option>
                     </select>
                     <div className="">
-                      <button onClick={handleCancel} className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-700 transition duration-300">Cancel</button>
-                      <button onClick={() => handleSaveRole(user._id)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300">Save</button>
+                      <button onClick={handleCancel} className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-700 transition duration-300">Thoát</button>
+                      <button onClick={() => handleSaveRole(user._id)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition duration-300">Lưu</button>
                     </div>
                   </div>
                 )}

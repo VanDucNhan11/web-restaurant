@@ -32,7 +32,7 @@ const DetailRecruitment = () => {
         <div className="absolute mt-10 top-1/2 left-1/2 transform -translate-x-1/2 flex items-center text-white text-lg md:flex-row md:text-2xl font-light">
           <a href="/" className="mb-2 md:mb-0 md:mr-2">Trang chủ</a>
           <span className="md:mx-2">/</span>
-          <span className="mb-2 md:mb-0 md:mr-2 ">Tuyển dụng</span>
+          <span className="mb-2 md:mb-0 md:mr-2 ">Chi tiết tuyển dụng</span>
         </div>
       </div>
       <div className="mx-auto items-center justify-center md:w-3/4 pb-10 pt-10">

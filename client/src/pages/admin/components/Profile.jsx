@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -9,8 +9,8 @@ const Profile = () => {
   const { currentUser } = useSelector(state => state.user);
   const dispatch = useDispatch();
 
-  console.log(currentUser)
-  const [avatar, setAvatar] = useState(currentUser.profilePicture );
+  console.log(currentUser);
+  const [avatar, setAvatar] = useState(currentUser.profilePicture);
 
   const [formData, setFormData] = useState({
     name: currentUser.username,
@@ -24,6 +24,9 @@ const Profile = () => {
     confirmNewPassword: '',
   });
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   const handleAvatarChange = (e) => {
     const file = e.target.files[0];
@@ -60,7 +63,6 @@ const Profile = () => {
     }
   };
 
-
   const handleChangePassword = async () => {
     if (passwords.newPassword !== passwords.confirmNewPassword) {
       return alert("New passwords do not match.");
@@ -86,10 +88,6 @@ const Profile = () => {
 
   return (
     <div className="h-full p-4 sm:p-8 flex flex-col items-center relative">
-      <button onClick={() => navigate('/')} className="absolute top-0 right-0 mt-4 mr-4 bg-red-600 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center" type="button">
-        <ion-icon name="chevron-back-circle-outline" className="text-xl mr-5" />
-        <span>Quay lại trang chủ</span>
-      </button>
       <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Thông tin cá nhân</h2>
       <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
         <div className="flex flex-col items-center mb-4">
@@ -161,50 +159,83 @@ const Profile = () => {
         <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75 z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-2">Đổi mật khẩu</h3>
-            <div className="mb-4">
+            <div className="mb-4 relative">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="currentPassword">
                 Mật khẩu cũ:
               </label>
               <input
                 id="currentPassword"
-                type="password"
+                type={showCurrentPassword ? "text" : "password"}
                 value={passwords.currentPassword}
                 onChange={(e) => setPasswords({ ...passwords, currentPassword: e.target.value })}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 placeholder="Mật khẩu cũ"
               />
+              <button
+                type="button"
+                className="absolute right-3 top-9"
+                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+              >
+                {showCurrentPassword ? (
+                  <ion-icon name="eye-off-outline"></ion-icon>
+                ) : (
+                  <ion-icon name="eye-outline"></ion-icon>
+                )}
+              </button>
             </div>
-            <div className="mb-4">
+            <div className="mb-4 relative">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="newPassword">
                 Mật khẩu mới:
               </label>
               <input
                 id="newPassword"
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 value={passwords.newPassword}
                 onChange={(e) => setPasswords({ ...passwords, newPassword: e.target.value })}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 placeholder="Mật khẩu mới"
               />
+              <button
+                type="button"
+                className="absolute right-3 top-9"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+              >
+                {showNewPassword ? (
+                  <ion-icon name="eye-off-outline"></ion-icon>
+                ) : (
+                  <ion-icon name="eye-outline"></ion-icon>
+                )}
+              </button>
             </div>
-            <div className="mb-6">
+            <div className="mb-6 relative">
               <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="confirmNewPassword">
                 Xác nhận mật khẩu mới:
               </label>
               <input
                 id="confirmNewPassword"
-                type="password"
+                type={showConfirmNewPassword ? "text" : "password"}
                 value={passwords.confirmNewPassword}
                 onChange={(e) => setPasswords({ ...passwords, confirmNewPassword: e.target.value })}
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 placeholder="Xác nhận mật khẩu mới"
               />
+              <button
+                type="button"
+                className="absolute right-3 top-9"
+                onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+              >
+                {showConfirmNewPassword ? (
+                  <ion-icon name="eye-off-outline"></ion-icon>
+                ) : (
+                  <ion-icon name="eye-outline"></ion-icon>
+                )}
+              </button>
             </div>
             <button onClick={handleChangePassword} className="w-full bg-red-600 hover:bg-red-900 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline title-font" type="button">
               Đổi mật khẩu
             </button>
             <button onClick={toggleChangePasswordModal} className="mt-4 w-full bg-gray-400 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline title-font" type="button">
-              Cancel
+              Thoát
             </button>
           </div>
         </div>
