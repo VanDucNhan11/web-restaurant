@@ -95,7 +95,10 @@ const UpdateInvoice = () => {
 
   const calculateTotal = (items) => {
     const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const vat = subtotal * 0.1;
+    const vat = items.reduce((acc, item) => {
+      const vatRate = item.area === 'VIP' ? 0.15 : 0.1;
+      return acc + item.price * item.quantity * vatRate;
+    }, 0);
     return subtotal + vat;
   };
 
@@ -304,3 +307,4 @@ const UpdateInvoice = () => {
 };
 
 export default UpdateInvoice;
+

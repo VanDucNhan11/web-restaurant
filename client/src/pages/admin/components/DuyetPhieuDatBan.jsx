@@ -16,12 +16,16 @@ const DuyetPhieuDatBan = () => {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [selectedDetailReservation, setSelectedDetailReservation] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
-  const [filterType, setFilterType] = useState('all'); // New state for filter type
-  const detailRef = useRef(null); // Ref for detail content
+  const [filterType, setFilterType] = useState('all');
+  const [filterDate, setFilterDate] = useState('');
+  const detailRef = useRef(null); 
 
   // Function to handle cancel reason change
   const handleCancelReasonChange = (event) => {
     setCancelReason(event.target.value);
+  };
+  const handleFilterDateChange = (event) => {
+    setFilterDate(event.target.value);
   };
 
   // Fetch reservations on component mount
@@ -61,12 +65,9 @@ const printToPdf = () => {
   // Create document definition
   const documentDefinition = {
     content: [
-      { text: 'Chi tiết phiếu đặt bàn', style: 'header' },
-      { text: `Tên khách hàng: ${selectedDetailReservation.fullName}`, margin: [0, 10, 0, 0] },
-      { text: `Email: ${selectedDetailReservation.email}`, margin: [0, 5, 0, 0] },
-      { text: `Phone: ${selectedDetailReservation.phone}`, margin: [0, 5, 0, 0] },
-      { text: `Đặt ngày: ${new Date(selectedDetailReservation.bookingDate).toLocaleDateString()}`, margin: [0, 5, 0, 0] },
-      { text: `Thời gian đặt: ${selectedDetailReservation.bookingTime}`, margin: [0, 5, 0, 0] },
+      { text: 'Phiếu chuẩn bị món', style: 'header' },
+      { text: `Ngày: ${new Date(selectedDetailReservation.bookingDate).toLocaleDateString()}`, margin: [0, 5, 0, 0] },
+      { text: `Thời gian: ${selectedDetailReservation.bookingTime}`, margin: [0, 5, 0, 0] },
       { text: `Số lượng khách: ${selectedDetailReservation.numberOfGuests}`, margin: [0, 5, 0, 0] },
       { text: `Yêu cầu đặc biệt: ${selectedDetailReservation.note}`, margin: [0, 5, 0, 20] },
       {
@@ -78,7 +79,7 @@ const printToPdf = () => {
                   ...tableData
               ]
           },
-          margin: [0, 10, 0, 0], // Margin top: 10px
+          margin: [0, 10, 0, 0], 
       },
       { 
           text: 'Vui lòng chuẩn bị món ăn trước thời gian khách đã đặt', 
@@ -100,7 +101,7 @@ const printToPdf = () => {
 
   // Generate and download PDF
   try {
-    pdfMake.createPdf(documentDefinition).download(`reservation_details_${selectedDetailReservation._id}.pdf`);
+    pdfMake.createPdf(documentDefinition).download(`Phiếu chuẩn bị món_${new Date(selectedDetailReservation.bookingDate).toLocaleDateString()}.pdf`);
   } catch (error) {
     console.error('Error generating PDF:', error);
   }
@@ -231,8 +232,8 @@ const printToPdf = () => {
             )}
           </div>
           <div className="flex justify-end">
-            <button onClick={() => setDetailModalOpen(false)} className="bg-gray-300 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-400">Đóng</button>
-            <button onClick={printToPdf} className="bg-blue-500 ml-3 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-400">Xuất PDF</button>
+            <button onClick={() => setDetailModalOpen(false)} className="mr-4 bg-gray-300 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-400">Đóng</button>
+            <button onClick={printToPdf} className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">In phiếu</button>
           </div>
         </div>
       </div>
@@ -258,25 +259,52 @@ const printToPdf = () => {
   // Filter reservations based on filterType
   const filteredReservations = reservations.filter(reservation => {
     const reservationDate = new Date(reservation.bookingDate);
-    return filterType === 'all' ||
-      (filterType === 'overdue' && now > reservationDate) ||
-      (filterType === 'new' && now <= reservationDate);
+  
+    // Check if there's a filterDate set
+    if (filterDate) {
+      const filterDateObj = new Date(filterDate);
+  
+      // Compare year, month, and day to ignore time components
+      return reservationDate.getFullYear() === filterDateObj.getFullYear() &&
+             reservationDate.getMonth() === filterDateObj.getMonth() &&
+             reservationDate.getDate() === filterDateObj.getDate();
+    }
+  
+    // If no filterDate, apply filterType logic
+    switch (filterType) {
+      case 'all':
+        return true;
+      case 'overdue':
+        return now > reservationDate;
+      case 'new':
+        return now <= reservationDate;
+      default:
+        return true;
+    }
   });
 
   // JSX for reservations table
   return (
     <div className="p-4 sm:p-8">
       <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách phiếu đặt bàn</h2>
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center items-center mb-4 space-x-4">
+        <label htmlFor="filterDate" className="text-gray-700">Chọn ngày:</label>
+        <input
+          id="filterDate"
+          type="date"
+          value={filterDate}
+          onChange={handleFilterDateChange}
+          className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+        />
         <button
           onClick={() => setFilterType('all')}
-          className={`px-4 py-2 rounded-full ${filterType === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} mr-2`}
+          className={`px-4 py-2 rounded-full ${filterType === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
         >
           Tất cả
         </button>
         <button
           onClick={() => setFilterType('overdue')}
-          className={`px-4 py-2 rounded-full ${filterType === 'overdue' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'} mr-2`}
+          className={`px-4 py-2 rounded-full ${filterType === 'overdue' ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'}`}
         >
           Quá hạn
         </button>
@@ -320,14 +348,14 @@ const printToPdf = () => {
                   <td className={`w-1/6 py-3 px-4 text-center ${reservation.status === 'chưa xác nhận' ? 'text-red-500' : 'text-green-500'}`}>{reservation.status}</td>
                   <td className="py-3 text-center">
                     {reservation.status === 'chưa xác nhận' && canApprove ? (
-                      <button onClick={() => handleApproveReservation(reservation._id)} className="bg-green-500 hover:bg-green-700 text-white py-2 px-2 rounded focus:outline-none focus:shadow-outline mr-2 border-2 border-transparent">Duyệt</button>
+                      <button onClick={() => handleApproveReservation(reservation._id)} className="bg-green-500 text-white px-4 py-2 rounded-full hover:bg-green-600 mr-2">Duyệt</button>
                     ) : null}
                     {canCancel ? (
-                      <button onClick={() => handleCancelReservation(reservation._id)} className="bg-red-500 hover:bg-red-700 text-white py-2 px-2 rounded focus:outline-none focus:shadow-outline border-2 border-transparent">Huỷ đặt bàn</button>
+                      <button onClick={() => handleCancelReservation(reservation._id)} className="bg-red-500 text-white px-2 py-2 rounded-full hover:bg-red-600 mr-2">Huỷ đặt bàn</button>
                     ) : null}
                   </td>
                   <td className="w-1/6 py-3 px-4 text-center">
-                    <button onClick={() => handleViewDetail(reservation._id)} className="text-blue-500 hover:text-blue-700 focus:outline-none">Xem chi tiết</button>
+                    <button onClick={() => handleViewDetail(reservation._id)} className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">Xem chi tiết</button>
                   </td>
                 </tr>
               );

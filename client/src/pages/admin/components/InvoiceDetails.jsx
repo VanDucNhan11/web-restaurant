@@ -12,7 +12,8 @@ import { format, parseISO } from 'date-fns'; // Thêm thư viện date-fns
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-const VAT_RATE = 0.1; // 10% VAT
+const VAT_RATE_DEFAULT = 0.1; // 10% VAT
+const VAT_RATE_VIP = 0.15;// 10% VAT
 const LOGO_URL = 'https://madamelan.vn/storage/logo-favicon/logo.png'; // Replace with your logo's URL
 
 const ITEMS_PER_PAGE = 8; // Số lượng món ăn trên mỗi trang
@@ -120,7 +121,10 @@ const InvoiceDetails = () => {
     return Object.values(selectedTables[tableKey]).reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const calculateVAT = (total) => total * VAT_RATE;
+  const calculateVAT = (total, area) => {
+    const vatRate = area === 'VIP' ? VAT_RATE_VIP : VAT_RATE_DEFAULT;
+    return total * vatRate;
+  };
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
@@ -136,7 +140,7 @@ const InvoiceDetails = () => {
     const table = tables.find(table => `${table.area}-${table.tableNumber}` === tableKey);
     const items = Object.values(selectedTables[tableKey]);
     const total = calculateTotalPrice(tableKey);
-    const vat = calculateVAT(total);
+    const vat = calculateVAT(total, table.area);
     const totalWithVAT = total + vat;
     const currentDate = new Date(); // Lấy thời gian hiện tại
     const formattedDate = format(currentDate, 'yyyy-MM-dd HH:mm:ss'); // Định dạng ngày thành chuỗi 'yyyy-MM-dd HH:mm:ss'
@@ -223,7 +227,7 @@ const InvoiceDetails = () => {
                             ['Tên món', 'Số lượng', 'Đơn giá', 'Thành tiền'],
                             ...tableData,
                             [{ text: 'Tổng tiền', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.total)],
-                            [{ text: 'VAT (10%)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
+                            [{ text: `VAT (${invoiceData.table?.area === 'VIP' ? '15%' : '10%'})`, colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
                             [{ text: 'Tổng tiền (đã bao gồm VAT)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.totalWithVAT)]
                         ]
                     }
@@ -384,7 +388,7 @@ const InvoiceDetails = () => {
                     <TableCell>{formatCurrency(invoiceData.total)}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={3} align="right">VAT (10%)</TableCell>
+                    <TableCell colSpan={3} align="right">VAT ({invoiceData.table?.area === 'VIP' ? '15%' : '10%'})</TableCell>
                     <TableCell>{formatCurrency(invoiceData.vat)}</TableCell>
                   </TableRow>
                   <TableRow>

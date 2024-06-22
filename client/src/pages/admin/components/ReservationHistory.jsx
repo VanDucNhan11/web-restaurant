@@ -45,13 +45,35 @@ const ReservationHistory = () => {
       if (!response.ok) {
         throw new Error('Failed to cancel reservation');
       }
-      // Update the reservations list after cancellation
       const updatedReservations = reservations.filter(reservation => reservation._id !== reservationId);
       setReservations(updatedReservations);
-      // Close the modal
       handleCloseModal();
     } catch (error) {
       console.error('Error cancelling reservation:', error.message);
+    }
+  };
+
+  const handleUpdateReservation = async (updatedReservation) => {
+    try {
+      const { status, ...dataToUpdate } = updatedReservation; // Exclude the status field
+      const response = await fetch(`http://localhost:3000/api/v1/reservations/${updatedReservation._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataToUpdate),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update reservation');
+      }
+      const data = await response.json();
+      const updatedReservations = reservations.map(reservation =>
+        reservation._id === data._id ? data : reservation
+      );
+      setReservations(updatedReservations);
+      handleCloseModal();
+    } catch (error) {
+      console.error('Error updating reservation:', error.message);
     }
   };
 
@@ -101,24 +123,25 @@ const ReservationHistory = () => {
           reservation={selectedReservation}
           onClose={handleCloseModal}
           onCancel={handleCancelReservation}
+          onUpdate={handleUpdateReservation}
         />
       )}
     </div>
   );
 };
 
-const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
+const ReservationDetailModal = ({ reservation, onClose, onCancel, onUpdate }) => {
   const [cancelError, setCancelError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [updatedReservation, setUpdatedReservation] = useState({ ...reservation });
 
   const handleCancel = () => {
-    // Combine bookingDate and bookingTime to create a Date object for the booking
     const [hours, minutes] = reservation.bookingTime.split(':').map(Number);
     const bookingDateTime = new Date(reservation.bookingDate);
     bookingDateTime.setHours(hours, minutes);
 
-    // Calculate the time difference between now and the booking time
     const now = new Date();
-    const timeDifference = (bookingDateTime - now) / (1000 * 60 * 60); // Time difference in hours
+    const timeDifference = (bookingDateTime - now) / (1000 * 60 * 60);
 
     if (timeDifference < 0.5) {
       setCancelError('Bạn không thể huỷ đặt bàn trong vòng 30 phút trước thời gian đặt bàn');
@@ -127,14 +150,24 @@ const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
     }
   };
 
-  // Combine bookingDate and bookingTime to create a Date object for the booking
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setUpdatedReservation({ ...updatedReservation, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onUpdate(updatedReservation);
+  };
+
   const [hours, minutes] = reservation.bookingTime.split(':').map(Number);
   const bookingDateTime = new Date(reservation.bookingDate);
   bookingDateTime.setHours(hours, minutes);
 
-  // Calculate the time difference between now and the booking time
   const now = new Date();
-  const timeDifference = (bookingDateTime - now) / (1000 * 60 * 60); // Time difference in hours
+  const timeDifference = (bookingDateTime - now) / (1000 * 60 * 60);
+
+  const isUpdateAllowed = timeDifference >= 0.5 && reservation.status !== 'đã xác nhận';
 
   return (
     <div className="fixed inset-0 z-50 overflow-auto bg-gray-500 bg-opacity-50 flex items-center justify-center">
@@ -148,26 +181,113 @@ const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
         </div>
         <div className="p-6">
           <h2 className="text-xl font-semibold mb-4">Chi tiết phiếu đặt bàn</h2>
-          <p><strong>Họ và tên:</strong> {reservation.fullName}</p>
-          <p><strong>Email:</strong> {reservation.email}</p>
-          <p><strong>Phone:</strong> {reservation.phone}</p>
-          <p><strong>Đặt ngày:</strong> {new Date(reservation.bookingDate).toLocaleDateString()}</p>
-          <p><strong>Thời gian:</strong> {reservation.bookingTime}</p>
-          <p><strong>Số lượng khách:</strong> {reservation.numberOfGuests}</p>
-          <p><strong>Ghi chú:</strong> {reservation.note}</p>
-          <p><strong>Trạng thái:</strong> {reservation.status}</p>
-          <h3 className="text-lg font-semibold mt-4">Danh sách món ăn:</h3>
-          <ul className="list-disc pl-5">
-            {reservation.selectedItems.map((item, index) => (
-              <li key={index}>
-                {item.itemName} - Số lượng: {item.quantity} - Giá: {item.price}
-              </li>
-            ))}
-          </ul>
-          {timeDifference < 5 ? (
-            <p className="text-red-500 mt-4">Bạn không thể huỷ đặt bàn trong vòng 30 phút trước thời gian đặt bàn</p>
+          {editMode ? (
+            <form onSubmit={handleSubmit}>
+              <label>
+                Họ và tên:
+                <input
+                  type="text"
+                  name="fullName"
+                  value={updatedReservation.fullName}
+                  onChange={handleInputChange}
+                  className="block w-full mt-1"
+                />
+              </label>
+              <label>
+                Email:
+                <input
+                  type="email"
+                  name="email"
+                  value={updatedReservation.email}
+                  onChange={handleInputChange}
+                  className="block w-full mt-1"
+                />
+              </label>
+              <label>
+                Phone:
+                <input
+                  type="tel"
+                  name="phone"
+                  value={updatedReservation.phone}
+                  onChange={handleInputChange}
+                  className="block w-full mt-1"
+                />
+              </label>
+              <label>
+                Đặt ngày:
+                <input
+                  type="date"
+                  name="bookingDate"
+                  value={new Date(updatedReservation.bookingDate).toISOString().split('T')[0]}
+                  onChange={handleInputChange}
+                  className="block w-full mt-1"
+                />
+              </label>
+              <label>
+                Thời gian:
+                <input
+                  type="time"
+                  name="bookingTime"
+                  value={updatedReservation.bookingTime}
+                  onChange={handleInputChange}
+                  className="block w-full mt-1"
+                />
+              </label>
+              <label>
+                Số lượng khách:
+                <input
+                  type="number"
+                  name="numberOfGuests"
+                  value={updatedReservation.numberOfGuests}
+                  onChange={handleInputChange}
+                  className="block w-full mt-1"
+                />
+              </label>
+              <label>
+                Ghi chú:
+                <textarea
+                  name="note"
+                  value={updatedReservation.note}
+                  onChange={handleInputChange}
+                  className="block w-full mt-1"
+                ></textarea>
+              </label>
+              <button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full">
+                Cập nhật
+              </button>
+              <button onClick={() => setEditMode(false)} className="mt-4 ml-2 bg-gray-500 text-white px-4 py-2 rounded-full">
+                Hủy
+              </button>
+            </form>
           ) : (
-            <button onClick={handleCancel} className="mt-4 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white">Huỷ đặt bàn</button>
+            <>
+              <p><strong>Họ và tên:</strong> {reservation.fullName}</p>
+              <p><strong>Email:</strong> {reservation.email}</p>
+              <p><strong>Phone:</strong> {reservation.phone}</p>
+              <p><strong>Đặt ngày:</strong> {new Date(reservation.bookingDate).toLocaleDateString()}</p>
+              <p><strong>Thời gian:</strong> {reservation.bookingTime}</p>
+              <p><strong>Số lượng khách:</strong> {reservation.numberOfGuests}</p>
+              <p><strong>Ghi chú:</strong> {reservation.note}</p>
+              <p><strong>Trạng thái:</strong> {reservation.status}</p>
+              <h3 className="text-lg font-semibold mt-4">Danh sách món ăn:</h3>
+              <ul className="list-disc pl-5">
+                {reservation.selectedItems.map((item, index) => (
+                  <li key={index}>
+                    {item.itemName} - Số lượng: {item.quantity} - Giá: {item.price}
+                  </li>
+                ))}
+              </ul>
+              {timeDifference < 0.5 ? (
+                <p className="text-red-500 mt-4">Bạn không thể huỷ đặt bàn trong vòng 30 phút trước thời gian đặt bàn</p>
+              ) : (
+                <button onClick={handleCancel} className="mt-4 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white">Huỷ đặt bàn</button>
+              )}
+              {isUpdateAllowed && (
+                <button onClick={() => setEditMode(true)} className="mt-4 bg-green-500 text-white px-4 py-2 rounded-full border-2 border-green-600 hover:bg-green-600 hover:border-green-700 hover:text-white">
+                  Cập nhật
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
