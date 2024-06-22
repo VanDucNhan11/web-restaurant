@@ -10,6 +10,6 @@ router.post('/', upload.single('photo'), employeeController.createEmployee);
 router.get('/:id', employeeController.getEmployee);
 router.put('/:id', upload.single('photo'), employeeController.updateEmployee);
 router.delete('/:id', employeeController.deleteEmployee);
-router.get('/position', employeeController.getEmployeesByPosition);
+router.get('/count', employeeController.getEmployeesByPosition);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
+const UserTable = ({ users, handleUpdateRole, handleDeleteUser, filter }) => {
   const [selectedRole, setSelectedRole] = useState('');
   const [showDropdownRowId, setShowDropdownRowId] = useState(null); // State để lưu ID của hàng đang hiển thị dropdown menu
 
@@ -16,6 +16,18 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
     setSelectedRole(''); // Reset selectedRole về trạng thái mặc định
   };
 
+  const filteredUsers = users.filter(user => {
+    if (filter === 'Khách hàng') {
+      return user.role === 'Khách hàng';
+    } else if (filter === 'Nhân viên') {
+      return user.role === 'Nhân viên';
+    } else if (filter === 'Quản trị viên') {
+      return user.role === 'Quản trị viên';
+    } else {
+      return true; // Hiển thị tất cả nếu không có bộ lọc hoặc bộ lọc là ''
+    }
+  });
+
   return (
     <div className="overflow-x-auto shadow-md rounded-lg">
       <table className="min-w-full bg-white border border-gray-200">
@@ -28,7 +40,7 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
           </tr>
         </thead>
         <tbody className="text-gray-600 text-sm font-light">
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <tr key={user._id} className="border-b border-gray-200 hover:bg-gray-100">
               <td className="py-3 px-6 text-left">{user.username}</td>
               <td className="py-3 px-6 text-left">{user.email}</td>
@@ -60,9 +72,9 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser }) => {
   );
 };
 
-
 const AccountManagement = () => {
   const [users, setUsers] = useState([]);
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -70,7 +82,7 @@ const AccountManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:3000/api/v1/user'); 
+      const response = await axios.get('http://localhost:3000/api/v1/user');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -79,7 +91,7 @@ const AccountManagement = () => {
 
   const handleUpdateRole = async (userId, role) => {
     try {
-      const response = await axios.put(`http://localhost:3000/api/v1/user/${userId}/role`, { role }); 
+      const response = await axios.put(`http://localhost:3000/api/v1/user/${userId}/role`, { role });
       console.log(response.data.message);
       fetchUsers();
     } catch (error) {
@@ -89,7 +101,7 @@ const AccountManagement = () => {
 
   const handleDeleteUser = async (userId) => {
     try {
-      const response = await axios.delete(`http://localhost:3000/api/v1/user/${userId}`); 
+      const response = await axios.delete(`http://localhost:3000/api/v1/user/${userId}`);
       console.log(response.data.message);
       fetchUsers();
     } catch (error) {
@@ -97,10 +109,22 @@ const AccountManagement = () => {
     }
   };
 
+  const handleFilterChange = (selectedFilter) => {
+    setFilter(selectedFilter);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách tài khoản</h1>
-      <UserTable users={users} handleUpdateRole={handleUpdateRole} handleDeleteUser={handleDeleteUser} />
+      {/* Dropdown hoặc các nút để lọc */}
+      <div className="flex justify-center mb-4">
+        <button onClick={() => handleFilterChange('')} className={`bg-gray-300 text-gray-700 px-3 py-1 rounded-l-md ${filter === '' ? 'bg-gray-500' : 'hover:bg-gray-400'} transition duration-300`}>Tất cả</button>
+        <button onClick={() => handleFilterChange('Khách hàng')} className={`bg-gray-300 text-gray-700 px-3 py-1 ${filter === 'Khách hàng' ? 'bg-gray-500' : 'hover:bg-gray-400'} transition duration-300`}>Khách hàng</button>
+        <button onClick={() => handleFilterChange('Nhân viên')} className={`bg-gray-300 text-gray-700 px-3 py-1 ${filter === 'Nhân viên' ? 'bg-gray-500' : 'hover:bg-gray-400'} transition duration-300`}>Nhân viên</button>
+        <button onClick={() => handleFilterChange('Quản trị viên')} className={`bg-gray-300 text-gray-700 px-3 py-1 rounded-r-md ${filter === 'Quản trị viên' ? 'bg-gray-500' : 'hover:bg-gray-400'} transition duration-300`}>Quản trị viên</button>
+      </div>
+      {/* Bảng danh sách tài khoản */}
+      <UserTable users={users} handleUpdateRole={handleUpdateRole} handleDeleteUser={handleDeleteUser} filter={filter} />
     </div>
   );
 };

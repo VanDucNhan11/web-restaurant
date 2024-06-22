@@ -1,15 +1,53 @@
 const Invoice = require('../models/Invoice.model.js');
 
+
 exports.createInvoice = async (req, res) => {
-    try {
-        const { area, tableNumber, date, total, username, customerName } = req.body; 
-        const newInvoice = new Invoice({ area, tableNumber, date, total, username, customerName }); 
-        await newInvoice.save();
-        res.status(201).json(newInvoice);
-    } catch (error) {
-        console.error('Error saving invoice:', error);
-        res.status(500).json({ error: 'Internal server error' });
+  try {
+    const { area, tableNumber, date, total, username, customerName, selectedItems } = req.body; // Thêm selectedItems
+
+    // Tạo URL thanh toán (Ví dụ: http://localhost:3000/payment/ID_HOA_DON)
+    const paymentUrl = `http://localhost:3000/payment/${req.body.id}`;
+
+    const newInvoice = new Invoice({
+      area,
+      tableNumber,
+      date,
+      total,
+      username,
+      customerName,
+      selectedItems, // Lưu danh sách món ăn
+      paymentUrl
+    });
+    
+    await newInvoice.save();
+    res.status(201).json(newInvoice);
+  } catch (error) {
+    console.error('Error saving invoice:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+exports.updateInvoice = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { area, tableNumber, date, total, username, customerName, selectedItems } = req.body;
+
+    const newTotal = selectedItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+    const updatedInvoice = await Invoice.findByIdAndUpdate(
+      id,
+      { area, tableNumber, date, total: newTotal, username, customerName, selectedItems },
+      { new: true }
+    );
+
+    if (!updatedInvoice) {
+      return res.status(404).json({ error: 'Invoice not found' });
     }
+
+    res.status(200).json(updatedInvoice);
+  } catch (error) {
+    console.error('Error updating invoice:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 exports.getRevenue = async (req, res) => {
@@ -63,4 +101,12 @@ exports.getRevenue = async (req, res) => {
   }
 };
   
-  
+exports.getInvoices = async (req, res) => {
+  try {
+    const invoices = await Invoice.find();
+    res.status(200).json(invoices);
+  } catch (error) {
+    console.error('Error fetching invoices:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { jsPDF } from 'jspdf';
-import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
 
 const DuyetPhieuDatBan = () => {
   const currentUser = useSelector(state => state.user.currentUser);
@@ -25,67 +27,85 @@ const DuyetPhieuDatBan = () => {
   // Fetch reservations on component mount
   useEffect(() => {
     const fetchReservations = async () => {
-      try {
-        const response = await fetch(`http://localhost:3000/api/v1/reservations`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch reservations');
+        try {
+            const response = await fetch(`http://localhost:3000/api/v1/reservations`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch reservations');
+            }
+            const data = await response.json();
+            setReservations(data);
+            setLoading(false);
+        } catch (error) {
+            setError(error.message);
+            setLoading(false);
         }
-        const data = await response.json();
-        setReservations(data);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
     };
 
     fetchReservations();
-  }, []);
+}, []);
 
-  const printToPdf = async () => {
-    try {
-      const content = detailRef.current.innerHTML;
+const printToPdf = () => {
+  if (!selectedDetailReservation) {
+    console.error('No selected reservation data available.');
+    return;
+  }
 
-      // Tạo canvas từ nội dung HTML sử dụng html2canvas
-      const canvas = await html2canvas(detailRef.current, {
-        scale: 2, // Tăng tỷ lệ để đảm bảo chất lượng hình ảnh cao hơn
-        useCORS: true, // Sử dụng CORS để tránh lỗi về bảo mật khi tạo ảnh canvas
-      });
+  // Set fonts for pdfMake
+  pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
-      // Lấy đối tượng jsPDF mới
-      const pdf = new jsPDF('p', 'px', 'a4');
+  // Create an array for selected items data
+  const tableData = selectedDetailReservation.selectedItems.map(item => {
+    return [item.itemName, item.quantity];
+  });
 
-      // Tính toán kích thước của PDF dựa trên kích thước của canvas
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
-
-      // Thêm ảnh từ canvas vào PDF
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfWidth, pdfHeight);
-
-      // Tính toán chiều cao của văn bản
-      const lineHeight = 12; // Chiều cao của mỗi dòng văn bản
-      const textLines = pdf.splitTextToSize(content, pdfWidth); // Tách văn bản thành từng dòng với chiều rộng tối đa là pdfWidth
-
-      // Chiều cao của văn bản
-      const textHeight = textLines.length * lineHeight;
-
-      // Kiểm tra nếu chiều cao văn bản vượt quá chiều cao trang, thêm trang mới và in lại
-      let currentY = pdfHeight + 10; // Đặt vị trí y bắt đầu in văn bản
-      if (currentY + textHeight > pdf.internal.pageSize.getHeight()) {
-        pdf.addPage(); // Thêm trang mới
-        currentY = 10; // Đặt lại vị trí y bắt đầu in văn bản ở trang mới
+  // Create document definition
+  const documentDefinition = {
+    content: [
+      { text: 'Chi tiết phiếu đặt bàn', style: 'header' },
+      { text: `Tên khách hàng: ${selectedDetailReservation.fullName}`, margin: [0, 10, 0, 0] },
+      { text: `Email: ${selectedDetailReservation.email}`, margin: [0, 5, 0, 0] },
+      { text: `Phone: ${selectedDetailReservation.phone}`, margin: [0, 5, 0, 0] },
+      { text: `Đặt ngày: ${new Date(selectedDetailReservation.bookingDate).toLocaleDateString()}`, margin: [0, 5, 0, 0] },
+      { text: `Thời gian đặt: ${selectedDetailReservation.bookingTime}`, margin: [0, 5, 0, 0] },
+      { text: `Số lượng khách: ${selectedDetailReservation.numberOfGuests}`, margin: [0, 5, 0, 0] },
+      { text: `Yêu cầu đặc biệt: ${selectedDetailReservation.note}`, margin: [0, 5, 0, 20] },
+      {
+          table: {
+              headerRows: 1,
+              widths: ['*', '*'],
+              body: [
+                  ['Tên món', 'Số lượng'],
+                  ...tableData
+              ]
+          },
+          margin: [0, 10, 0, 0], // Margin top: 10px
+      },
+      { 
+          text: 'Vui lòng chuẩn bị món ăn trước thời gian khách đã đặt', 
+          alignment: 'center', 
+          margin: [0, 15, 0, 0],
+          fontSize: 14,
+          bold: true,
+      },
+    ],
+    styles: {
+      header: {
+        fontSize: 18,
+        bold: true,
+        alignment: 'center',
+        margin: [0, 0, 0, 10]
       }
-
-      // Thêm văn bản vào PDF
-
-      // Lưu file PDF với tên reservation_detail.pdf
-      pdf.save('reservation_detail.pdf');
-    } catch (error) {
-      console.error('Error exporting to PDF:', error);
-      // Xử lý lỗi khi xuất PDF
     }
   };
- 
+
+  // Generate and download PDF
+  try {
+    pdfMake.createPdf(documentDefinition).download(`reservation_details_${selectedDetailReservation._id}.pdf`);
+  } catch (error) {
+    console.error('Error generating PDF:', error);
+  }
+};
+
   // Function to handle approval of a reservation
   const handleApproveReservation = (reservationId) => {
     setSelectedReservation(reservationId);

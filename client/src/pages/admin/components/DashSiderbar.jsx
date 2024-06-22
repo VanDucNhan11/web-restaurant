@@ -65,6 +65,12 @@ const DashSiderbar = () => {
                 <ion-icon name="documents-outline" class="mr-3"></ion-icon>
                 Hệ thông thanh toán
               </Link>
+              <Link
+                to="/dashboard?tab=UpdateInvoice"
+                className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'UpdateInvoice' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
+                <ion-icon name="albums-outline" class="mr-3"></ion-icon>
+                Cập nhật hoá đơn
+              </Link>
             </>
           )}
           {currentUser.role === 'Quản trị viên' && (
@@ -79,13 +85,13 @@ const DashSiderbar = () => {
                 to="/dashboard?tab=category-management"
                 className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'category-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
                 <ion-icon name="list-outline" class="mr-3"></ion-icon>
-                Cập nhật danh mục menu
+                Cập nhật danh mục thực đơn
               </Link>
               <Link
                 to="/dashboard?tab=menu-management"
                 className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'menu-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
                 <ion-icon name="fast-food-outline" class="mr-3"></ion-icon>
-                Cập nhật menu
+                Cập nhật thực đơn
               </Link>
               <Link
                 to="/dashboard?tab=employee-management"

@@ -14,6 +14,7 @@ const RecruitmentUpdate = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingJob, setEditingJob] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState('');
 
   useEffect(() => {
     fetchJobs();
@@ -122,10 +123,25 @@ const RecruitmentUpdate = () => {
     setSelectedFile(null);
   };
 
+  const handleChangeSearch = (e) => {
+    setSearchKeyword(e.target.value.toLowerCase());
+  };
+
+  const filteredJobs = jobs.filter(job =>
+    job.title.toLowerCase().includes(searchKeyword)
+  );
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách bài viết tuyển dụng</h1>
       <div className="flex justify-end mb-4">
+        <input
+          type="text"
+          value={searchKeyword}
+          onChange={handleChangeSearch}
+          placeholder="Tìm kiếm theo tiêu đề công việc"
+          className="border border-gray-300 rounded-md px-3 py-2 w-64 mr-2"
+        />
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
@@ -147,7 +163,7 @@ const RecruitmentUpdate = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <tr key={job._id} className="border-b border-gray-200 hover:bg-gray-100">
                 <td className="py-3 px-6 border">{job.title}</td>
                 <td className="py-3 px-6 border">{job.description}</td>
@@ -265,3 +281,4 @@ const RecruitmentUpdate = () => {
 };
 
 export default RecruitmentUpdate;
+

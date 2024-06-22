@@ -15,6 +15,7 @@ import MenuManagement from './MenuManagement';
 import DuyetPhieuDB from './DuyetPhieuDatBan'
 import ChiTietHoaDon from './InvoiceDetails'
 import RecruitmentUpdate from './RecruitmentUpdate'
+import UpdateInvoice from './UpdateInvoice'
 
 // Dashboard.js
 const Dashboard = () => {
@@ -44,6 +45,7 @@ const Dashboard = () => {
         {tab === 'profile' && <Profile />}
         {tab === 'history' &&  <History />}
         {tab === 'DuyetPhieuDB' &&  <DuyetPhieuDB />}
+        {tab === 'UpdateInvoice' &&  <UpdateInvoice />}
         {tab === 'XuatHoaDon' &&  <ChiTietHoaDon />}
         {tab === 'account-management' &&  <AccountManagement />}
         {tab === 'category-management' &&  <CategoryManagement />}

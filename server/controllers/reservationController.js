@@ -1,8 +1,12 @@
 const Reservation = require('../models/Reservation.model');
 const nodemailer = require('nodemailer');
 const qrcode = require('qrcode');
+const querystring = require('querystring');
+const crypto = require('crypto');
 
-// Create a new reservation
+
+
+
 const createReservation = async (req, res) => {
   const { userID, fullName, email, phone, bookingDate, bookingTime, numberOfGuests, note, selectedItems } = req.body;
 
@@ -48,7 +52,7 @@ const getReservationById = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-};
+}; 
 
 // Update a reservation
 const updateReservation = async (req, res) => {
@@ -214,6 +218,206 @@ const cancelReservation = async (req, res) => {
   }
 };
 
+
+const createVnpayHash = (req, res, next) => {
+  var vnp_Params = req.query;
+  var secureHash = vnp_Params['vnp_SecureHash'];
+
+  delete vnp_Params['vnp_SecureHash'];
+  delete vnp_Params['vnp_SecureHashType'];
+
+  vnp_Params = sortObject(vnp_Params);
+  var config = require('config');
+  var secretKey = config.get('vnp_HashSecret');
+  var querystring = require('qs');
+  var signData = querystring.stringify(vnp_Params, { encode: false });
+  var crypto = require("crypto");     
+  var hmac = crypto.createHmac("sha512", secretKey);
+  var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");     
+   
+
+  if(secureHash === signed){
+      var orderId = vnp_Params['vnp_TxnRef'];
+      var rspCode = vnp_Params['vnp_ResponseCode'];
+      //Kiem tra du lieu co hop le khong, cap nhat trang thai don hang va gui ket qua cho VNPAY theo dinh dang duoi
+      res.status(200).json({RspCode: '00', Message: 'success'})
+  }
+  else {
+      res.status(200).json({RspCode: '97', Message: 'Fail checksum'})
+  }
+};
+
+const createPaymentUrl = async (req, res, next) => {
+    try {
+      const ipAddr = req.headers['x-forwarded-for'] ||
+          req.connection.remoteAddress ||
+          req.socket.remoteAddress ||
+          (req.connection.socket ? req.connection.socket.remoteAddress : null);
+      
+      const config = require('config');
+      const dateFormat = require('dateformat');
+      
+      const tmnCode = config.get('GRVLYHCV');
+      const secretKey = config.get('YAQ8ESNI1GPY1KDJ8QT26FS7Z08IA4EL');
+      const vnpUrl = config.get('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html');
+      const returnUrl = config.get('http://localhost:5173/success');
+      
+      const date = new Date();
+      const createDate = dateFormat(date, 'yyyymmddHHmmss');
+      const orderId = dateFormat(date, 'HHmmss');
+      const { amount, bankCode, orderDescription, orderType, language } = req.body;
+
+      if(locale === null || locale === ''){
+            locale = 'vn';
+        }
+        var currCode = 'VND';
+        var vnp_Params = {};
+        vnp_Params['vnp_Version'] = '2.1.0';
+        vnp_Params['vnp_Command'] = 'pay';
+        vnp_Params['vnp_TmnCode'] = tmnCode;
+        // vnp_Params['vnp_Merchant'] = ''
+        vnp_Params['vnp_Locale'] = locale;
+        vnp_Params['vnp_CurrCode'] = currCode;
+        vnp_Params['vnp_TxnRef'] = orderId;
+        vnp_Params['vnp_OrderInfo'] = orderInfo;
+        vnp_Params['vnp_OrderType'] = orderType;
+        vnp_Params['vnp_Amount'] = amount * 100;
+        vnp_Params['vnp_ReturnUrl'] = returnUrl;
+        vnp_Params['vnp_IpAddr'] = ipAddr;
+        vnp_Params['vnp_CreateDate'] = createDate;
+        if(bankCode !== null && bankCode !== ''){
+            vnp_Params['vnp_BankCode'] = bankCode;
+        }
+
+        vnp_Params = sortObject(vnp_Params);
+
+        var querystring = require('qs');
+        var signData = querystring.stringify(vnp_Params, { encode: false });
+        var crypto = require("crypto");     
+        var hmac = crypto.createHmac("sha512", secretKey);
+        var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex"); 
+        vnp_Params['vnp_SecureHash'] = signed;
+        vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
+
+        res.redirect(vnpUrl)
+
+  } catch (error) {
+      next(error);
+  }
+};
+
+const vnpayReturn = (req, res, next) => {
+    var vnp_Params = req.query;
+      
+    var secureHash = vnp_Params['vnp_SecureHash'];
+
+    delete vnp_Params['vnp_SecureHash'];
+    delete vnp_Params['vnp_SecureHashType'];
+
+    vnp_Params = sortObject(vnp_Params);
+
+    var config = require('config');
+    var tmnCode = config.get('vnp_TmnCode');
+    var secretKey = config.get('vnp_HashSecret');
+
+    var querystring = require('qs');
+    var signData = querystring.stringify(vnp_Params, { encode: false });
+    var crypto = require("crypto");     
+    var hmac = crypto.createHmac("sha512", secretKey);
+    var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");     
+
+    if(secureHash === signed){
+        //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
+
+        res.render('success', {code: vnp_Params['vnp_ResponseCode']})
+    } else{
+        res.render('success', {code: '97'})
+    }
+};
+const createmomo = async (req, Rres) => {
+  const partnerCode = "MOMO";
+  const accessKey = "F8BBA842ECF85";
+  const secretkey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
+  const requestId = partnerCode + new Date().getTime();
+  const orderId = requestId;
+  const orderInfo = "Thanh Toán đặt cọc bàn";
+  const redirectUrl = "http://localhost:5173/success";
+  const ipnUrl = "http://localhost:5173//success";
+
+  const amount = req.body.amount;
+  const requestType = "captureWallet"
+  const extraData = ""; //pass empty value if your merchant does not have stores
+
+  // Create raw signature
+  const rawSignature = `accessKey=${accessKey}&amount=${amount}&extraData=${extraData}&ipnUrl=${ipnUrl}&orderId=${orderId}&orderInfo=${orderInfo}&partnerCode=${partnerCode}&redirectUrl=${redirectUrl}&requestId=${requestId}&requestType=${requestType}`;
+
+  // Generate HMAC SHA256 signature
+  const crypto = require('crypto');
+  const signature = crypto.createHmac('sha256', secretkey)
+      .update(rawSignature)
+      .digest('hex');
+
+  // JSON object to send to MoMo endpoint
+  const requestBody = JSON.stringify({
+      partnerCode: partnerCode,
+      accessKey: accessKey,
+      requestId: requestId,
+      amount: amount,
+      orderId: orderId,
+      orderInfo: orderInfo,
+      redirectUrl: redirectUrl,
+      ipnUrl: ipnUrl,
+      extraData: extraData,
+      requestType: requestType,
+      signature: signature,
+      lang: 'en'
+  });
+
+  // Create the HTTPS request
+  const https = require('https');
+  const options = {
+      hostname: 'test-payment.momo.vn',
+      port: 443,
+      path: '/v2/gateway/api/create',
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(requestBody)
+      }
+  };
+
+  // Send the request and get the response
+  const hm = https.request(options, res => {
+      res.setEncoding('utf8');
+      let body = '';
+      res.on('data', chunk => {
+          body += chunk;
+      });
+      res.on('end', () => {
+          try {
+              const responseBody = JSON.parse(body);
+              const payUrl = responseBody.payUrl;
+              Rres.json(payUrl); // Return payUrl to the client
+          } catch (error) {
+              console.error('Error parsing MoMo response:', error);
+              Rres.status(500).json({ error: 'Error processing MoMo response' });
+          }
+      });
+  });
+
+  // Handle HTTPS request errors
+  hm.on('error', e => {
+      console.error(`Problem with MoMo request: ${e.message}`);
+      Rres.status(500).json({ error: e.message });
+  });
+
+  // Write data to request body and end request
+  hm.write(requestBody);
+  hm.end();
+};
+
+  
+
 module.exports = {
   createReservation,
   getReservations,
@@ -222,5 +426,9 @@ module.exports = {
   deleteReservation,
   getReservationsByUserId,
   approveReservation,
-  cancelReservation
+  cancelReservation,
+  createPaymentUrl,
+  vnpayReturn,
+  createmomo,
+  createVnpayHash
 };

@@ -56,6 +56,8 @@ const EmployeeManagement = () => {
   const [detailEmployee, setDetailEmployee] = useState(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [filterPosition, setFilterPosition] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchEmployees();
@@ -145,7 +147,42 @@ const EmployeeManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Quản lý nhân viên</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách nhân viên</h1>
+      <div className="flex justify-between items-center mb-4">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm"
+          />
+        </div>
+        <div className="relative flex items-center ml-4">
+          <label htmlFor="filter" className="mr-2">Lọc theo chức vụ:</label>
+          <select
+            id="filter"
+            value={filterPosition}
+            onChange={(e) => setFilterPosition(e.target.value)}
+            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          >
+            <option value="">Tất cả chức vụ</option>
+            <option value="Phục vụ">Phục vụ</option>
+            <option value="Tiếp thực">Tiếp thực</option>
+            <option value="Lễ tân">Lễ tân</option>
+            <option value="Chảo chính">Chảo chính</option>
+            <option value="Phụ thớt">Phụ thớt</option>
+            <option value="Bếp nướng">Bếp nướng</option>
+            <option value="Nấu món ăn sáng">Nấu món ăn sáng</option>
+            <option value="Bảo trì">Bảo trì</option>
+            <option value="Nấu xôi chè">Nấu xôi chè</option>
+            <option value="Quầy (bán món ăn sáng)">Quầy (bán món ăn sáng)</option>
+            <option value="Sơ chế nguyên liệu">Sơ chế nguyên liệu</option>
+            <option value="Thủ kho">Thủ kho</option>
+            <option value="Pha chế">Pha chế</option>
+          </select>
+        </div>
+      </div>
       <div className="flex justify-end mb-4">
         <button onClick={() => { setEditEmployee({}); setIsModalOpen(true); }} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Thêm nhân viên</button>
       </div>
@@ -161,23 +198,34 @@ const EmployeeManagement = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {employees.map((employee) => (
-              <tr key={employee._id} className="border-b border-gray-200 hover:bg-gray-100">
-                <td className="py-3 px-6 text-left">{employee.name}</td>
-                <td className="py-3 px-6 text-left">{employee.position}</td>
-                <td className="py-3 px-6 text-left">{employee.phone}</td>
-                <td className="py-3 px-6 text-left">{employee.status}</td>
-                <td className="py-3 px-6 text-center">
-                  <button onClick={() => handleViewDetails(employee)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Xem chi tiết</button>
-                  <button onClick={() => handleEdit(employee)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Sửa</button>
-                  <button onClick={() => handleDelete(employee._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300">Xóa</button>
-                </td>
-              </tr>
-            ))}
+            {employees
+              .filter((employee) => {
+                // Áp dụng bộ lọc theo chức vụ
+                if (filterPosition && employee.position !== filterPosition) {
+                  return false;
+                }
+                // Áp dụng tìm kiếm theo tên
+                if (searchTerm && !employee.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+                  return false;
+                }
+                return true;
+              })
+              .map((employee) => (
+                <tr key={employee._id} className="border-b border-gray-200 hover:bg-gray-100">
+                  <td className="py-3 px-6 text-left">{employee.name}</td>
+                  <td className="py-3 px-6 text-left">{employee.position}</td>
+                  <td className="py-3 px-6 text-left">{employee.phone}</td>
+                  <td className="py-3 px-6 text-left">{employee.status}</td>
+                  <td className="py-3 px-6 text-center">
+                    <button onClick={() => handleViewDetails(employee)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Xem chi tiết</button>
+                    <button onClick={() => handleEdit(employee)} className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-700 transition duration-300">Sửa</button>
+                    <button onClick={() => handleDelete(employee._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300">Xóa</button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
-
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editEmployee._id ? "Chỉnh sửa nhân viên" : "Thêm nhân viên"}>
         <form onSubmit={handleSave} className="space-y-4">
           <div>

@@ -10,6 +10,15 @@ const MenuManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const filteredMenuItems = menuItems.filter(item => {
+    return item.itemName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   useEffect(() => {
     fetchMenuItems();
@@ -98,8 +107,34 @@ const MenuManagement = () => {
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách món ăn</h1>
-      <div className="flex justify-end mb-4">
-        <button onClick={() => { setCurrentItem({}); setIsModalOpen(true); }} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300">Thêm món ăn</button>
+      <div className="flex justify-between items-center mb-4">
+        <div className="relative">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className="border border-gray-300 focus:outline-none focus:border-blue-500 rounded-lg py-2 px-4 block w-64 appearance-none leading-normal"
+            placeholder="Tìm kiếm món ăn"
+          />
+          <div className="absolute right-0 top-0 mt-3 mr-4 text-gray-600">
+            <svg
+              className="h-4 w-4 fill-current"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+            >
+              <path
+                className="heroicon-ui"
+                d="M17.5 16h-.79l-.28-.27a6.5 6.5 0 0 0 1.48-5.34c-.47-2.78-2.79-5-5.59-5.34a6.505 6.505 0 0 0-7.27 7.27c.34 2.8 2.56 5.12 5.34 5.59a6.5 6.5 0 0 0 5.34-1.48l.27.28v.79l5 4.99L22 21.5l-4.5-4.5zm-6 0C7.01 16 5 13.99 5 11.5S7.01 7 9.5 7 14 9.01 14 11.5 11.99 16 9.5 16z"
+              />
+            </svg>
+          </div>
+        </div>
+        <button
+          onClick={() => { setCurrentItem({}); setIsModalOpen(true); }}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
+        >
+          Thêm món ăn
+        </button>
       </div>
       <div className="overflow-x-auto shadow-md rounded-lg">
         <table className="min-w-full bg-white border border-gray-200">
@@ -114,24 +149,23 @@ const MenuManagement = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {menuItems.map((item) => (
-              <tr key={item._id} className="border-b border-gray-200 hover:bg-gray-100">
-                
-                <td className="py-3 px-6 text-left">{item.categoryID.name}</td>
-                <td className="py-3 px-6 text-left">{item.itemName}</td>
-                <td className="py-3 px-6 text-left">{item.description}</td>
-                <td className="py-3 px-6 text-left">{item.price.toLocaleString('vi-VN')} VNĐ</td>
-                <td className="py-3 px-6 text-left">
-                  {item.image && (
-                    <img src={`http://localhost:3000/${item.image}`} alt={item.itemName} className="w-16 h-16 object-cover" />
-                  )}
-                </td>
-                <td className="py-3 px-6 text-center">
-                  <button onClick={() => handleEdit(item)} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-300">Sửa</button>
-                  <button onClick={() => handleDelete(item._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300 mt-2">Xoá</button>
-                </td>
-              </tr>
-            ))}
+          {filteredMenuItems.map((item) => (
+            <tr key={item._id} className="border-b border-gray-200 hover:bg-gray-100">
+              <td className="py-3 px-6 text-left">{item.categoryID.name}</td>
+              <td className="py-3 px-6 text-left">{item.itemName}</td>
+              <td className="py-3 px-6 text-left">{item.description}</td>
+              <td className="py-3 px-6 text-left">{item.price.toLocaleString('vi-VN')} VNĐ</td>
+              <td className="py-3 px-6 text-left">
+                {item.image && (
+                  <img src={`http://localhost:3000/${item.image}`} alt={item.itemName} className="w-16 h-16 object-cover" />
+                )}
+              </td>
+              <td className="py-3 px-6 text-center">
+                <button onClick={() => handleEdit(item)} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-300">Sửa</button>
+                <button onClick={() => handleDelete(item._id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300 mt-2">Xoá</button>
+              </td>
+            </tr>
+          ))}
           </tbody>
         </table>
       </div>

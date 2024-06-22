@@ -7,6 +7,7 @@ const TableManagement = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [newTableData, setNewTableData] = useState({ quantity: '', type: '', area: 'A', tableNumber: '' });
   const [editTableData, setEditTableData] = useState({});
+  const [filterArea, setFilterArea] = useState('');
 
   useEffect(() => {
     fetchTables();
@@ -80,16 +81,47 @@ const TableManagement = () => {
     }
   };
 
+  const handleFilterChange = (e) => {
+    setFilterArea(e.target.value);
+  };
+
+  // Lọc danh sách bàn dựa trên khu đã chọn
+  const filteredTables = tables.filter(table => {
+    if (filterArea === '') {
+      return true; // Hiển thị tất cả nếu chưa chọn khu
+    } else {
+      return table.area === filterArea;
+    }
+  });
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách bàn</h1>
-      <div className="flex justify-end mb-4">
-        <button
-          onClick={openAddModal}
-          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
-        >
-          Thêm 
-        </button>
+      <div className="flex justify-between mb-4">
+        <div>
+          <button
+            onClick={openAddModal}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
+          >
+            Thêm
+          </button>
+        </div>
+        <div className="relative">
+          <label htmlFor="filterArea" className="mr-2">Lọc theo khu:</label>
+          <select
+            id="filterArea"
+            onChange={handleFilterChange}
+            value={filterArea}
+            className="border border-gray-300 rounded-md px-3 py-2"
+          >
+            <option value="">Tất cả</option>
+            <option value="A">Khu A</option>
+            <option value="B">Khu B</option>
+            <option value="C">Khu C</option>
+            <option value="D">Khu D</option>
+            <option value="VIP">VIP</option>
+          </select>
+        </div>
       </div>
       <div className="overflow-x-auto shadow-md rounded-lg">
         <table className="min-w-full bg-white border border-gray-200">
@@ -103,7 +135,7 @@ const TableManagement = () => {
             </tr>
           </thead>
           <tbody className="text-gray-600 text-sm font-light">
-            {tables.map((table) => (
+            {filteredTables.map((table) => (
               <tr key={table._id} className="border-b border-gray-200 hover:bg-gray-100">
                 <td className="py-3 px-6 text-center">{table.quantity}</td>
                 <td className="py-3 px-6 text-center">{table.type}</td>
@@ -183,16 +215,16 @@ const TableManagement = () => {
             </label>
             <div className="flex justify-end mt-4">
               <button
-                onClick={handleAddTable}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300 mr-2"
-              >
-                Thêm
-              </button>
-              <button
                 onClick={closeAddModal}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300 mr-2"
               >
                 Thoát
+              </button>
+              <button
+                onClick={handleAddTable}
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300 "
+              >
+                Thêm
               </button>
             </div>
           </div>
@@ -252,18 +284,19 @@ const TableManagement = () => {
               />
             </label>
             <div className="flex justify-end mt-4">
-              <button
-                onClick={saveUpdatedTable}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 mr-2"
-              >
-                Lưu
-              </button>
-              <button
+             <button
                 onClick={closeEditModal}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300"
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300 mr-2 "
               >
                 Thoát
               </button>
+              <button
+                onClick={saveUpdatedTable}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 "
+              >
+                Lưu
+              </button>
+              
             </div>
           </div>
         </div>
@@ -273,3 +306,4 @@ const TableManagement = () => {
 };
 
 export default TableManagement;
+

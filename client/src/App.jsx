@@ -17,6 +17,9 @@ import ChatIcons from './components/ChatIcons';
 import DetailRecruitment from './pages/recruitment/DetailRecruitment';
 import Profile from './pages/admin/components/Profile';
 import Historys from './pages/admin/components/ReservationHistory';
+import Success from './pages/reservations/Success';
+import Payment from './pages/reservations/Payment';
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 
 function App() {
   const location = useLocation();
@@ -24,21 +27,23 @@ function App() {
   const isDashboardPage = location.pathname.startsWith('/dashboard');;
   return (
     <>
-      <Routes>
-        <Route path='/' element={<><Header /><Home /><Footer /></>} />
-        <Route path='/ve-chung-toi' element={<><Header /><Abouts /><Footer /></>} />
-        <Route path='/thuc-don' element={<><Header /><FoodMenu /><Footer /></>} />
-        <Route path='/dat-cho' element={<><Header /><Reservations /><Footer /></>} />
-        <Route path='/tin-tuc' element={<><Header /><News /><Footer /></>} />
-        <Route path='/news/:id' element={<><Header /><DetailNews /><Footer /></>} />
-        <Route path='/tuyen-dung' element={<><Header /><Recruitment /><Footer /></>} />
-        <Route path='/tuyen-dung/:id' element={<><Header /><DetailRecruitment /><Footer /></>} />
-        <Route path='/dang-nhap' element={<><Header /><Login /><Footer /></>} />
-        <Route path='/dang-ky' element={<><Header /><Resister /><Footer /></>} />
-        <Route path='/profile' element={<><Header /><Profile /><Footer /></>} />
-        <Route path='/historyss' element={<><Header /><Historys /></>} />
-        <Route path='/dashboard/*' element={<Dashboard />} />
-      </Routes>  
+        <Routes>
+          <Route path='/' element={<><Header /><Home /><Footer /></>} />
+          <Route path='/ve-chung-toi' element={<><Header /><Abouts /><Footer /></>} />
+          <Route path='/thuc-don' element={<><Header /><FoodMenu /><Footer /></>} />
+          <Route path='/dat-cho' element={<><Header /><Reservations /><Footer /></>} />
+          <Route path='/tin-tuc' element={<><Header /><News /><Footer /></>} />
+          <Route path='/news/:id' element={<><Header /><DetailNews /><Footer /></>} />
+          <Route path='/tuyen-dung' element={<><Header /><Recruitment /><Footer /></>} />
+          <Route path='/tuyen-dung/:id' element={<><Header /><DetailRecruitment /><Footer /></>} />
+          <Route path='/dang-nhap' element={<><Header /><Login /><Footer /></>} />
+          <Route path='/dang-ky' element={<><Header /><Resister /><Footer /></>} />
+          <Route path='/profile' element={<><Header /><Profile /><Footer /></>} />
+          <Route path='/historyss' element={<><Header /><Historys /></>} />
+          <Route path='/dashboard/*' element={<Dashboard />} />
+          <Route path='/payment' element={<><Header /><Payment /><Footer /></>} /> 
+          <Route path='/success' element={<><Header /><Success /><Footer /></>} /> 
+        </Routes>
       {!isDashboardPage && <ChatIcons />}
     </>
     

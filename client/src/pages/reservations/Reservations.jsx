@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import './Reservations.css';
 
 const Reservations = () => {
   const [message, setMessage] = useState(null);
   const currentUser = useSelector(state => state.user.currentUser);
-  const location = useLocation();
   const navigate = useNavigate();
   const [selectedItems, setSelectedItems] = useState(JSON.parse(localStorage.getItem('selectedItems')) || []);
+ 
 
-  useEffect(() => {
-    return () => {
-      localStorage.removeItem('selectedItems');
-    };
-  }, []);
+  
 
   const handleSelectFood = () => {
     localStorage.setItem('selectedItems', JSON.stringify(selectedItems));
@@ -38,43 +34,16 @@ const Reservations = () => {
       bookingTime: event.target.bookingTime.value,
       numberOfGuests: event.target.numberOfGuests.value,
       note: event.target.content.value,
-      selectedItems: selectedItems, // Include selected items
+      selectedItems: selectedItems,
     };
   
-    try {
-      const response = await fetch('http://localhost:3000/api/v1/reservations', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(reservationData),
-      });
+    localStorage.setItem('reservationData', JSON.stringify(reservationData));
+    console.log('Reservation data saved:', reservationData);
   
-      if (!response.ok) {
-        throw new Error('Something went wrong');
-      }
-  
-      const result = await response.json();
-      console.log('Reservation created:', result);
-      setMessage('Đặt bàn thành công! Vui lòng chờ xác nhận.');
-  
-      // Reset selectedItems to empty array
-      setSelectedItems([]);
-  
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
-    } catch (error) {
-      console.error('Error:', error);
-      setMessage('Có lỗi xảy ra. Vui lòng thử lại.');
-    }
+    navigate('/payment');
+    console.log('Navigated to /payment');
   };
   
-
-  const handleViewSelectedItems = () => {
-    navigate('/thuc-don', { state: { selectedItems: selectedItems } });
-  };
-
   const handleRemoveItem = (item) => {
     const updatedItems = selectedItems.filter(selectedItem => selectedItem._id !== item._id);
     setSelectedItems(updatedItems);
@@ -87,7 +56,6 @@ const Reservations = () => {
     setSelectedItems(updatedItems);
     localStorage.setItem('selectedItems', JSON.stringify(updatedItems));
   };
-  
 
   return (
     <div className="datban flex flex-col items-center justify-center min-h-screen">
@@ -109,7 +77,7 @@ const Reservations = () => {
           </div>
         </div>
         <div className="flex flex-wrap justify-between w-full gap-4">
-        <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
+          <div className="p-5 bg-white rounded-xl border-2 w-full sm:w-72">
             <div className="mb-2">Ngày</div>
             <input
                 type="date"
@@ -117,7 +85,7 @@ const Reservations = () => {
                 placeholder="date"
                 name="bookingDate"
                 required
-                min={new Date().toISOString().split('T')[0]} // Chỉ cho phép chọn từ ngày hiện tại trở đi
+                min={new Date().toISOString().split('T')[0]}
                 defaultValue={new Date().toISOString().split('T')[0]}
               />
           </div>
@@ -129,9 +97,8 @@ const Reservations = () => {
               placeholder="time"
               name="bookingTime"
               required
-              min="06:30"  // Giới hạn thời gian bắt đầu từ 6:30 sáng
-              max="21:30"  // Giới hạn thời gian kết thúc là 21:30 tối
-              defaultValue={new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+              min="06:30"
+              max="21:30"
             />
           </div>
           <div className="p-5 bg-white rounded-xl border-2 mt-4 sm:mt-0 w-full sm:w-72">
@@ -145,7 +112,6 @@ const Reservations = () => {
             <button type="button" className="w-full p-2 border rounded bg-red-600 text-white" onClick={handleSelectFood}>
               Chọn món ăn
             </button>
-            {/* Phần hiển thị các món đã chọn */}
             {selectedItems.length > 0 && (
               <div className="mt-4">
                 <h3 className="font-semibold">Món đã chọn:</h3>
@@ -162,12 +128,11 @@ const Reservations = () => {
                           onChange={(e) => handleQuantityChange(item, parseInt(e.target.value, 10))}
                           min="1"
                         />
-                        <button className="ml-2 text-red-500" onClick={() => handleRemoveItem(item)}>Hủy chọn</button>
+                        <button type="button" className="ml-2 text-red-500" onClick={() => handleRemoveItem(item)}>Hủy chọn</button>
                       </div>
                     </li>
                   ))}
                 </ul>
-                
               </div>
             )}
           </div>
@@ -177,6 +142,11 @@ const Reservations = () => {
           </div>
         </div>
         <button type="submit" className="mt-10 mb-10 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white">Hoàn Thành</button>
+        <div className="title-font text-4xl  mb-4 text-white">Hỗ trợ đặt bàn</div>
+        <div className="flex items-center justify-center space-x-4 mb-10">
+            <img src="https://madamelan.vn/themes/elegant/assets/images/phone-icon.png" alt="" />
+            <div className="text-white text-xl title-font">0899 885 260</div>
+        </div>
       </form>
       {message && <div className="mt-5 p-3 bg-green-500 text-white rounded">{message}</div>}
     </div>

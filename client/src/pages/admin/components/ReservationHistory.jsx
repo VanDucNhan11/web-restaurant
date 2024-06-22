@@ -120,8 +120,8 @@ const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
     const now = new Date();
     const timeDifference = (bookingDateTime - now) / (1000 * 60 * 60); // Time difference in hours
 
-    if (timeDifference < 2) {
-      setCancelError('Bạn không thể huỷ đặt bàn trong vòng 2 tiếng trước thời gian đặt bàn');
+    if (timeDifference < 0.5) {
+      setCancelError('Bạn không thể huỷ đặt bàn trong vòng 30 phút trước thời gian đặt bàn');
     } else {
       onCancel(reservation._id);
     }
@@ -165,7 +165,7 @@ const ReservationDetailModal = ({ reservation, onClose, onCancel }) => {
             ))}
           </ul>
           {timeDifference < 5 ? (
-            <p className="text-red-500 mt-4">Bạn không thể huỷ đặt bàn trong vòng 2 tiếng trước thời gian đặt bàn</p>
+            <p className="text-red-500 mt-4">Bạn không thể huỷ đặt bàn trong vòng 30 phút trước thời gian đặt bàn</p>
           ) : (
             <button onClick={handleCancel} className="mt-4 bg-red-500 text-white px-4 py-2 rounded-full border-2 border-red-600 hover:bg-red-600 hover:border-red-700 hover:text-white">Huỷ đặt bàn</button>
           )}

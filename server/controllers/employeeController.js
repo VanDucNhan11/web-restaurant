@@ -100,11 +100,11 @@ exports.deleteEmployee = async (req, res) => {
   }
 };
 exports.getEmployeesByPosition = async (req, res) => {
-  const { position } = req.query;
   try {
-    const employees = await Employee.find({ position });
-    res.json(employees);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+    const position = decodeURIComponent(req.query.position);
+    const count = await Employee.countDocuments({ position });
+    res.status(200).json({ count });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching employee count by position', error });
   }
 };

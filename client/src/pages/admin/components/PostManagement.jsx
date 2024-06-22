@@ -25,7 +25,7 @@ const PostTable = ({ posts, onEdit, onDelete }) => (
             <td className="py-3 px-6 text-center">
               <button
                 onClick={() => onEdit(post)}
-                className="bg-blue-500 text-white px-3 py-1 rounded  hover:bg-blue-700 transition duration-300"
+                className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-300"
               >
                 Sửa
               </button>
@@ -53,6 +53,8 @@ const PostManagement = () => {
     image: ''
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterDate, setFilterDate] = useState('');
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -130,9 +132,43 @@ const PostManagement = () => {
     setPostData({ ...postData, image: e.target.files[0] });
   };
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleFilterDateChange = (e) => {
+    setFilterDate(e.target.value);
+  };
+
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    (filterDate ? new Date(post.datePosted).toISOString().split('T')[0] === filterDate : true)
+  );
+
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-fon">Danh sách bài viết</h1>
+      <h1 className="text-3xl font-semibold mb-6 text-center">Danh sách bài viết</h1>
+      <div className="flex justify-between mb-4">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tiêu đề"
+            value={searchTerm}
+            onChange={handleSearch}
+            className="px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm"
+          />
+        </div>
+        <div className="relative">
+          <label htmlFor="filterDate" className="mr-2">Lọc theo ngày:</label>
+          <input
+            type="date"
+            id="filterDate"
+            value={filterDate}
+            onChange={handleFilterDateChange}
+            className="border p-2"
+          />
+        </div>
+      </div>
       <div className="flex justify-end mb-4">
         <button
           onClick={() => {
@@ -150,7 +186,7 @@ const PostManagement = () => {
           Thêm bài
         </button>
       </div>
-      <PostTable posts={posts} onEdit={handleEdit} onDelete={handleDelete} />
+      <PostTable posts={filteredPosts} onEdit={handleEdit} onDelete={handleDelete} />
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-80">
@@ -167,7 +203,7 @@ const PostManagement = () => {
               name="content"
               value={postData.content}
               onChange={handleInputChange}
-              className="border p-2 mb-4 w-full"
+              className="border p-2 mb-4 w-full h-60"
               placeholder="Nội dung"
             />
             <input
@@ -177,16 +213,16 @@ const PostManagement = () => {
               className="border p-2 mb-4 w-full"
             />
             <button
+              onClick={() => setIsModalOpen(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700 transition duration-300 mr-5"
+            >
+              Đóng
+            </button>
+            <button
               onClick={handleSavePost}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
             >
-             Lưu
-            </button>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="bg-gray-500 text-white px-4 py-2 rounded ml-2 hover:bg-gray-700 transition duration-300"
-            >
-              thoát
+              {editPost ? 'Lưu chỉnh sửa' : 'Thêm bài viết mới'}
             </button>
           </div>
         </div>

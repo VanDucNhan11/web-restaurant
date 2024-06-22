@@ -30,7 +30,7 @@ const InvoiceDetails = () => {
   const [customerName, setCustomerName] = useState('Khách lẻ');
   const [searchTerm, setSearchTerm] = useState('');
   const [customerNames, setCustomerNames] = useState({});
-  const [currentPage, setCurrentPage] = useState(1); // Trang hiện tại
+  const [currentPage, setCurrentPage] = useState(1); 
 
   useEffect(() => {
     fetchTables();
@@ -39,7 +39,7 @@ const InvoiceDetails = () => {
   }, []);
 
   useEffect(() => {
-    sessionStorage.setItem('selectedTables', JSON.stringify(selectedTables));
+    localStorage.setItem('selectedTables', JSON.stringify(selectedTables));
   }, [selectedTables]);
 
   const updateCustomerNameForTable = (tableKey, name) => {
@@ -68,7 +68,7 @@ const InvoiceDetails = () => {
   };
 
   const loadSelectedTables = () => {
-    const savedTables = sessionStorage.getItem('selectedTables');
+    const savedTables = localStorage.getItem('selectedTables');
     if (savedTables) {
       try {
         setSelectedTables(JSON.parse(savedTables));
@@ -102,6 +102,17 @@ const InvoiceDetails = () => {
     updatedTables[tableKey] = { ...updatedTables[tableKey], ...selectedItems };
     setSelectedTables(updatedTables);
     setSelectedItems({}); // Reset selected items after adding to table
+  };
+
+  const handleRemoveItem = (tableKey, itemId) => {
+    const updatedTables = { ...selectedTables };
+    if (updatedTables[tableKey] && updatedTables[tableKey][itemId]) {
+      delete updatedTables[tableKey][itemId];
+      if (Object.keys(updatedTables[tableKey]).length === 0) {
+        delete updatedTables[tableKey]; // Remove table if no items left
+      }
+      setSelectedTables(updatedTables);
+    }
   };
 
   const calculateTotalPrice = (tableKey) => {
@@ -163,76 +174,91 @@ const InvoiceDetails = () => {
 
   // Cắt danh sách menuItems thành các trang
   const paginatedMenuItems = filteredMenuItems.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+  
 
   const exportPDF = async () => {
     try {
-      // Convert the invoice date to the format required by your backend
-      const formattedDate = format(parseISO(invoiceData.date), 'yyyy-MM-dd'); // Chuyển đổi ngày từ địa phương sang định dạng ISO
+        // Convert the invoice date to the format required by your backend
+        const formattedDate = format(parseISO(invoiceData.date), 'yyyy-MM-dd'); // Chuyển đổi ngày từ địa phương sang định dạng ISO
 
-      // Send invoice data to the backend
-      await axios.post('http://localhost:3000/api/v1/invoices', {
-        area: invoiceData.table?.area,
-        tableNumber: invoiceData.table?.tableNumber,
-        date: formattedDate,
-        total: invoiceData.totalWithVAT,
-        username: invoiceData.currentUser?.username,
-        customerName: invoiceData.customerName
-      });
+        // Send invoice data to the backend and get the response
+        const response = await axios.post('http://localhost:3000/api/v1/invoices', {
+            area: invoiceData.table?.area,
+            tableNumber: invoiceData.table?.tableNumber,
+            date: formattedDate,
+            total: invoiceData.totalWithVAT,
+            username: invoiceData.currentUser?.username,
+            customerName: invoiceData.customerName,
+            selectedItems: invoiceData.items
+        });
 
-      // Proceed with PDF export after successful backend save
-      const tableData = invoiceData.items.map(item => {
-        return [item.itemName, item.quantity, formatCurrency(item.price), formatCurrency(item.price * item.quantity)];
-      });
+        // Get the invoice ID from the response
+        const invoiceId = response.data._id; // Assuming your backend returns the invoice ID as '_id'
 
-      const documentDefinition = {
-        content: [
-          { text: 'Hóa Đơn Thanh Toán', style: 'title' },
-          { text: 'Nhà hàng Madame Lân', style: 'subtitle' },
-          'Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng',
-          'PHIẾU THANH TOÁN',
-          { text: `Khu: ${invoiceData.table?.area}`, margin: [0, 10, 0, 0] },
-          { text: `Bàn: ${invoiceData.table?.tableNumber}`, margin: [0, 5, 0, 0] },
-          { text: `Nhân viên: ${invoiceData.currentUser?.username}`, margin: [0, 5, 0, 0] },
-          { text: `Tên khách hàng: ${invoiceData.customerName}`, margin: [0, 5, 0, 0] },
-          { text: `Ngày: ${invoiceData.displayDate}`, margin: [0, 5, 5, 20] },
-          {
-            table: {
-              headerRows: 1,
-              widths: ['*', 'auto', 'auto', 'auto'],
-              body: [
-                ['Tên món', 'Số lượng', 'Đơn giá', 'Thành tiền'],
-                ...tableData,
-                [{ text: 'Tổng tiền', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.total)],
-                [{ text: 'VAT (10%)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
-                [{ text: 'Tổng tiền (đã bao gồm VAT)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.totalWithVAT)]
-              ]
+        // Proceed with PDF export after successful backend save
+        const tableData = invoiceData.items.map(item => {
+            return [item.itemName, item.quantity, formatCurrency(item.price), formatCurrency(item.price * item.quantity)];
+        });
+
+        // Define QR code data (e.g., payment URL)
+        const paymentUrl = `http://localhost:3000/payment/${invoiceId}`;
+
+
+        const documentDefinition = {
+            content: [
+                { text: 'Hóa Đơn Thanh Toán', style: 'title' },
+                { text: 'Nhà hàng Madame Lân', style: 'subtitle' },
+                'Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng',
+                'PHIẾU THANH TOÁN',
+                { text: `Khu: ${invoiceData.table?.area}`, margin: [0, 10, 0, 0] },
+                { text: `Bàn: ${invoiceData.table?.tableNumber}`, margin: [0, 5, 0, 0] },
+                { text: `Nhân viên thu ngân: ${invoiceData.currentUser?.username}`, margin: [0, 5, 0, 0] },
+                { text: `Tên khách hàng: ${invoiceData.customerName}`, margin: [0, 5, 0, 0] },
+                { text: `Ngày: ${invoiceData.displayDate}`, margin: [0, 5, 5, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', 'auto', 'auto', 'auto'],
+                        body: [
+                            ['Tên món', 'Số lượng', 'Đơn giá', 'Thành tiền'],
+                            ...tableData,
+                            [{ text: 'Tổng tiền', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.total)],
+                            [{ text: 'VAT (10%)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
+                            [{ text: 'Tổng tiền (đã bao gồm VAT)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.totalWithVAT)]
+                        ]
+                    }
+                },
+                { text: 'Scan mã QR để thanh toán:', margin: [0, 30, 0, 0], alignment: 'center' },
+                { qr: paymentUrl, fit: '100', margin: [0, 5, 0, 0], alignment: 'center' }, // Adjust 'fit' as necessary for QR code size
+                { text: 'Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!', margin: [0, 10, 0, 0], alignment: 'center' },
+                { text: 'Hẹn gặp lại ở Nhà hàng Madame Lân!', margin: [0, 5, 0, 0], alignment: 'center' }
+            ],
+            styles: {
+                title: {
+                    fontSize: 18,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 10]
+                },
+                subtitle: {
+                    fontSize: 14,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 5]
+                }
             }
-          }
-        ],
-        styles: {
-          title: {
-            fontSize: 18,
-            bold: true,
-            alignment: 'center',
-            margin: [0, 0, 0, 10]
-          },
-          subtitle: {
-            fontSize: 14,
-            alignment: 'center',
-            margin: [0, 0, 0, 5]
-          }
-        }
-      };
+        };
 
-      pdfMake.createPdf(documentDefinition).download(`hoa_don_${invoiceData.table?.area}_${invoiceData.table?.tableNumber}_${invoiceData.displayDate}.pdf`);
+        pdfMake.createPdf(documentDefinition).download(`hoa_don_${invoiceData.table?.area}_${invoiceData.table?.tableNumber}_${invoiceData.displayDate}.pdf`);
 
-      // Clear selected items for the table
-      handleDeleteTable(`${invoiceData.table?.area}-${invoiceData.table?.tableNumber}`);
-      setOpenInvoice(false);
+        // Clear selected items for the table
+        handleDeleteTable(`${invoiceData.table?.area}-${invoiceData.table?.tableNumber}`);
+        setOpenInvoice(false);
     } catch (error) {
-      console.error('Error exporting PDF:', error);
+        console.error('Error exporting PDF:', error);
     }
-  };
+};
+
+
 
   return (
     <Container>
@@ -254,40 +280,40 @@ const InvoiceDetails = () => {
       </Paper>
 
       <Paper sx={{ padding: 2, marginBottom: 2 }}>
-      <Typography variant="h6" gutterBottom>Chọn món ăn</Typography>
-      <Box sx={{ marginBottom: 1 }}>
-        <TextField
-          label="Tìm kiếm món ăn"
-          variant="outlined"
-          value={searchTerm}
-          onChange={handleSearch}
-          fullWidth
-        />
-      </Box>
-      <Box display="flex" flexWrap="wrap">
-        {paginatedMenuItems.map(item => (
-          <Box key={item._id} sx={{ margin: 1 }}>
-            <Typography>{item.itemName}</Typography>
-            <TextField
-              type="number"
-              label="Số lượng"
-              value={selectedItems[item._id]?.quantity || ''}
-              onChange={(e) => handleItemChange(item._id, parseInt(e.target.value))}
-              inputProps={{ min: 0 }}
-              fullWidth
-            />
-          </Box>
-        ))}
-      </Box>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {/* Thêm nút điều hướng */}
-        <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>Trang trước</Button>
-        <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>Trang tiếp theo</Button>
-      </Box>
-      <Button variant="contained" onClick={handleAddItems} disabled={!currentTable || Object.keys(selectedItems).length === 0}>
-        Thêm vào bàn
-      </Button>
-    </Paper>
+        <Typography variant="h6" gutterBottom>Chọn món ăn</Typography>
+        <Box sx={{ marginBottom: 1 }}>
+          <TextField
+            label="Tìm kiếm món ăn"
+            variant="outlined"
+            value={searchTerm}
+            onChange={handleSearch}
+            fullWidth
+          />
+        </Box>
+        <Box display="flex" flexWrap="wrap">
+          {paginatedMenuItems.map(item => (
+            <Box key={item._id} sx={{ margin: 1 }}>
+              <Typography>{item.itemName}</Typography>
+              <TextField
+                type="number"
+                label="Số lượng"
+                value={selectedItems[item._id]?.quantity || ''}
+                onChange={(e) => handleItemChange(item._id, parseInt(e.target.value))}
+                inputProps={{ min: 0 }}
+                fullWidth
+              />
+            </Box>
+          ))}
+        </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {/* Thêm nút điều hướng */}
+          <Button disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>Trang trước</Button>
+          <Button disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>Trang tiếp theo</Button>
+        </Box>
+        <Button variant="contained" onClick={handleAddItems} disabled={!currentTable || Object.keys(selectedItems).length === 0}>
+          Thêm vào bàn
+        </Button>
+      </Paper>
 
       <Paper sx={{ padding: 2 }}>
         <Typography variant="h6" gutterBottom>Các bàn đã chọn</Typography>
@@ -310,6 +336,7 @@ const InvoiceDetails = () => {
                     {Object.values(selectedTables[tableKey]).map(item => (
                       <ListItem key={item._id}>
                         <ListItemText primary={`${item.itemName} - Số lượng: ${item.quantity}`} />
+                        <Button variant="contained" size="small" color="secondary" onClick={() => handleRemoveItem(tableKey, item._id)}>Hủy</Button>
                       </ListItem>
                     ))}
                   </List>
@@ -381,3 +408,4 @@ const InvoiceDetails = () => {
 };
 
 export default InvoiceDetails;
+

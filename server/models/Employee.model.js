@@ -14,7 +14,7 @@ const employeeSchema = new mongoose.Schema({
   email: { type: String, required: true },
   address: { type: String, required: true },
   status: { type: String, enum: ['Đang làm việc', 'Tạm nghỉ', 'Nghỉ việc'], required: true },
-  photo: { type: String, required: false } // Thêm trường ảnh
+  photo: { type: String, required: false }
 });
 
 module.exports = mongoose.model('Employee', employeeSchema);
