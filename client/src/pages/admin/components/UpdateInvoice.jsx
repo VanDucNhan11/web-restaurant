@@ -1,32 +1,7 @@
-import React, { useState, useEffect, Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {
-  Container, Typography, TextField, Paper, Box, Select, MenuItem, InputLabel, FormControl, Button, Modal, Checkbox, ListItemSecondaryAction, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, List, ListItem, ListItemText, IconButton
-} from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { format } from 'date-fns';
-
-class ErrorBoundary extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  componentDidCatch(error, errorInfo) {
-    console.error("Error caught in Error Boundary: ", error, errorInfo);
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h1>Something went wrong.</h1>;
-    }
-    return this.props.children;
-  }
-}
+import 'tailwindcss/tailwind.css'; // Ensure Tailwind CSS is imported
 
 const UpdateInvoice = () => {
   const [invoices, setInvoices] = useState([]);
@@ -145,11 +120,11 @@ const UpdateInvoice = () => {
   const handleUpdateInvoice = async () => {
     try {
       await axios.put(`http://localhost:3000/api/v1/invoices/${selectedInvoiceId}`, updatedInvoice);
-      alert('Hóa đơn đã được cập nhật');
+      alert('Invoice updated successfully');
       fetchInvoices();
     } catch (error) {
       console.error('Error updating invoice:', error);
-      alert('Cập nhật hóa đơn thất bại');
+      alert('Failed to update invoice');
     }
   };
 
@@ -164,147 +139,131 @@ const UpdateInvoice = () => {
   );
 
   return (
-    <ErrorBoundary>
-      <Container>
-        <Typography variant="h4" gutterBottom className="text-center title-1 title-font">Cập nhật hóa đơn</Typography>
-        
-        <Box sx={{ marginBottom: 2 }}>
-          <Typography variant="h6" gutterBottom>Lọc hóa đơn theo ngày và khu vực</Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
-            <TextField
-              label="Chọn ngày"
-              type="date"
-              value={selectedDate}
-              onChange={(e) => setSelectedDate(e.target.value)}
-              InputLabelProps={{ shrink: true }}
-            />
-            <FormControl sx={{ minWidth: 120 }}>
-              <InputLabel>Khu vực</InputLabel>
-              <Select
-                value={selectedArea}
-                onChange={(e) => setSelectedArea(e.target.value)}
-              >
-                <MenuItem value=""><em>None</em></MenuItem>
-                <MenuItem value="A">A</MenuItem>
-                <MenuItem value="B">B</MenuItem>
-                <MenuItem value="C">C</MenuItem>
-                <MenuItem value="D">D</MenuItem>
-                <MenuItem value="VIP">VIP</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-        </Box>
-        
-        <Paper sx={{ padding: 2, marginBottom: 2 }}>
-          <Typography variant="h6" gutterBottom>Tìm hóa đơn</Typography>
-          <TextField
-            label="Tìm theo tên khách hàng"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            fullWidth
-            sx={{ marginBottom: 2 }}
+    <div className="container mx-auto p-4">
+      <h2 className="text-center text-2xl font-bold mb-4">Cập nhật hoá đơn</h2>
+      
+      <div className="mb-4">
+        <h3 className="text-xl font-semibold mb-2">Lọc hoá đơn theo Ngày và Khu:</h3>
+        <div className="flex space-x-4">
+          <input
+            type="date"
+            value={selectedDate}
+            onChange={(e) => setSelectedDate(e.target.value)}
+            className="border p-2"
           />
-        </Paper>
+          <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)} className="border p-2">
+            <option value="">Tất cả</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+            <option value="VIP">VIP</option>
+          </select>
+        </div>
+      </div>
+      
+      <div className="mb-4">
+        <h3 className="text-xl font-semibold mb-2">Tìm hoá đơn theo tên khách hàng:</h3>
+        <input
+          type="text"
+          placeholder="Nhập tên"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="border p-2 w-full"
+        />
+      </div>
 
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Khu</TableCell>
-                <TableCell>Bàn</TableCell>
-                <TableCell>Khách hàng</TableCell>
-                <TableCell>Ngày</TableCell>
-                <TableCell>Tổng tiền</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredInvoices.map(invoice => (
-                <TableRow key={invoice._id} onClick={() => setSelectedInvoiceId(invoice._id)}>
-                  <TableCell>{invoice.area}</TableCell>
-                  <TableCell>{invoice.tableNumber}</TableCell>
-                  <TableCell>{invoice.customerName}</TableCell>
-                  <TableCell>{format(new Date(invoice.date), 'dd/MM/yyyy')}</TableCell>
-                  <TableCell>{invoice.total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+      <table className="min-w-full bg-white border">
+        <thead>
+          <tr>
+            <th className="py-2 px-4 border">Khu</th>
+            <th className="py-2 px-4 border">Số bàn</th>
+            <th className="py-2 px-4 border">Tên khách hàng</th>
+            <th className="py-2 px-4 border">Ngày xuất hoá đơn</th>
+            <th className="py-2 px-4 border">Tổng tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredInvoices.map(invoice => (
+            <tr key={invoice._id} onClick={() => setSelectedInvoiceId(invoice._id)} className="cursor-pointer">
+              <td className="py-2 px-4 border text-center">{invoice.area}</td>
+              <td className="py-2 px-4 border text-center">{invoice.tableNumber}</td>
+              <td className="py-2 px-4 border text-center">{invoice.customerName}</td>
+              <td className="py-2 px-4 border text-center">{format(new Date(invoice.date), 'dd/MM/yyyy')}</td>
+              <td className="py-2 px-4 border text-center">{invoice.total.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-        {selectedInvoice && (
-          <Paper sx={{ padding: 2, marginTop: 2 }}>
-            <Typography variant="h6" gutterBottom>Chi tiết hóa đơn</Typography>
-            <Box>
-              <TextField
-                label="Tên khách hàng"
-                value={updatedInvoice.customerName}
-                onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, customerName: e.target.value })}
-                fullWidth
-                sx={{ marginBottom: 2 }}
-              />
-              <List>
-                {updatedInvoice.selectedItems.map(item => (
-                  <ListItem key={item._id}>
-                    <ListItemText primary={`${item.itemName} - Giá: ${item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}`} />
-                    <TextField
-                      type="number"
-                      label="Số lượng"
-                      value={item.quantity}
-                      onChange={(e) => handleItemChange(item._id, parseInt(e.target.value))}
-                      inputProps={{ min: 0 }}
-                      sx={{ width: '100px', marginLeft: '20px' }}
-                    />
-                    <IconButton onClick={() => handleDeleteItem(item._id)}>
-                      <DeleteIcon />
-                    </IconButton>
-                  </ListItem>
-                ))}
-              </List>
-              <Typography variant="h6" gutterBottom>Thêm món ăn</Typography>
-              <Button variant="contained" onClick={() => setIsModalOpen(true)}>Thêm món ăn</Button>
-              <Box sx={{ marginTop: 2 }}>
-                <Typography variant="h6">Tổng tiền: {updatedInvoice.total?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</Typography>
-              </Box>
-              <Button variant="contained" color="primary" onClick={handleUpdateInvoice} sx={{ marginTop: 2 }}>
-                Lưu thay đổi
-              </Button>
-            </Box>
-          </Paper>
-        )}
+      {selectedInvoice && (
+        <div className="mt-4 p-4 border bg-gray-100">
+          <h3 className="text-xl font-semibold mb-2">Chi tiết hoá đơn</h3>
+          <h4 className=" font-semibold mb-2">Tên khách hàng: </h4>
+          <input
+            type="text"
+            value={updatedInvoice.customerName}
+            onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, customerName: e.target.value })}
+            placeholder="Customer Name"
+            className="border p-2 mb-4 w-full"
+          />
+          <ul className="mb-4">
+            <h4 className=" font-semibold mb-2">Các món ăn trong hoá đơn: </h4>
+            {updatedInvoice.selectedItems.map(item => (
+              <li key={item._id} className="flex items-center mb-2">
+                <span className="flex-1">{item.itemName} - Price: {item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
+                <input
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) => handleItemChange(item._id, parseInt(e.target.value))}
+                  min="0"
+                  className="border p-2 w-16"
+                />
+                <button onClick={() => handleDeleteItem(item._id)} className="ml-2 text-red-500">Xoá</button>
+              </li>
+            ))}
+          </ul>
+          <h3 className="text-xl font-semibold mb-2">Chỉnh sửa món ăn</h3>
+          <button onClick={() => setIsModalOpen(true)} className="bg-blue-500 text-white px-4 py-2 rounded">Thêm món ăn</button>
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold">Tổng tiền: {updatedInvoice.total?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h3>
+          </div>
+          <button  className="bg-red-500 text-white px-4 py-2 rounded mt-4 mr-5">Đóng</button>
+          <button onClick={handleUpdateInvoice} className="bg-green-500 text-white px-4 py-2 rounded mt-4">Lưu thay đổi</button>
+        </div>
+      )}
 
-        <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-          <Box sx={{ width: 400, bgcolor: 'background.paper', padding: 4, margin: 'auto', marginTop: 4 }}>
-            <Typography variant="h6" gutterBottom>Thêm món ăn</Typography>
-            <TextField
-              label="Tìm kiếm món ăn"
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white p-4 rounded shadow-lg w-96">
+            <h3 className="text-xl font-semibold mb-2">Thực đơn</h3>
+            <input
+              type="text"
+              placeholder="Tìm kiếm món ăn"
               value={searchMenu}
               onChange={(e) => setSearchMenu(e.target.value)}
-              fullWidth
-              sx={{ marginBottom: 2 }}
+              className="border p-2 mb-4 w-full"
             />
-            <Box sx={{ maxHeight: 400, overflowY: 'auto' }}>
-              <List>
-                {filteredMenuItems.map(item => (
-                  <ListItem key={item._id} button onClick={() => handleAddItem(item)}>
-                    <img src={`http://localhost:3000/${item.image}`} alt={item.itemName} style={{ width: '50px', height: '50px', marginRight: '20px' }} />
-                    <ListItemText primary={item.itemName} />
-                    <ListItemSecondaryAction>
-                      <Checkbox
-                        edge="end"
-                        checked={updatedInvoice.selectedItems.some(i => i._id === item._id)}
-                      />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
-            </Box>
-            <Button variant="contained" onClick={() => setIsModalOpen(false)} sx={{ marginTop: 2 }}>Đóng</Button>
-          </Box>
-        </Modal>
-      </Container>
-    </ErrorBoundary>
+            <ul className="max-h-64 overflow-y-auto mb-4">
+              {filteredMenuItems.map(item => (
+                <li key={item._id} onClick={() => handleAddItem(item)} className="flex items-center p-2 border mb-2 cursor-pointer">
+                  <img src={`http://localhost:3000/${item.image}`} alt={item.itemName} className="w-12 h-12 mr-4" />
+                  <span className="flex-1">{item.itemName}</span>
+                  <input
+                    type="checkbox"
+                    checked={updatedInvoice.selectedItems.some(i => i._id === item._id)}
+                    readOnly
+                    className="ml-2"
+                  />
+                </li>
+              ))}
+            </ul>
+            <button onClick={() => setIsModalOpen(false)} className="bg-red-500 text-white px-4 py-2 rounded">Thoát</button>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
 export default UpdateInvoice;
-

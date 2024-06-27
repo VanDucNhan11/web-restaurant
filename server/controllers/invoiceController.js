@@ -4,8 +4,6 @@ const Invoice = require('../models/Invoice.model.js');
 exports.createInvoice = async (req, res) => {
   try {
     const { area, tableNumber, date, total, username, customerName, selectedItems } = req.body; // Thêm selectedItems
-
-    // Tạo URL thanh toán (Ví dụ: http://localhost:3000/payment/ID_HOA_DON)
     const paymentUrl = `http://localhost:3000/payment/${req.body.id}`;
 
     const newInvoice = new Invoice({
@@ -15,7 +13,7 @@ exports.createInvoice = async (req, res) => {
       total,
       username,
       customerName,
-      selectedItems, // Lưu danh sách món ăn
+      selectedItems, 
       paymentUrl
     });
     

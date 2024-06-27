@@ -82,6 +82,18 @@ const DashSiderbar = () => {
                 Cập nhật phân quyền tài khoản
               </Link>
               <Link
+                to="/dashboard?tab=employee-management"
+                className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'employee-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
+                <ion-icon name="people-outline" class="mr-3"></ion-icon>
+                Quản lý nhân viên
+              </Link>
+              <Link
+                to="/dashboard?tab=table-management"
+                className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'table-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
+                <ion-icon name="grid-outline" class="mr-3"></ion-icon>
+                Quản lý bàn
+              </Link>
+              <Link
                 to="/dashboard?tab=category-management"
                 className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'category-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
                 <ion-icon name="list-outline" class="mr-3"></ion-icon>
@@ -94,22 +106,10 @@ const DashSiderbar = () => {
                 Cập nhật thực đơn
               </Link>
               <Link
-                to="/dashboard?tab=employee-management"
-                className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'employee-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
-                <ion-icon name="people-outline" class="mr-3"></ion-icon>
-                Quản lý nhân viên
-              </Link>
-              <Link
                 to="/dashboard?tab=post-management"
                 className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'post-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
                 <ion-icon name="document-text-outline" class="mr-3"></ion-icon>
                 Cập nhật bài viết
-              </Link>
-              <Link
-                to="/dashboard?tab=table-management"
-                className={`block py-2.5 px-4 rounded transition duration-200 flex items-center ${tab === 'table-management' ? 'bg-gray-700 text-gray-100' : 'hover:bg-gray-700 hover:text-gray-100'}`}>
-                <ion-icon name="grid-outline" class="mr-3"></ion-icon>
-                Quản lý bàn
               </Link>
               <Link
                 to="/dashboard?tab=recruitment-update"

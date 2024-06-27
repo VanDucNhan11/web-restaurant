@@ -58,49 +58,7 @@ const Revenue = ({ filters, selectedDate, revenue, invoices, setFilters, setSele
   );
 };
 
-const EmployeesByPosition = ({ position, employeeCountByPosition, setPosition }) => {
 
-  const handlePositionChange = async (e) => {
-    const newPosition = e.target.value;
-    setPosition(newPosition);
-
-    try {
-      const encodedPosition = encodeURIComponent(newPosition);
-      const positionResponse = await axios.get(`http://localhost:3000/api/v1/employees/count?position=${encodedPosition}`);
-      setEmployeeCountByPosition(positionResponse.data.count);
-    } catch (error) {
-      console.error('Error fetching employee count by position', error);
-    }
-  };
-
-  return (
-    <div className="bg-white shadow-md rounded-lg p-6">
-      <h2 className="text-xl font-semibold mb-2">Số lượng nhân viên theo chức vụ</h2>
-      <select
-        className="p-2 border border-gray-300 rounded-md mb-2"
-        value={position}
-        onChange={handlePositionChange}
-      >
-        <option value="Phục vụ">Phục vụ</option>
-        <option value="Tiếp thực">Tiếp thực</option>
-        <option value="Lễ tân">Lễ tân</option>
-        <option value="Chảo chính">Chảo chính</option>
-        <option value="Phụ thớt">Phụ thớt</option>
-        <option value="Bếp nướng">Bếp nướng</option>
-        <option value="Nấu món ăn sáng">Nấu món ăn sáng</option>
-        <option value="Bảo trì">Bảo trì</option>
-        <option value="Nấu xôi chè">Nấu xôi chè</option>
-        <option value="Quầy (bán món ăn sáng)">Quầy (bán món ăn sáng)</option>
-        <option value="Sơ chế nguyên liệu">Sơ chế nguyên liệu</option>
-        <option value="Thủ kho">Thủ kho</option>
-        <option value="Pha chế">Pha chế</option>
-      </select>
-      <div>
-        <p>Số lượng: {employeeCountByPosition}</p>
-      </div>
-    </div>
-  );
-};
 
 const Reports = () => {
   const [revenue, setRevenue] = useState(0);
@@ -129,24 +87,6 @@ const Reports = () => {
     fetchRevenueData();
   }, [filters, selectedDate]);
 
-  useEffect(() => {
-    const fetchEmployeeCountData = async () => {
-      try {
-        const encodedPosition = encodeURIComponent(position);
-        const positionResponse = await axios.get(`http://localhost:3000/api/v1/employees/count?position=${encodedPosition}`);
-        setEmployeeCountByPosition(positionResponse.data.count);
-      } catch (error) {
-        console.error('Error fetching employee count by position', error);
-      }
-    };
-
-    fetchEmployeeCountData();
-  }, [position]);
-
-  const showEmployeeStats = () => {
-    setShowRevenue(false);
-  };
-
   const showRevenueStats = () => {
     setShowRevenue(true);
   };
@@ -155,14 +95,8 @@ const Reports = () => {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6 text-center">Thống kê</h1>
       <div className="flex justify-center mb-4">
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-md mr-4" onClick={showRevenueStats}>
-          Thống kê doanh thu
-        </button>
-        <button className="bg-blue-500 text-white px-4 py-2 rounded-md" onClick={showEmployeeStats}>
-          Thống kê nhân viên
-        </button>
       </div>
-      {showRevenue ? (
+       
         <Revenue
           filters={filters}
           selectedDate={selectedDate}
@@ -171,13 +105,7 @@ const Reports = () => {
           setFilters={setFilters}
           setSelectedDate={setSelectedDate}
         />
-      ) : (
-        <EmployeesByPosition
-          position={position}
-          employeeCountByPosition={employeeCountByPosition}
-          setPosition={setPosition}
-        />
-      )}
+     
     </div>
   );
 };

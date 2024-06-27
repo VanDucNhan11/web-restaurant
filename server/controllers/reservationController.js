@@ -1,11 +1,9 @@
 const Reservation = require('../models/Reservation.model');
 const nodemailer = require('nodemailer');
 const qrcode = require('qrcode');
-const querystring = require('querystring');
-const crypto = require('crypto');
-
-
-
+const axios = require('axios').default; 
+const CryptoJS = require('crypto-js'); 
+const moment = require('moment');
 
 const createReservation = async (req, res) => {
   const { userID, fullName, email, phone, bookingDate, bookingTime, numberOfGuests, note, selectedItems } = req.body;
@@ -57,16 +55,16 @@ const getReservationById = async (req, res) => {
 // Update a reservation
 const updateReservation = async (req, res) => {
   const { id } = req.params;
-  const { fullName, email, phone, bookingDate, bookingTime, numberOfGuests, note, status } = req.body;
+  const { fullName, email, phone, bookingDate, bookingTime, numberOfGuests, note, status, selectedItems } = req.body;
 
   try {
     const updatedReservation = await Reservation.findByIdAndUpdate(
       id,
-      { fullName, email, phone, bookingDate, bookingTime, numberOfGuests, note, status },
+      { fullName, email, phone, bookingDate, bookingTime, numberOfGuests, note, status, selectedItems },
       { new: true }
     );
     if (!updatedReservation) {
-      return res.status(404).json({ error: 'Reservation not found' });
+      return res.status(404).json({ error: 'Không tìm thấy đặt bàn' });
     }
     res.status(200).json(updatedReservation);
   } catch (err) {
@@ -218,122 +216,48 @@ const cancelReservation = async (req, res) => {
   }
 };
 
-
-const createVnpayHash = (req, res, next) => {
-  var vnp_Params = req.query;
-  var secureHash = vnp_Params['vnp_SecureHash'];
-
-  delete vnp_Params['vnp_SecureHash'];
-  delete vnp_Params['vnp_SecureHashType'];
-
-  vnp_Params = sortObject(vnp_Params);
-  var config = require('config');
-  var secretKey = config.get('vnp_HashSecret');
-  var querystring = require('qs');
-  var signData = querystring.stringify(vnp_Params, { encode: false });
-  var crypto = require("crypto");     
-  var hmac = crypto.createHmac("sha512", secretKey);
-  var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");     
-   
-
-  if(secureHash === signed){
-      var orderId = vnp_Params['vnp_TxnRef'];
-      var rspCode = vnp_Params['vnp_ResponseCode'];
-      //Kiem tra du lieu co hop le khong, cap nhat trang thai don hang va gui ket qua cho VNPAY theo dinh dang duoi
-      res.status(200).json({RspCode: '00', Message: 'success'})
-  }
-  else {
-      res.status(200).json({RspCode: '97', Message: 'Fail checksum'})
-  }
+const config = {
+  app_id: "2554",
+  key1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn",
+  key2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf",
+  endpoint: "https://sb-openapi.zalopay.vn/v2/create"
 };
 
-const createPaymentUrl = async (req, res, next) => {
-    try {
-      const ipAddr = req.headers['x-forwarded-for'] ||
-          req.connection.remoteAddress ||
-          req.socket.remoteAddress ||
-          (req.connection.socket ? req.connection.socket.remoteAddress : null);
-      
-      const config = require('config');
-      const dateFormat = require('dateformat');
-      
-      const tmnCode = config.get('GRVLYHCV');
-      const secretKey = config.get('YAQ8ESNI1GPY1KDJ8QT26FS7Z08IA4EL');
-      const vnpUrl = config.get('https://sandbox.vnpayment.vn/paymentv2/vpcpay.html');
-      const returnUrl = config.get('http://localhost:5173/success');
-      
-      const date = new Date();
-      const createDate = dateFormat(date, 'yyyymmddHHmmss');
-      const orderId = dateFormat(date, 'HHmmss');
-      const { amount, bankCode, orderDescription, orderType, language } = req.body;
+const createPaymentZaloPay = async (req, res) => {
+  const embed_data = {
+    redirecturl: 'http://localhost:5173/success',
+  };
 
-      if(locale === null || locale === ''){
-            locale = 'vn';
-        }
-        var currCode = 'VND';
-        var vnp_Params = {};
-        vnp_Params['vnp_Version'] = '2.1.0';
-        vnp_Params['vnp_Command'] = 'pay';
-        vnp_Params['vnp_TmnCode'] = tmnCode;
-        // vnp_Params['vnp_Merchant'] = ''
-        vnp_Params['vnp_Locale'] = locale;
-        vnp_Params['vnp_CurrCode'] = currCode;
-        vnp_Params['vnp_TxnRef'] = orderId;
-        vnp_Params['vnp_OrderInfo'] = orderInfo;
-        vnp_Params['vnp_OrderType'] = orderType;
-        vnp_Params['vnp_Amount'] = amount * 100;
-        vnp_Params['vnp_ReturnUrl'] = returnUrl;
-        vnp_Params['vnp_IpAddr'] = ipAddr;
-        vnp_Params['vnp_CreateDate'] = createDate;
-        if(bankCode !== null && bankCode !== ''){
-            vnp_Params['vnp_BankCode'] = bankCode;
-        }
+  const items = [{}];
+  const transID = Math.floor(Math.random() * 1000000);
 
-        vnp_Params = sortObject(vnp_Params);
+  const order = {
+      app_id: config.app_id,
+      app_trans_id: `${moment().format('YYMMDD')}_${transID}`, 
+      app_user: "user123",
+      app_time: Date.now(), // milliseconds
+      item: JSON.stringify(items),
+      embed_data: JSON.stringify(embed_data),
+      amount: 100000,
+      description: `Thanh toán đặt cọc bàn#${transID}`,
+      bank_code: "",
+  };
 
-        var querystring = require('qs');
-        var signData = querystring.stringify(vnp_Params, { encode: false });
-        var crypto = require("crypto");     
-        var hmac = crypto.createHmac("sha512", secretKey);
-        var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex"); 
-        vnp_Params['vnp_SecureHash'] = signed;
-        vnpUrl += '?' + querystring.stringify(vnp_Params, { encode: false });
+  // appid|app_trans_id|appuser|amount|apptime|embeddata|item
+  const data = config.app_id + "|" + order.app_trans_id + "|" + order.app_user + "|" + order.amount + "|" + order.app_time + "|" + order.embed_data + "|" + order.item;
+  order.mac = CryptoJS.HmacSHA256(data, config.key1).toString();
 
-        res.redirect(vnpUrl)
+  try {
+    const result = await axios.post(config.endpoint, null, { params: order });
 
+    return res.status(200).json(result.data);
   } catch (error) {
-      next(error);
+    console.log(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
 
-const vnpayReturn = (req, res, next) => {
-    var vnp_Params = req.query;
-      
-    var secureHash = vnp_Params['vnp_SecureHash'];
 
-    delete vnp_Params['vnp_SecureHash'];
-    delete vnp_Params['vnp_SecureHashType'];
-
-    vnp_Params = sortObject(vnp_Params);
-
-    var config = require('config');
-    var tmnCode = config.get('vnp_TmnCode');
-    var secretKey = config.get('vnp_HashSecret');
-
-    var querystring = require('qs');
-    var signData = querystring.stringify(vnp_Params, { encode: false });
-    var crypto = require("crypto");     
-    var hmac = crypto.createHmac("sha512", secretKey);
-    var signed = hmac.update(new Buffer(signData, 'utf-8')).digest("hex");     
-
-    if(secureHash === signed){
-        //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-
-        res.render('success', {code: vnp_Params['vnp_ResponseCode']})
-    } else{
-        res.render('success', {code: '97'})
-    }
-};
 const createmomo = async (req, Rres) => {
   const partnerCode = "MOMO";
   const accessKey = "F8BBA842ECF85";
@@ -427,8 +351,6 @@ module.exports = {
   getReservationsByUserId,
   approveReservation,
   cancelReservation,
-  createPaymentUrl,
-  vnpayReturn,
   createmomo,
-  createVnpayHash
+  createPaymentZaloPay,
 };

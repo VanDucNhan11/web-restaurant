@@ -7,9 +7,8 @@ const { createReservation,
     getReservationsByUserId, 
     approveReservation, 
     cancelReservation, 
-    createPaymentUrl,
-    vnpayReturn, 
     createmomo,
+    createPaymentZaloPay,
 } = require('../controllers/reservationController');
 
 const router = express.Router();
@@ -23,10 +22,10 @@ router.delete('/:id', deleteReservation);
 router.post('/:id/approve', approveReservation);
 router.post('/:id/cancel', cancelReservation);
 
-router.post('/vnpay', createPaymentUrl);
+
 router.post('/momo', createmomo);
 
+router.post('/zalopay', createPaymentZaloPay);
 
-router.get('/vnpay_return', vnpayReturn);
 
 module.exports = router;

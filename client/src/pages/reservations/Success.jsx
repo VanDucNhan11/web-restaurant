@@ -62,6 +62,7 @@ const Success = () => {
     saveReservationToDatabase();
 
     setTimeout(() => {
+      localStorage.clear();
       navigate('/');
     }, 3000);
   }, [navigate]);

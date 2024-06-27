@@ -17,6 +17,11 @@ const tableSchema = new mongoose.Schema({
     tableNumber: {
         type: Number,
         required: true
+    },
+    status: {
+        type: String,
+        enum: ['Còn Trống', 'Đang phục vụ'],
+        default: 'Còn Trống' 
     }
 });
 

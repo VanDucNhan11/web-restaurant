@@ -1,6 +1,6 @@
-const Table = require('../models/Table.model');
+const Table = require('../models/Table.model'); // Thay đổi đường dẫn nếu cần thiết
 
-// Get all tables
+// Lấy tất cả bàn
 exports.getAllTables = async (req, res) => {
     try {
         const tables = await Table.find();
@@ -10,13 +10,15 @@ exports.getAllTables = async (req, res) => {
     }
 };
 
-// Create a new table
+// Tạo bàn mới
 exports.createTable = async (req, res) => {
+    const { quantity, type, area, tableNumber } = req.body;
     const table = new Table({
-        quantity: req.body.quantity,
-        type: req.body.type,
-        area: req.body.area,
-        tableNumber: req.body.tableNumber
+        quantity,
+        type,
+        area,
+        tableNumber,
+        status: 'Còn Trống' // Mặc định khi tạo mới là Trống
     });
 
     try {
@@ -27,17 +29,18 @@ exports.createTable = async (req, res) => {
     }
 };
 
-// Update a table
+// Cập nhật thông tin bàn
 exports.updateTable = async (req, res) => {
     const { id } = req.params;
-    const { quantity, type, area, tableNumber } = req.body;
+    const { quantity, type, area, tableNumber, status } = req.body;
 
     try {
         const updatedTable = await Table.findByIdAndUpdate(id, {
             quantity,
             type,
             area,
-            tableNumber
+            tableNumber,
+            status
         }, { new: true });
 
         res.json(updatedTable);
@@ -46,7 +49,7 @@ exports.updateTable = async (req, res) => {
     }
 };
 
-// Delete a table
+// Xóa bàn
 exports.deleteTable = async (req, res) => {
     try {
         await Table.findByIdAndDelete(req.params.id);

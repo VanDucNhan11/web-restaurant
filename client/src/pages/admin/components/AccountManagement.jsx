@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const UserTable = ({ users, handleUpdateRole, handleDeleteUser, filter }) => {
+const UserTable = ({ users, handleUpdateRole, handleDeleteUser, filter, searchTerm }) => {
   const [selectedRole, setSelectedRole] = useState('');
   const [showDropdownRowId, setShowDropdownRowId] = useState(null); // State để lưu ID của hàng đang hiển thị dropdown menu
 
@@ -26,7 +26,10 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser, filter }) => {
     } else {
       return true; // Hiển thị tất cả nếu không có bộ lọc hoặc bộ lọc là ''
     }
-  });
+  }).filter(user =>
+    user.username.toLowerCase().includes(searchTerm.toLowerCase()) || // Lọc theo tên người dùng
+    user.email.toLowerCase().includes(searchTerm.toLowerCase()) // Lọc theo email người dùng
+  );
 
   return (
     <div className="overflow-x-auto shadow-md rounded-lg">
@@ -75,6 +78,7 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser, filter }) => {
 const AccountManagement = () => {
   const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -113,6 +117,10 @@ const AccountManagement = () => {
     setFilter(selectedFilter);
   };
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách tài khoản</h1>
@@ -123,8 +131,18 @@ const AccountManagement = () => {
         <button onClick={() => handleFilterChange('Nhân viên')} className={`bg-gray-300 text-gray-700 px-3 py-1 ${filter === 'Nhân viên' ? 'bg-gray-500' : 'hover:bg-gray-400'} transition duration-300`}>Nhân viên</button>
         <button onClick={() => handleFilterChange('Quản trị viên')} className={`bg-gray-300 text-gray-700 px-3 py-1 rounded-r-md ${filter === 'Quản trị viên' ? 'bg-gray-500' : 'hover:bg-gray-400'} transition duration-300`}>Quản trị viên</button>
       </div>
+      {/* Ô tìm kiếm theo tên */}
+      <div className="flex justify-center mb-4">
+        <input
+          type="text"
+          placeholder="Tìm kiếm theo tên"
+          value={searchTerm}
+          onChange={handleSearch}
+          className="border border-gray-300 rounded-md px-3 py-2"
+        />
+      </div>
       {/* Bảng danh sách tài khoản */}
-      <UserTable users={users} handleUpdateRole={handleUpdateRole} handleDeleteUser={handleDeleteUser} filter={filter} />
+      <UserTable users={users} handleUpdateRole={handleUpdateRole} handleDeleteUser={handleDeleteUser} filter={filter} searchTerm={searchTerm} />
     </div>
   );
 };

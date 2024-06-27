@@ -2,17 +2,16 @@ const express = require('express');
 const router = express.Router();
 const tableController = require('../controllers/tableController');
 
-// Get all tables
+// Lấy tất cả bàn
 router.get('/', tableController.getAllTables);
 
-// Create a new table
+// Tạo bàn mới
 router.post('/', tableController.createTable);
 
-// Update a table
+// Cập nhật thông tin bàn
 router.patch('/:id', tableController.updateTable);
 
-
-// Delete a table
+// Xóa bàn
 router.delete('/:id', tableController.deleteTable);
 
 module.exports = router;

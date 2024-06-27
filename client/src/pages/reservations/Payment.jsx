@@ -49,47 +49,36 @@ const Payment = () => {
     }
   };
 
-  const handleVNPayPayment = async () => {
-    const paymentData = {
-      amount: 100000,
-      bankCode: 'NCB',
-      orderDescription: 'Thanh toán đơn hàng',
-      orderType: 'billpayment',
-      language: 'vn',
-    };
-  
+  const handleZaloPayPayment = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/v1/reservations/vnpay', {
+      const response = await fetch('http://localhost:3000/api/v1/reservations/zalopay', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(paymentData),
       });
   
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to initiate VNPay payment: ${errorText}`);
-      }
+      const data = await response.json();
   
-      const result = await response.json();
-  
-      if (result && result.paymentUrl) {
-        window.location.href = result.paymentUrl;
+      if (response.ok) {
+        // Assuming data contains a URL to redirect the user for payment
+        window.location.href = data.order_url; 
       } else {
-        throw new Error('Invalid VNPay payment URL');
+        console.error('Payment initiation failed', data);
+        alert('Payment initiation failed. Please try again.');
       }
     } catch (error) {
-      console.error('Error processing VNPay payment:', error);
-      alert('Có lỗi xảy ra khi thanh toán qua VNPay: ' + error.message);
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
     }
   };
+  
 
   const handlePayment = async () => {
     if (paymentMethod === 'momo') {
       await handleMoMoPayment();
-    } else if (paymentMethod === 'vnpay') {
-      await handleVNPayPayment();
+    } else if (paymentMethod === 'zalopay') {
+      await handleZaloPayPayment();
     }
   };
 
@@ -164,7 +153,7 @@ const Payment = () => {
                   type="text"
                   value={reservationData.bookingTime}
                   readOnly
-                  className="shadow appearance-none border rounded w-60 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  className="shadow appearance-none border rounded w-64 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 />
               </div>
               <div className="mb-4">
@@ -225,13 +214,13 @@ const Payment = () => {
             <label className="flex items-center space-x-2">
               <input
                 type="radio"
-                value="vnpay"
-                checked={paymentMethod === 'vnpay'}
-                onChange={() => setPaymentMethod('vnpay')}
+                value="zalopay"
+                checked={paymentMethod === 'zalopay'}
+                onChange={() => setPaymentMethod('zalopay')}
                 className="form-radio h-5 w-5 text-blue-600"
               />
-              <span className="text-lg text-gray-700 pr-8">Thanh toán qua VNPay</span>
-              <img src="https://cdn.bio.link/uploads/profile_pictures/2023-08-09/ZCXnagobVPlSSCAOrumGbLsEQI1KPYsq.png" alt="VNPay Icon" className="h-6 w-6" />
+              <span className="text-lg text-gray-700 pr-8">Thanh toán qua ZaloPay</span>
+              <img src="https://cdn.haitrieu.com/wp-content/uploads/2022/10/Logo-ZaloPay-Square.png" alt="ZaloPay Icon" className="h-6 w-6" />
             </label>
           </div>
         </div>

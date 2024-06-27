@@ -5,7 +5,7 @@ const TableManagement = () => {
   const [tables, setTables] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [newTableData, setNewTableData] = useState({ quantity: '', type: '', area: 'A', tableNumber: '' });
+  const [newTableData, setNewTableData] = useState({ quantity: '', type: '', area: '', tableNumber: '', status: 'Còn Trống' });
   const [editTableData, setEditTableData] = useState({});
   const [filterArea, setFilterArea] = useState('');
 
@@ -39,7 +39,7 @@ const TableManagement = () => {
       const updatedTables = [...tables];
       updatedTables[updatedTableIndex] = response.data;
       setTables(updatedTables);
-      closeEditModal(); // Đóng modal sau khi lưu dữ liệu thành công
+      closeEditModal();
     } catch (error) {
       console.error('Error saving updated table:', error);
     }
@@ -55,7 +55,7 @@ const TableManagement = () => {
   };
 
   const openAddModal = () => {
-    setNewTableData({ quantity: '', type: '', area: 'A', tableNumber: '' }); 
+    setNewTableData({ quantity: '', type: '', area: '', tableNumber: '', status: 'Còn Trống' });
     setShowAddModal(true);
   };
 
@@ -94,6 +94,16 @@ const TableManagement = () => {
     }
   });
 
+  const getStatusColor = (status) => {
+    if (status === 'Đang phục vụ') {
+      return 'bg-red-500'; 
+    } else if (status === 'Còn Trống') {
+      return 'bg-green-400'; // màu xanh lá
+    } else {
+      return ''; // hoặc trường hợp khác bạn có thể xử lý tùy ý
+    }
+  };
+  
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Danh sách bàn</h1>
@@ -131,6 +141,7 @@ const TableManagement = () => {
               <th className="py-3 px-6 text-center">Loại bàn</th>
               <th className="py-3 px-6 text-center">Khu</th>
               <th className="py-3 px-6 text-center">Bàn số</th>
+              <th className="py-3 px-6 text-center">Trạng thái</th>
               <th className="py-3 px-6 text-center">Actions</th>
             </tr>
           </thead>
@@ -141,16 +152,19 @@ const TableManagement = () => {
                 <td className="py-3 px-6 text-center">{table.type}</td>
                 <td className="py-3 px-6 text-center">{table.area}</td>
                 <td className="py-3 px-6 text-center">{table.tableNumber}</td>
+                <td className={`py-3 px-6 text-center ${getStatusColor(table.status)} border  rborder-gray-300 rounded-md`}>
+                  {table.status}
+                </td>
                 <td className="py-3 px-6 text-center">
                   <button
                     onClick={() => openEditModal(table)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-300 mr-2"
+                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-700 transition duration-300 mr-2 border border-gray-300 rounded-md"
                   >
                     Sửa
                   </button>
                   <button
                     onClick={() => handleDelete(table._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300"
+                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 transition duration-300 border border-gray-300 rounded-md"
                   >
                     Xoá
                   </button>
@@ -195,6 +209,7 @@ const TableManagement = () => {
                 onChange={(e) => handleChange(e, 'add')}
                 className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
               >
+                <option value=""></option>
                 <option value="A">A</option>
                 <option value="B">B</option>
                 <option value="C">C</option>
@@ -222,7 +237,7 @@ const TableManagement = () => {
               </button>
               <button
                 onClick={handleAddTable}
-                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300 "
+                className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-700 transition duration-300"
               >
                 Thêm
               </button>
@@ -283,20 +298,32 @@ const TableManagement = () => {
                 className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
               />
             </label>
+            <label htmlFor="status" className="block mb-2">
+              Trạng thái:
+              <select
+                id="status"
+                name="status"
+                value={editTableData.status}
+                onChange={(e) => handleChange(e, 'edit')}
+                className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
+              >
+                <option value="Còn Trống">Còn Trống</option>
+                <option value="Đang phục vụ">Đang phục vụ</option>
+              </select>
+            </label>
             <div className="flex justify-end mt-4">
-             <button
+              <button
                 onClick={closeEditModal}
-                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300 mr-2 "
+                className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300 mr-2"
               >
                 Thoát
               </button>
               <button
                 onClick={saveUpdatedTable}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 "
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300"
               >
                 Lưu
               </button>
-              
             </div>
           </div>
         </div>

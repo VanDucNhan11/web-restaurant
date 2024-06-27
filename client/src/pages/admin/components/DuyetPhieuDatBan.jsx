@@ -4,6 +4,7 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import { useNavigate } from 'react-router-dom';
 
 const DuyetPhieuDatBan = () => {
   const currentUser = useSelector(state => state.user.currentUser);
@@ -19,6 +20,7 @@ const DuyetPhieuDatBan = () => {
   const [filterType, setFilterType] = useState('all');
   const [filterDate, setFilterDate] = useState('');
   const detailRef = useRef(null); 
+  const navigate = useNavigate();
 
   // Function to handle cancel reason change
   const handleCancelReasonChange = (event) => {
@@ -163,6 +165,9 @@ const printToPdf = () => {
       console.error('Error cancelling reservation:', error.message);
     }
   };
+  const handleAssignTable = (reservation) => {
+    navigate('/dashboard?tab=XuatHoaDon', { state: { reservation } });
+  };
 
   // JSX for approval confirmation dialog
   const approveConfirmationDialog = (
@@ -234,6 +239,12 @@ const printToPdf = () => {
           <div className="flex justify-end">
             <button onClick={() => setDetailModalOpen(false)} className="mr-4 bg-gray-300 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-400">Đóng</button>
             <button onClick={printToPdf} className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600">In phiếu</button>
+            <button
+              onClick={() => handleAssignTable(selectedDetailReservation)}
+              className="bg-blue-500 ml-3 text-white px-4 py-2 rounded-full hover:bg-blue-600"
+            >
+              Xếp bàn
+            </button>
           </div>
         </div>
       </div>
