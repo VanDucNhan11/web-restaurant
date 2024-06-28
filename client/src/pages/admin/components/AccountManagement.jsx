@@ -4,6 +4,20 @@ import axios from 'axios';
 const UserTable = ({ users, handleUpdateRole, handleDeleteUser, filter, searchTerm }) => {
   const [selectedRole, setSelectedRole] = useState('');
   const [showDropdownRowId, setShowDropdownRowId] = useState(null); // State để lưu ID của hàng đang hiển thị dropdown menu
+  const [roles, setRoles] = useState([]); // State để lưu danh sách các quyền
+
+  useEffect(() => {
+    fetchRoles();
+  }, []);
+
+  const fetchRoles = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/roles');
+      setRoles(response.data);
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+    }
+  };
 
   const handleSaveRole = (userId) => {
     handleUpdateRole(userId, selectedRole);
@@ -56,9 +70,9 @@ const UserTable = ({ users, handleUpdateRole, handleDeleteUser, filter, searchTe
                   <div>
                     <select className="mt-3 mb-3" value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
                       <option value="">Chọn quyền</option>
-                      <option value="Khách hàng">Khách hàng</option>
-                      <option value="Nhân viên">Nhân viên</option>
-                      <option value="Quản trị viên">Quản trị viên</option>
+                      {roles.map(role => (
+                        <option key={role._id} value={role.nameRole}>{role.nameRole}</option>
+                      ))}
                     </select>
                     <div className="">
                       <button onClick={handleCancel} className="bg-gray-500 text-white px-4 py-2 rounded-md mr-2 hover:bg-gray-700 transition duration-300">Thoát</button>

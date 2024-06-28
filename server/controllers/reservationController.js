@@ -159,7 +159,8 @@ const approveReservation = async (req, res) => {
         <ul>
           ${approvedReservation.selectedItems.map(item => `<li>${item.itemName} - ${item.quantity} x ${item.price.toLocaleString('vi-VN')} VNĐ</li>`).join('')}
         </ul>
-        <p>Best regards,<br>Your Restaurant</p>
+        <p>Hẹn gặp lại bạn ở nhà hàng chúng tôi!</p>
+        <p>Trân trọng,<br>Nhà hàng của chúng tôi</p>
       `
     };
 

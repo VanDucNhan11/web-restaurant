@@ -307,6 +307,7 @@ const TableManagement = () => {
                 onChange={(e) => handleChange(e, 'edit')}
                 className="border border-gray-300 rounded-md w-full px-3 py-2 mt-1"
               >
+                 <option value="">Chọn trạng thái</option>
                 <option value="Còn Trống">Còn Trống</option>
                 <option value="Đang phục vụ">Đang phục vụ</option>
               </select>

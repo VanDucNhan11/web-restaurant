@@ -6,7 +6,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { useNavigate } from 'react-router-dom';
 
-const DuyetPhieuDatBan = () => {
+const ApproveTableReservations = () => {
   const currentUser = useSelector(state => state.user.currentUser);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -381,5 +381,5 @@ const printToPdf = () => {
   );
 };
 
-export default DuyetPhieuDatBan;
+export default ApproveTableReservations;
 

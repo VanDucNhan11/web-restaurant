@@ -51,6 +51,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
 const EmployeeManagement = () => {
   const [employees, setEmployees] = useState([]);
+  const [positions, setPositions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editEmployee, setEditEmployee] = useState({});
   const [detailEmployee, setDetailEmployee] = useState(null);
@@ -61,6 +62,7 @@ const EmployeeManagement = () => {
 
   useEffect(() => {
     fetchEmployees();
+    fetchPositions();
   }, []);
 
   const fetchEmployees = async () => {
@@ -69,6 +71,14 @@ const EmployeeManagement = () => {
       setEmployees(response.data);
     } catch (error) {
       console.error('Có lỗi xảy ra khi lấy danh sách nhân viên:', error);
+    }
+  };
+  const fetchPositions = async () => {
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/positions');
+      setPositions(response.data);
+    } catch (error) {
+      console.error('Có lỗi xảy ra khi lấy danh sách chức vụ:', error);
     }
   };
 
@@ -167,19 +177,11 @@ const EmployeeManagement = () => {
             className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
           >
             <option value="">Tất cả chức vụ</option>
-            <option value="Phục vụ">Phục vụ</option>
-            <option value="Tiếp thực">Tiếp thực</option>
-            <option value="Lễ tân">Lễ tân</option>
-            <option value="Chảo chính">Chảo chính</option>
-            <option value="Phụ thớt">Phụ thớt</option>
-            <option value="Bếp nướng">Bếp nướng</option>
-            <option value="Nấu món ăn sáng">Nấu món ăn sáng</option>
-            <option value="Bảo trì">Bảo trì</option>
-            <option value="Nấu xôi chè">Nấu xôi chè</option>
-            <option value="Quầy (bán món ăn sáng)">Quầy (bán món ăn sáng)</option>
-            <option value="Sơ chế nguyên liệu">Sơ chế nguyên liệu</option>
-            <option value="Thủ kho">Thủ kho</option>
-            <option value="Pha chế">Pha chế</option>
+            {positions.map((position) => (
+              <option key={position._id} value={position.namePosition}>
+                {position.namePosition}
+              </option>
+            ))}
           </select>
         </div>
       </div>
@@ -265,13 +267,19 @@ const EmployeeManagement = () => {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Chức vụ:</label>
-            <input
-              type="text"
+            <select
               value={editEmployee.position || ''}
               onChange={(e) => setEditEmployee({ ...editEmployee, position: e.target.value })}
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
               required
-            />
+            >
+              <option value="">Chọn chức vụ</option>
+              {positions.map((position) => (
+                <option key={position._id} value={position.namePosition}>
+                  {position.namePosition}
+                </option>
+              ))}
+            </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Ngày bắt đầu:</label>

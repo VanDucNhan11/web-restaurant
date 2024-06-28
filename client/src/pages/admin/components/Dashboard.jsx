@@ -12,7 +12,7 @@ import PostManagement from './PostManagement';
 import TableManagement from './TableManagement';
 import Reports from './Reports';
 import MenuManagement from './MenuManagement';
-import DuyetPhieuDB from './DuyetPhieuDatBan'
+import DuyetPhieuDB from './ApproveTableReservations'
 import ChiTietHoaDon from './InvoiceDetails'
 import RecruitmentUpdate from './RecruitmentUpdate'
 import UpdateInvoice from './UpdateInvoice'

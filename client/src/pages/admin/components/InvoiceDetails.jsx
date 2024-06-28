@@ -5,6 +5,9 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { format } from 'date-fns';
 import { useLocation } from 'react-router-dom';
+import QRCode from 'qrcode';
+
+
 
 pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
@@ -27,7 +30,10 @@ const InvoiceDetails = () => {
   const [customerName, setCustomerName] = useState(reservation ? reservation.fullName : 'Khách lẻ');
   const [inputCustomerName, setInputCustomerName] = useState(reservation ? reservation.fullName : '');
   const [reservationApplied, setReservationApplied] = useState(false);
+  const [selectingNewTable, setSelectingNewTable] = useState(false);
+  const [isChangingTable, setIsChangingTable] = useState(false);
   
+
  
 
 
@@ -73,17 +79,20 @@ const InvoiceDetails = () => {
   const handleTableClick = async (table) => {
     setSelectedTable(table);
     setShowMenu(true);
-
+  
     if (reservation && !reservationApplied) {
       setInputCustomerName(reservation.fullName);
+      const reservedItems = reservation.selectedItems.map(item => ({
+        _id: item._id,
+        itemName: item.itemName,
+        price: item.price,
+        quantity: item.quantity
+      }));
       setTableOrders((prevOrders) => ({
         ...prevOrders,
-        [table._id]: reservation.selectedItems.map((item) => ({
-          itemName: item.itemName,
-          quantity: item.quantity,
-          price: item.price
-        }))
+        [table._id]: reservedItems
       }));
+      setSelectedMenuItems(reservedItems); // Ensure selectedMenuItems are updated
       setTableHasOrder(true);
       setReservationApplied(true);
       await updateTableStatus(table._id, 'Đang phục vụ'); // Cập nhật trạng thái bàn
@@ -97,10 +106,10 @@ const InvoiceDetails = () => {
       } else {
         setTableHasOrder(true);
       }
+      setSelectedMenuItems(tableOrders[table._id] || []);
     }
-
-    setSelectedMenuItems(tableOrders[table._id] || []);
   };
+  
 
   const updateTableStatus = async (tableId, status) => {
     try {
@@ -257,6 +266,7 @@ const InvoiceDetails = () => {
       
       // Calculate total with VAT
       const totalWithVAT = invoiceData.total + invoiceData.vat;
+      const qrCodeUrl = await QRCode.toDataURL(`Thanh toán hóa đơn cho bàn ${invoiceData.table.tableNumber}, tổng tiền: ${formatCurrency(totalWithVAT)}`);
   
       const documentDefinition = {
         content: [
@@ -264,8 +274,7 @@ const InvoiceDetails = () => {
           { text: 'Nhà hàng Madame Lân', style: 'subtitle' },
           'Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng',
           'PHIẾU THANH TOÁN',
-          { text: `Khu: ${invoiceData.table.area}`, margin: [0, 10, 0, 0] },
-          { text: `Bàn: ${invoiceData.table.tableNumber}`, margin: [0, 5, 0, 0] },
+          { text: `Khu: ${invoiceData.table.area} - Bàn số: ${invoiceData.table.tableNumber}`, margin: [0, 10, 0, 0] },
           { text: `Nhân viên thu ngân: ${invoiceData.currentUser.username}`, margin: [0, 5, 0, 0] },
           { text: `Tên khách hàng: ${invoiceData.customerName}`, margin: [0, 5, 0, 0] },
           { text: `Ngày: ${invoiceData.displayDate}`, margin: [0, 5, 0, 20] },
@@ -282,10 +291,17 @@ const InvoiceDetails = () => {
                   formatCurrency(item.price * item.quantity)
                 ]),
                 [{ text: 'Tổng tiền', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.total)],
-                [{ text: `VAT (${invoiceData.table.area === 'VIP' ? '15%' : '10%'})`, colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
+                [{ text: `VAT (${invoiceData.table.area === 'VIP' ? '10% + Phụ phí' : '10%'})`, colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
                 [{ text: 'Tổng tiền (đã bao gồm VAT)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(totalWithVAT)]
               ]
             }
+          },
+          { text: 'Quét QR code ở dưới để thanh toán!', margin: [0, 10, 0, 0], alignment: 'center' },
+          {
+            image: qrCodeUrl,
+            width: 150,
+            alignment: 'center',
+            margin: [0, 20, 0, 0]
           },
           { text: 'Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!', margin: [0, 10, 0, 0], alignment: 'center' },
           { text: 'Hẹn gặp lại ở Nhà hàng Madame Lân!', margin: [0, 5, 0, 0], alignment: 'center' }
@@ -307,10 +323,11 @@ const InvoiceDetails = () => {
       };
   
       console.log('Document definition:', documentDefinition);
-  
+
+      const formattedDate = format(new Date(invoiceData.date), 'dd-MM-yyyy');
       // Generate and download PDF
       const pdfDoc = pdfMake.createPdf(documentDefinition);
-      pdfDoc.download(`HoaDon_${invoiceData.table.tableNumber}_${invoiceData.displayDate}.pdf`);
+      pdfDoc.download(`HoaDon_Khu:${invoiceData.table.area}_Bàn:${invoiceData.table.tableNumber}_Ngày:${formattedDate}.pdf`);
   
       // Save invoice to MongoDB via API
       await fetch('http://localhost:3000/api/v1/invoices', {
@@ -338,7 +355,7 @@ const InvoiceDetails = () => {
         if (table._id === selectedTable._id) {
           return {
             ...table,
-            status: 'Còn trống'
+            status: 'Còn Trống'
           };
         }
         return table;
@@ -373,11 +390,120 @@ const InvoiceDetails = () => {
     window.print();
   };
 
+  const handleDeteledatatable = async () => {
+    if (selectedTable) {
+      try {
+        // Update table status to "Còn trống"
+        await axios.patch(`http://localhost:3000/api/v1/tables/${selectedTable._id}`, {
+          status: 'Còn Trống',
+          items: []
+        });
+  
+        // Update the local state
+        const updatedTables = tables.map(table => {
+          if (table._id === selectedTable._id) {
+            return {
+              ...table,
+              status: 'Còn Trống'
+            };
+          }
+          return table;
+        });
+  
+        setTables(updatedTables);
+        setTableOrders(prevTableOrders => ({
+          ...prevTableOrders,
+          [selectedTable._id]: []
+        }));
+  
+        setSelectedMenuItems([]);
+        setShowMenu(false);
+        setTableHasOrder(false);
+        setSelectedTable(null);
+  
+        console.log('Table status updated and orders cleared successfully');
+      } catch (error) {
+        console.error('Failed to update table status and clear orders:', error);
+      }
+    }
+  };
+  
+  const handleQuantityChangeInTable = (itemId, quantity) => {
+    setTableOrders((prevOrders) => ({
+      ...prevOrders,
+      [selectedTable._id]: prevOrders[selectedTable._id].map((item) =>
+        item._id === itemId ? { ...item, quantity: Number(quantity) } : item
+      ),
+    }));
+  };
+  
+  const handleRemoveItemFromTable = (itemId) => {
+    setTableOrders((prevOrders) => {
+      const updatedTableOrders = prevOrders[selectedTable._id].filter((item) => item._id !== itemId);
+      return {
+        ...prevOrders,
+        [selectedTable._id]: updatedTableOrders,
+      };
+    });
+  
+    setSelectedMenuItems((prevItems) => prevItems.filter((item) => item._id !== itemId));
+  };
   const handleInvoiceClose = () => {
     setOpenInvoice(false);
     setInvoiceData(null);
   };
+  
+  const handShowmenu = () => {
+    setShowMenu(true);
+  };
 
+  const handleChangeTable = async (newTable) => {
+    if (!selectedTable || isChangingTable) return;
+  
+    setIsChangingTable(true);
+    
+    // Lấy thông tin khách hàng và các món ăn từ bàn cũ
+    const customerName = inputCustomerName;
+    const items = tableOrders[selectedTable._id] || [];
+  
+    try {
+      setShowMenu(false);
+      setTableHasOrder(false);
+      setSelectedTable(null);
+      // Cập nhật trạng thái bàn cũ là 'Còn trống'
+      await updateTableStatus(selectedTable._id, 'Còn Trống');
+  
+      // Cập nhật thông tin khách hàng và các món ăn sang bàn mới
+      setSelectedTable(newTable);
+      setInputCustomerName(customerName);
+      setTableOrders((prevOrders) => ({
+        ...prevOrders,
+        [newTable._id]: items,
+        [selectedTable._id]: [], // Đặt thông tin món ăn ở bàn cũ về rỗng
+      }));
+      setSelectedMenuItems(items);
+      setTableHasOrder(true);
+  
+      // Cập nhật trạng thái bàn mới là 'Đang phục vụ'
+      await updateTableStatus(newTable._id, 'Đang phục vụ');
+  
+      // Hiển thị thông báo đổi bàn thành công
+      alert("Đã đổi bàn thành công");
+    } catch (error) {
+      console.error('Error changing table:', error);
+    } finally {
+      setIsChangingTable(false);
+      setSelectingNewTable(false);
+    }
+  };
+  
+  const handleTableSelection = (table) => {
+    if (selectedTable && table._id !== selectedTable._id && selectingNewTable && !isChangingTable) {
+      handleChangeTable(table);
+    }
+  };
+  
+  
   const renderMenuItems = () => {
     return (
       <div className={`mt-6 ${showMenu && selectedTable ? 'block' : 'hidden'}`}>
@@ -400,44 +526,48 @@ const InvoiceDetails = () => {
         <div className="grid grid-cols-4 gap-6">
           {menuItems
             .filter((item) => item.itemName.toLowerCase().includes(searchQuery.toLowerCase()))
-            .map((item) => (
-              <div
-                key={item._id}
-                className={`relative flex flex-col items-center border border-gray-300 p-4 rounded-md cursor-pointer ${selectedMenuItems.find(selectedItem => selectedItem._id === item._id) ? 'bg-green-100' : ''}`}
-                onClick={() => handleMenuItemClick(item)}
-              >
-                <img
-                  src={`http://localhost:3000/${item.image}`}
-                  alt={item.itemName}
-                  className="mb-2"
-                  style={{ width: '150px', height: '150px', objectFit: 'cover' }}
-                />
-                <div className="text-center">{item.itemName}</div>
-                <div className="text-center font-bold">{formatCurrency(item.price)}</div>
-                {selectedMenuItems.find(selectedItem => selectedItem._id === item._id) && (
-                  <>
-                    <input
-                      type="number"
-                      min="1"
-                      value={selectedMenuItems.find(selectedItem => selectedItem._id === item._id).quantity}
-                      onChange={(e) => handleQuantityChange(item, e.target.value)}
-                      className="mt-2 border border-gray-300 rounded-md px-2 py-1"
-                      onClick={(e) => e.stopPropagation()} // Ngăn việc click vào input làm bỏ chọn món
-                    />
-                    <button
-                      className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md"
-                      onClick={(e) => { e.stopPropagation(); handleCancelMenuItem(item); }}
+            .map((item) => {
+              const isSelected = selectedMenuItems.find(selectedItem => selectedItem._id === item._id);
+              return (
+                <div
+                  key={item._id}
+                  className={`relative flex flex-col items-center border border-gray-300 p-4 rounded-md cursor-pointer ${isSelected ? 'bg-green-100' : ''}`}
+                  onClick={() => handleMenuItemClick(item)}
+                >
+                  <img
+                    src={`http://localhost:3000/${item.image}`}
+                    alt={item.itemName}
+                    className="mb-2"
+                    style={{ width: '150px', height: '150px', objectFit: 'cover' }}
+                  />
+                  <div className="text-center">{item.itemName}</div>
+                  <div className="text-center font-bold">{formatCurrency(item.price)}</div>
+                  {isSelected && (
+                    <>
+                      <input
+                        type="number"
+                        min="1"
+                        value={isSelected.quantity}
+                        onChange={(e) => handleQuantityChange(item, e.target.value)}
+                        className="mt-2 border border-gray-300 rounded-md px-2 py-1"
+                        onClick={(e) => e.stopPropagation()} 
+                      />
+                      <button
+                        className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded-md"
+                        onClick={(e) => { e.stopPropagation(); handleCancelMenuItem(item); }}
                       >
                         Huỷ
                       </button>
                     </>
                   )}
                 </div>
-              ))}
-          </div>
+              );
+            })}
         </div>
-      );
-    };
+      </div>
+    );
+  };
+  
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center">
@@ -456,7 +586,7 @@ const InvoiceDetails = () => {
             ))}
           </div>
           <div className="ml-10 w-3/4">
-            {selectedArea && (
+          {selectedArea && (
               <div className="bg-gray-200 rounded-md p-4">
                 <div className="text-lg font-bold mb-4">Bàn ở Khu {selectedArea}</div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 p-4">
@@ -466,7 +596,7 @@ const InvoiceDetails = () => {
                       <div
                         key={table._id}
                         className={`transition transform hover:scale-105 hover:shadow-xl rounded-lg p-6 flex flex-col items-center mb-6 cursor-pointer ${table.status === 'Đang phục vụ' ? 'bg-red-300' : 'bg-green-400'}`}
-                        onClick={() => handleTableClick(table)}
+                        onClick={() => selectingNewTable ? handleTableSelection(table) : handleTableClick(table)}
                       >
                         <div className="text-3xl font-bold ">{table.tableNumber}</div>
                         <div className="text-lg mb-1">{table.status}</div>
@@ -478,36 +608,84 @@ const InvoiceDetails = () => {
             )}
             {selectedTable && (
               <div className="bg-white rounded-md p-6 mt-10 shadow-md">
-                <div className="text-lg font-bold mb-4">Thông tin Bàn  </div>
-                <div className="text-lg font-bold mb-4">Khu: {selectedTable.area} - Bàn số: {selectedTable.tableNumber} </div>
-                <div className="mb-4">
-                <div className="mb-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Tên khách hàng:
-                    </label>
-                    <input
-                      type="text"
-                      className="border border-gray-300 px-3 py-2 rounded-md w-64"
-                      value={inputCustomerName}
-                      onChange={(e) => setInputCustomerName(e.target.value)}
-                    />
-                  </div>
-                  <div className="text-lg font-semibold">Các món ăn đã chọn</div>
-                  {tableOrders[selectedTable._id] && tableOrders[selectedTable._id].length === 0 ? (
-                    <div>Chưa có món ăn nào</div>
-                  ) : (
-                    <ul>
-                      {tableOrders[selectedTable._id].map((item) => (
-                        <li key={item._id} className="flex justify-between my-2">
-                          <div>{item.itemName} x {item.quantity}</div>
-                          <div>{formatCurrency(item.price * item.quantity)}</div>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+                <div className="text-lg font-bold mb-4">Thông tin Bàn</div>
+                <div className="text-lg font-bold mb-4">
+                  Khu: {selectedTable.area} - Bàn số: {selectedTable.tableNumber}
                 </div>
-                <div className="text-lg font-semibold mb-4">Tổng tiền: {formatCurrency(calculateTotal())}</div>
-                <button className="bg-red-500 text-white px-4 py-2 rounded-md ml-4 mr-5" onClick={() => setSelectedTable(null)}>Đóng</button>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Tên khách hàng:
+                  </label>
+                  <input
+                    type="text"
+                    className="border border-gray-300 px-3 py-2 rounded-md w-64"
+                    value={inputCustomerName}
+                    onChange={(e) => setInputCustomerName(e.target.value)}
+                  />
+                </div>
+                <div className="text-lg font-semibold mb-4">Các món ăn đã chọn</div>
+                {tableOrders[selectedTable._id] && tableOrders[selectedTable._id].length === 0 ? (
+                  <div>Chưa có món ăn nào</div>
+                ) : (
+                  <ul>
+                    <li className="flex justify-between my-2 items-center font-bold">
+                      <div className="flex-1">Tên món ăn</div>
+                      <div className="w-32 text-center">Số lượng</div>
+                      <div className="w-32 text-center">Đơn giá</div>
+                      <div className="w-16"></div> {/* Nơi để nút Xóa */}
+                    </li>
+                    {tableOrders[selectedTable._id].map((item) => (
+                      <li key={item._id} className="flex justify-between my-2 items-center">
+                        <div className="flex-1">{item.itemName}</div>
+                        <div className="w-32 text-center">
+                          <input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) => handleQuantityChangeInTable(item._id, e.target.value)}
+                            className="border border-gray-300 rounded-md px-2 py-1 w-full text-center"
+                          />
+                        </div>
+                        <div className="w-32 text-center">
+                          {formatCurrency(item.price * item.quantity)}
+                        </div>
+                        <button
+                          className="bg-red-500 text-white px-2 py-1 rounded-md w-16"
+                          onClick={() => handleRemoveItemFromTable(item._id)}
+                        >
+                          Xoá
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="text-lg font-semibold mb-4">
+                  Tổng tiền: {formatCurrency(calculateTotal())}
+                </div>
+                <button
+                  className="bg-red-500 text-white px-4 py-2 rounded-md mr-5"
+                  onClick={() => setSelectedTable(null)}
+                >
+                  Đóng
+                </button>
+                <button
+                  className="bg-yellow-500 text-white px-4 py-2 rounded-md mr-5"
+                  onClick={handleDeteledatatable}
+                >
+                  Xoá thông tin bàn
+                </button>
+                <button
+                  className="bg-orange-500 text-white px-4 py-2 rounded-md mr-5"
+                  onClick={handShowmenu}
+                >
+                  Thêm món
+                </button>
+                <button
+                  className="bg-blue-500 text-white px-4 py-2 rounded-md mr-5"
+                  onClick={() => setSelectingNewTable(true)}
+                >
+                  Đổi bàn
+                </button>
                 <button className="bg-green-500 text-white px-4 py-2 rounded-md" onClick={generateBill}>Xuất hoá đơn</button>  
               </div>
             )}
@@ -546,7 +724,7 @@ const InvoiceDetails = () => {
                 <div>{formatCurrency(invoiceData.total)}</div>
               </div>
               <div className="flex justify-between font-semibold">
-                <div>VAT ({invoiceData.table.area === 'VIP' ? '15%' : '10%'}):</div>
+                <div>VAT ({invoiceData.table.area === 'VIP' ? '10% + Phụ phí' : '10%'}):</div>
                 <div>{formatCurrency(invoiceData.vat)}</div>
               </div>
               <div className="flex justify-between font-semibold">

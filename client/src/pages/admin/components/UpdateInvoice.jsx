@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
-import 'tailwindcss/tailwind.css'; // Ensure Tailwind CSS is imported
 
 const UpdateInvoice = () => {
   const [invoices, setInvoices] = useState([]);
@@ -119,12 +118,16 @@ const UpdateInvoice = () => {
 
   const handleUpdateInvoice = async () => {
     try {
-      await axios.put(`http://localhost:3000/api/v1/invoices/${selectedInvoiceId}`, updatedInvoice);
-      alert('Invoice updated successfully');
+      const total = calculateTotal(updatedInvoice.selectedItems);
+      await axios.put(`http://localhost:3000/api/v1/invoices/${selectedInvoiceId}`, {
+        ...updatedInvoice,
+        total: total,
+      });
+      alert('Hoá đơn đã được cập nhật thành công');
       fetchInvoices();
     } catch (error) {
-      console.error('Error updating invoice:', error);
-      alert('Failed to update invoice');
+      console.error('Lỗi khi cập nhật hoá đơn:', error);
+      alert('Cập nhật hoá đơn thất bại');
     }
   };
 
@@ -197,68 +200,143 @@ const UpdateInvoice = () => {
       </table>
 
       {selectedInvoice && (
-        <div className="mt-4 p-4 border bg-gray-100">
-          <h3 className="text-xl font-semibold mb-2">Chi tiết hoá đơn</h3>
-          <h4 className=" font-semibold mb-2">Tên khách hàng: </h4>
-          <input
-            type="text"
-            value={updatedInvoice.customerName}
-            onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, customerName: e.target.value })}
-            placeholder="Customer Name"
-            className="border p-2 mb-4 w-full"
-          />
-          <ul className="mb-4">
-            <h4 className=" font-semibold mb-2">Các món ăn trong hoá đơn: </h4>
-            {updatedInvoice.selectedItems.map(item => (
-              <li key={item._id} className="flex items-center mb-2">
-                <span className="flex-1">{item.itemName} - Price: {item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</span>
-                <input
-                  type="number"
-                  value={item.quantity}
-                  onChange={(e) => handleItemChange(item._id, parseInt(e.target.value))}
-                  min="0"
-                  className="border p-2 w-16"
-                />
-                <button onClick={() => handleDeleteItem(item._id)} className="ml-2 text-red-500">Xoá</button>
-              </li>
-            ))}
-          </ul>
-          <h3 className="text-xl font-semibold mb-2">Chỉnh sửa món ăn</h3>
-          <button onClick={() => setIsModalOpen(true)} className="bg-blue-500 text-white px-4 py-2 rounded">Thêm món ăn</button>
-          <div className="mt-4">
+        <div className="mt-4">
+          <h3 className="text-xl font-semibold mb-2">Thông tin hoá đơn</h3>
+          <div className="mb-4">
+            <label className="block mb-2 font-semibold">Tên khách hàng</label>
+            <input
+              type="text"
+              value={updatedInvoice.customerName}
+              onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, customerName: e.target.value })}
+              className="border p-2 w-full"
+            />
+          </div>
+          
+          <div className="mb-4">
+            <label className="block mb-2 font-semibold">Khu</label>
+            <select
+              value={updatedInvoice.area}
+              onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, area: e.target.value })}
+              className="border p-2 w-full"
+            >
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="C">C</option>
+              <option value="D">D</option>
+              <option value="VIP">VIP</option>
+            </select>
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-semibold">Số bàn</label>
+            <input
+              type="text"
+              value={updatedInvoice.tableNumber}
+              onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, table: e.target.value })}
+              className="border p-2 w-full"
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="block mb-2 font-semibold">Ngày xuất hoá đơn</label>
+            <input
+              type="date"
+              value={format(new Date(updatedInvoice.date), 'yyyy-MM-dd')}
+              onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, date: e.target.value })}
+              className="border p-2 w-full"
+            />
+          </div>
+
+          <h3 className="text-xl font-semibold mb-2">Danh sách món ăn</h3>
+          <table className="min-w-full bg-white border mb-4">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border">Tên món</th>
+                <th className="py-2 px-4 border">Số lượng</th>
+                <th className="py-2 px-4 border">Giá</th>
+                <th className="py-2 px-4 border">Thành tiền</th>
+                <th className="py-2 px-4 border">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              {updatedInvoice.selectedItems.map(item => (
+                <tr key={item._id}>
+                  <td className="py-2 px-4 border">{item.itemName}</td>
+                  <td className="py-2 px-4 border">
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(item._id, parseInt(e.target.value))}
+                      className="border p-2 w-16 text-center"
+                    />
+                  </td>
+                  <td className="py-2 px-4 border text-right">{item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                  <td className="py-2 px-4 border text-right">{(item.price * item.quantity).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                  <td className="py-2 px-4 border text-center">
+                    <button onClick={() => handleDeleteItem(item._id)} className="text-red-500">Xoá</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <div className="mb-4">
             <h3 className="text-xl font-semibold">Tổng tiền: {updatedInvoice.total?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</h3>
           </div>
-          <button  className="bg-red-500 text-white px-4 py-2 rounded mt-4 mr-5">Đóng</button>
-          <button onClick={handleUpdateInvoice} className="bg-green-500 text-white px-4 py-2 rounded mt-4">Lưu thay đổi</button>
+
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Thêm món
+          </button>
+
+          <button
+            onClick={handleUpdateInvoice}
+            className="bg-green-500 text-white px-4 py-2 rounded ml-2"
+          >
+            Lưu thay đổi
+          </button>
         </div>
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white p-4 rounded shadow-lg w-96">
-            <h3 className="text-xl font-semibold mb-2">Thực đơn</h3>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-4 rounded shadow-lg max-w-lg w-full">
+            <h3 className="text-xl font-semibold mb-2">Thêm món ăn</h3>
             <input
               type="text"
-              placeholder="Tìm kiếm món ăn"
+              placeholder="Tìm món ăn"
               value={searchMenu}
               onChange={(e) => setSearchMenu(e.target.value)}
-              className="border p-2 mb-4 w-full"
+              className="border p-2 w-full mb-4"
             />
-            <ul className="max-h-64 overflow-y-auto mb-4">
-              {filteredMenuItems.map(item => (
-                <li key={item._id} onClick={() => handleAddItem(item)} className="flex items-center p-2 border mb-2 cursor-pointer">
-                  <img src={`http://localhost:3000/${item.image}`} alt={item.itemName} className="w-12 h-12 mr-4" />
-                  <span className="flex-1">{item.itemName}</span>
-                  <input
-                    type="checkbox"
-                    checked={updatedInvoice.selectedItems.some(i => i._id === item._id)}
-                    readOnly
-                    className="ml-2"
-                  />
-                </li>
-              ))}
-            </ul>
-            <button onClick={() => setIsModalOpen(false)} className="bg-red-500 text-white px-4 py-2 rounded">Thoát</button>
+            <table className="min-w-full bg-white border">
+              <thead>
+                <tr>
+                  <th className="py-2 px-4 border">Tên món</th>
+                  <th className="py-2 px-4 border">Giá</th>
+                  <th className="py-2 px-4 border">Hành động</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredMenuItems.map(item => (
+                  <tr key={item._id}>
+                    <td className="py-2 px-4 border">{item.itemName}</td>
+                    <td className="py-2 px-4 border text-right">{item.price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                    <td className="py-2 px-4 border text-center">
+                      <button onClick={() => handleAddItem(item)} className="text-green-500">Thêm</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button
+              onClick={() => setIsModalOpen(false)}
+              className="bg-gray-500 text-white px-4 py-2 rounded mt-4"
+            >
+              Đóng
+            </button>
           </div>
         </div>
       )}
