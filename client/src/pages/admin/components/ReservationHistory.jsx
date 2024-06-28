@@ -82,7 +82,7 @@ const ReservationHistory = () => {
   if (error) {
     return <div>{error}</div>;
   }
-
+  const sortedReservations = reservations.sort((a, b) => new Date(a.bookingDate) - new Date(b.bookingDate));
   return (
     <div className="p-4 sm:p-8">
       <h2 className="text-3xl font-semibold mb-6 text-center title-1 title-font">Lịch sử đặt bàn</h2>
@@ -98,7 +98,7 @@ const ReservationHistory = () => {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {reservations.map((reservation, index) => (
+            {sortedReservations.map((reservation, index) => (
               <tr key={index} className="hover:bg-gray-200 transition duration-200">
                 <td className="w-1/5 py-3 px-4 text-center">{new Date(reservation.bookingDate).toLocaleDateString()}</td>
                 <td className="w-1/5 py-3 px-4 text-center">{reservation.bookingTime}</td>

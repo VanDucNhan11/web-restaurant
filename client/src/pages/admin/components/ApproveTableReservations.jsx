@@ -293,7 +293,7 @@ const printToPdf = () => {
         return true;
     }
   });
-
+  const sortedReservations = filteredReservations.sort((a, b) => new Date(a.bookingDate) - new Date(b.bookingDate));
   // JSX for reservations table
   return (
     <div className="p-4 sm:p-8">
@@ -339,7 +339,7 @@ const printToPdf = () => {
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {filteredReservations.map((reservation, index) => {
+            {sortedReservations.map((reservation, index) => {
               const reservationDate = new Date(reservation.bookingDate);
               const reservationTimeParts = reservation.bookingTime.split(':');
               const reservationHour = parseInt(reservationTimeParts[0], 10);

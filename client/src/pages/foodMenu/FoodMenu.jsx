@@ -28,7 +28,8 @@ const FoodMenu = () => {
   const fetchCategories = async () => {
     try {
       const response = await axios.get('http://localhost:3000/api/v1/categories');
-      setCategories(response.data);
+      const sortedCategories = response.data.sort((a, b) => a.name.localeCompare(b.name));
+      setCategories(sortedCategories);
     } catch (error) {
       console.error('Có lỗi xảy ra khi lấy danh sách danh mục:', error);
     }
@@ -112,10 +113,23 @@ const FoodMenu = () => {
         <img src="https://madamelan.vn/storage/menus/vi/0/pc/01.jpg" alt="" />
         <img src="https://madamelan.vn/storage/menus/vi/0/pc/02.jpg" alt="" />
       </div>
-      <div className="a-background">
+      <div className="text-center mt-10">
+        <div className="inline-block bg-white p-4 rounded-lg shadow-md">
+          {categories.map(category => (
+            <a
+              key={category._id}
+              href={`#${category._id}`}
+              className="text-red-500 mx-2 py-1 px-3 rounded-lg hover:bg-red-500 hover:text-white transition-colors duration-300"
+            >
+              {category.name}
+            </a>
+          ))}
+        </div>
+      </div>
+      <div className="a-background mt-10">
         {categories.map(category => (
-          <div key={category._id}>
-            <h1 className="title content-font-light text-center">{category.name}</h1>
+          <div key={category._id} id={category._id}>
+            <h1 className="title content-font-light text-center mt-5">{category.name}</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pb-10 mx-auto items-center justify-center md:w-5/6">
               {renderMenuItems(category._id)}
             </div>

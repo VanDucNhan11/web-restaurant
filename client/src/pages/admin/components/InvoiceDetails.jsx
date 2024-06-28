@@ -49,14 +49,23 @@ const InvoiceDetails = () => {
         throw new Error('Failed to fetch tables');
       }
       const data = await response.json();
-
-      const areas = [...new Set(data.map(table => table.area))];
-      setTables(data);
+  
+      // Sort tables by area and table number
+      const sortedData = data.sort((a, b) => {
+        if (a.area === b.area) {
+          return a.tableNumber - b.tableNumber;
+        }
+        return a.area.localeCompare(b.area);
+      });
+  
+      const areas = [...new Set(sortedData.map(table => table.area))];
+      setTables(sortedData);
       setAreas(areas);
     } catch (error) {
       console.error('Error fetching tables:', error);
     }
   };
+  
 
   const fetchMenuItems = async () => {
     try {
@@ -453,9 +462,7 @@ const InvoiceDetails = () => {
     setInvoiceData(null);
   };
   
-  const handShowmenu = () => {
-    setShowMenu(true);
-  };
+  
 
   const handleChangeTable = async (newTable) => {
     if (!selectedTable || isChangingTable) return;
@@ -502,7 +509,16 @@ const InvoiceDetails = () => {
       handleChangeTable(table);
     }
   };
-  
+  const handShowmenu = () => {
+    // Lấy các món ăn hiện tại trong thông tin bàn đã chọn
+    const currentTableItems = tableOrders[selectedTable._id] || [];
+    
+    // Cập nhật trạng thái của selectedMenuItems
+    setSelectedMenuItems(currentTableItems);
+    
+    // Hiển thị menu
+    setShowMenu(true);
+  };
   
   const renderMenuItems = () => {
     return (
@@ -578,7 +594,7 @@ const InvoiceDetails = () => {
             {areas.map((area) => (
               <button
                 key={area}
-                className={`block w-full p-4 bg-blue-500 text-white rounded-md mb-4 text-left ${selectedArea === area ? 'bg-blue-700' : ''}`}
+                className={`block w-full p-4 bg-blue-500 text-white rounded-md mb-4 text-left ${selectedArea === area ? 'bg-yellow-400' : ''}`}
                 onClick={() => handleAreaClick(area)}
               >
                 {area}
