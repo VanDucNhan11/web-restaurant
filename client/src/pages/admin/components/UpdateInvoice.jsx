@@ -70,7 +70,7 @@ const UpdateInvoice = () => {
   const calculateTotal = (items) => {
     const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const vat = items.reduce((acc, item) => {
-      const vatRate = item.area === 'VIP' ? 0.15 : 0.1;
+      const vatRate = item.area === 'VIP' ? 0.15 : 0.08;
       return acc + item.price * item.quantity * vatRate;
     }, 0);
     return subtotal + vat;
@@ -232,7 +232,7 @@ const UpdateInvoice = () => {
             <input
               type="text"
               value={updatedInvoice.tableNumber}
-              onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, table: e.target.value })}
+              onChange={(e) => setUpdatedInvoice({ ...updatedInvoice, tableNumber: e.target.value })}
               className="border p-2 w-full"
             />
           </div>

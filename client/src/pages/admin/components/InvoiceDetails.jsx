@@ -13,25 +13,27 @@ pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const InvoiceDetails = () => {
   const location = useLocation();
-  const reservation = location.state?.reservation;
-  const [tables, setTables] = useState([]);
-  const [selectedArea, setSelectedArea] = useState('A');
-  const [areas, setAreas] = useState([]);
-  const [selectedTable, setSelectedTable] = useState(null);
-  const [menuItems, setMenuItems] = useState([]);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [tableOrders, setTableOrders] = useState({});
-  const [showMenu, setShowMenu] = useState(false);
-  const [selectedMenuItems, setSelectedMenuItems] = useState([]);
-  const [tableHasOrder, setTableHasOrder] = useState(false);
-  const [openInvoice, setOpenInvoice] = useState(false);
-  const [invoiceData, setInvoiceData] = useState(null);
-  const currentUser = useSelector(state => state.user.currentUser);
-  const [customerName, setCustomerName] = useState(reservation ? reservation.fullName : 'Khách lẻ');
-  const [inputCustomerName, setInputCustomerName] = useState(reservation ? reservation.fullName : '');
-  const [reservationApplied, setReservationApplied] = useState(false);
-  const [selectingNewTable, setSelectingNewTable] = useState(false);
-  const [isChangingTable, setIsChangingTable] = useState(false);
+const reservation = location.state?.reservation;
+const [tables, setTables] = useState([]);
+const [selectedArea, setSelectedArea] = useState('A');
+const [areas, setAreas] = useState([]);
+const [selectedTable, setSelectedTable] = useState(null);
+const [menuItems, setMenuItems] = useState([]);
+const [searchQuery, setSearchQuery] = useState('');
+const [tableOrders, setTableOrders] = useState({});
+const [showMenu, setShowMenu] = useState(false);
+const [selectedMenuItems, setSelectedMenuItems] = useState([]);
+const [tableHasOrder, setTableHasOrder] = useState(false);
+const [openInvoice, setOpenInvoice] = useState(false);
+const [invoiceData, setInvoiceData] = useState(null);
+const currentUser = useSelector(state => state.user.currentUser);
+const [customerName, setCustomerName] = useState(reservation ? reservation.fullName : 'Khách lẻ');
+const [inputCustomerName, setInputCustomerName] = useState(reservation ? reservation.fullName : '');
+const [reservationApplied, setReservationApplied] = useState(false);
+const [selectingNewTable, setSelectingNewTable] = useState(false);
+const [isChangingTable, setIsChangingTable] = useState(false);
+const [customerNames, setCustomerNames] = useState({});
+const [tablesWithReservation, setTablesWithReservation] = useState({});
   
 
  
@@ -88,37 +90,45 @@ const InvoiceDetails = () => {
   const handleTableClick = async (table) => {
     setSelectedTable(table);
     setShowMenu(true);
-  
+
     if (reservation && !reservationApplied) {
-      setInputCustomerName(reservation.fullName);
-      const reservedItems = reservation.selectedItems.map(item => ({
-        _id: item._id,
-        itemName: item.itemName,
-        price: item.price,
-        quantity: item.quantity
-      }));
-      setTableOrders((prevOrders) => ({
-        ...prevOrders,
-        [table._id]: reservedItems
-      }));
-      setSelectedMenuItems(reservedItems); // Ensure selectedMenuItems are updated
-      setTableHasOrder(true);
-      setReservationApplied(true);
-      await updateTableStatus(table._id, 'Đang phục vụ'); // Cập nhật trạng thái bàn
-    } else {
-      if (!tableOrders[table._id]) {
-        setTableOrders((prevOrders) => ({
-          ...prevOrders,
-          [table._id]: [],
+        const reservedItems = reservation.selectedItems.map(item => ({
+            _id: item._id,
+            itemName: item.itemName,
+            price: item.price,
+            quantity: item.quantity
         }));
-        setTableHasOrder(false);
-      } else {
+        setTableOrders((prevOrders) => ({
+            ...prevOrders,
+            [table._id]: reservedItems
+        }));
+        setSelectedMenuItems(reservedItems);
         setTableHasOrder(true);
-      }
-      setSelectedMenuItems(tableOrders[table._id] || []);
+        setReservationApplied(true);
+        setCustomerNames((prevNames) => ({
+            ...prevNames,
+            [table._id]: reservation.fullName
+        }));
+        await updateTableStatus(table._id, 'Đang phục vụ');
+        
+        // Thêm bàn này vào danh sách bàn có áp dụng phiếu đặt
+        setTablesWithReservation((prev) => ({
+            ...prev,
+            [table._id]: true
+        }));
+    } else {
+        if (!tableOrders[table._id]) {
+            setTableOrders((prevOrders) => ({
+                ...prevOrders,
+                [table._id]: [],
+            }));
+            setTableHasOrder(false);
+        } else {
+            setTableHasOrder(true);
+        }
+        setSelectedMenuItems(tableOrders[table._id] || []);
     }
-  };
-  
+};
 
   const updateTableStatus = async (tableId, status) => {
     try {
@@ -228,25 +238,33 @@ const InvoiceDetails = () => {
     const total = calculateTotal();
     const vat = calculateVAT(total, selectedTable.area);
     const totalWithVAT = total + vat;
-    const customer = inputCustomerName !== '' ? inputCustomerName : 'Khách lẻ';
-    
-    setInvoiceData({
-      table: selectedTable,
-      items: tableOrders[selectedTable._id],
-      total,
-      vat,
-      totalWithVAT,
-      currentUser,
-      customerName: customer,
-      date: formattedDate,
-      displayDate: formattedDisplayDate,
-    });
-  
-    setOpenInvoice(true);
-  };
-  
-  
+    const customer = customerNames[selectedTable._id] || 'Khách lẻ';
+    let deposit = 0;
 
+    // Kiểm tra và áp dụng tiền cọc nếu bàn này đã áp dụng phiếu đặt
+    if (tablesWithReservation[selectedTable._id]) {
+        deposit = 100000; // Áp dụng tiền cọc
+    }
+
+    const finalTotal = totalWithVAT - deposit;
+    
+
+    setInvoiceData({
+        table: selectedTable,
+        items: tableOrders[selectedTable._id],
+        total,
+        vat,
+        totalWithVAT,
+        finalTotal,
+        deposit,
+        currentUser,
+        customerName: customer,
+        date: formattedDate,
+        displayDate: formattedDisplayDate,
+    });
+
+    setOpenInvoice(true);
+};
   const calculateTotal = () => {
     if (selectedTable && tableOrders[selectedTable._id]) {
       return tableOrders[selectedTable._id].reduce((total, item) => total + item.price * item.quantity, 0);
@@ -255,140 +273,158 @@ const InvoiceDetails = () => {
   };
 
   const calculateVAT = (total, area) => {
-    return area === 'VIP' ? total * 0.15 : total * 0.10;
+    return area === 'VIP' ? total * 0.15 : total * 0.08;
   };
 
   const exportPDF = async () => {
     try {
-      if (!invoiceData) {
-        throw new Error('Không có dữ liệu hóa đơn để xuất PDF');
-      }
-  
-      console.log('Preparing to export PDF:', invoiceData);
-  
-      // Prepare table data for PDF content
-      const tableData = invoiceData.items.map(item => ({
-        itemName: item.itemName,
-        price: item.price,
-        quantity: item.quantity
-      }));
-      
-      // Calculate total with VAT
-      const totalWithVAT = invoiceData.total + invoiceData.vat;
-      const qrCodeUrl = await QRCode.toDataURL(`Thanh toán hóa đơn cho bàn ${invoiceData.table.tableNumber}, tổng tiền: ${formatCurrency(totalWithVAT)}`);
-  
-      const documentDefinition = {
-        content: [
-          { text: 'Hóa Đơn Thanh Toán', style: 'title' },
-          { text: 'Nhà hàng Madame Lân', style: 'subtitle' },
-          'Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng',
-          'PHIẾU THANH TOÁN',
-          { text: `Khu: ${invoiceData.table.area} - Bàn số: ${invoiceData.table.tableNumber}`, margin: [0, 10, 0, 0] },
-          { text: `Nhân viên thu ngân: ${invoiceData.currentUser.username}`, margin: [0, 5, 0, 0] },
-          { text: `Tên khách hàng: ${invoiceData.customerName}`, margin: [0, 5, 0, 0] },
-          { text: `Ngày: ${invoiceData.displayDate}`, margin: [0, 5, 0, 20] },
-          {
-            table: {
-              headerRows: 1,
-              widths: ['*', 'auto', 'auto', 'auto'],
-              body: [
-                ['Tên món', 'Số lượng', 'Đơn giá', 'Thành tiền'],
-                ...tableData.map(item => [
-                  item.itemName,
-                  item.quantity,
-                  formatCurrency(item.price),
-                  formatCurrency(item.price * item.quantity)
-                ]),
-                [{ text: 'Tổng tiền', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.total)],
-                [{ text: `VAT (${invoiceData.table.area === 'VIP' ? '10% + Phụ phí' : '10%'})`, colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
-                [{ text: 'Tổng tiền (đã bao gồm VAT)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(totalWithVAT)]
-              ]
-            }
-          },
-          { text: 'Quét QR code ở dưới để thanh toán!', margin: [0, 10, 0, 0], alignment: 'center' },
-          {
-            image: qrCodeUrl,
-            width: 150,
-            alignment: 'center',
-            margin: [0, 20, 0, 0]
-          },
-          { text: 'Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!', margin: [0, 10, 0, 0], alignment: 'center' },
-          { text: 'Hẹn gặp lại ở Nhà hàng Madame Lân!', margin: [0, 5, 0, 0], alignment: 'center' }
-        ],
-        styles: {
-          title: {
-            fontSize: 18,
-            bold: true,
-            alignment: 'center',
-            margin: [0, 0, 0, 10]
-          },
-          subtitle: {
-            fontSize: 16,
-            bold: true,
-            alignment: 'center',
-            margin: [0, 0, 0, 10]
-          }
+        if (!invoiceData || !invoiceData.items || invoiceData.items.length === 0) {
+            throw new Error('Không có dữ liệu hóa đơn để xuất PDF');
         }
-      };
-  
-      console.log('Document definition:', documentDefinition);
 
-      const formattedDate = format(new Date(invoiceData.date), 'dd-MM-yyyy');
-      // Generate and download PDF
-      const pdfDoc = pdfMake.createPdf(documentDefinition);
-      pdfDoc.download(`HoaDon_Khu:${invoiceData.table.area}_Bàn:${invoiceData.table.tableNumber}_Ngày:${formattedDate}.pdf`);
-  
-      // Save invoice to MongoDB via API
-      await fetch('http://localhost:3000/api/v1/invoices', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          area: invoiceData.table.area,
-          tableNumber: invoiceData.table.tableNumber,
-          date: invoiceData.date,
-          total: totalWithVAT, // Save total including VAT
-          username: invoiceData.currentUser.username,
-          customerName: invoiceData.customerName,
-          selectedItems: tableData
-        }),
-      });
-      // Update table status via API call
-      await axios.patch(`http://localhost:3000/api/v1/tables/${selectedTable._id}`, {
-        status: 'Còn Trống' 
-      });
-  
-      // Reset local state
-      const updatedTables = tables.map(table => {
-        if (table._id === selectedTable._id) {
-          return {
-            ...table,
-            status: 'Còn Trống'
-          };
+        console.log('Preparing to export PDF:', invoiceData);
+
+        const tableData = invoiceData.items.map(item => ({
+            itemName: item.itemName,
+            price: item.price,
+            quantity: item.quantity
+        }));
+
+        const finalTotal = invoiceData.totalWithVAT - invoiceData.deposit;
+        let qrCodeUrl;
+        try {
+            qrCodeUrl = await QRCode.toDataURL(`Thanh toán hóa đơn cho bàn ${invoiceData.table.tableNumber}, tổng tiền: ${formatCurrency(finalTotal)}`);
+        } catch (qrError) {
+            console.error('Failed to generate QR code:', qrError);
+            qrCodeUrl = ''; // hoặc một hình ảnh mặc định nếu cần
         }
-        return table;
-      });
-  
-      setTables(updatedTables);
-      setTableOrders(prevTableOrders => ({
-        ...prevTableOrders,
-        [selectedTable._id]: []
-      }));
-  
-      setSelectedMenuItems([]);
-      setShowMenu(false);
-      setTableHasOrder(false);
-      setOpenInvoice(false);
-      setInvoiceData(null);
-      setInputCustomerName('');
-  
-      console.log('PDF exported successfully and invoice saved to MongoDB');
+
+        const tableBody = [
+            ['Tên món', 'Số lượng', 'Đơn giá', 'Thành tiền'],
+            ...tableData.map(item => [
+                item.itemName,
+                item.quantity,
+                formatCurrency(item.price),
+                formatCurrency(item.price * item.quantity)
+            ]),
+            [{ text: 'Tổng tiền', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.total)],
+            [{ text: `VAT (${invoiceData.table.area === 'VIP' ? '8% + Phụ phí' : '8%'})`, colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.vat)],
+            [{ text: 'Tổng tiền (đã bao gồm VAT)', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(invoiceData.totalWithVAT)]
+        ];
+
+        if (invoiceData.deposit > 0) {
+            tableBody.push([{ text: 'Trừ tiền cọc', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(-invoiceData.deposit)]);
+        }
+
+        tableBody.push([{ text: 'Tổng tiền thanh toán', colSpan: 3, alignment: 'right', bold: true }, {}, {}, formatCurrency(finalTotal)]);
+
+        const documentDefinition = {
+            content: [
+                { text: 'Hóa Đơn Thanh Toán', style: 'title' },
+                { text: 'Nhà hàng Madame Lân', style: 'subtitle' },
+                'Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng',
+                'PHIẾU THANH TOÁN',
+                { text: `Khu: ${invoiceData.table.area} - Bàn số: ${invoiceData.table.tableNumber}`, margin: [0, 10, 0, 0] },
+                { text: `Nhân viên thu ngân: ${invoiceData.currentUser.username}`, margin: [0, 5, 0, 0] },
+                { text: `Tên khách hàng: ${invoiceData.customerName}`, margin: [0, 5, 0, 0] },
+                { text: `Ngày: ${invoiceData.displayDate}`, margin: [0, 5, 0, 20] },
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', 'auto', 'auto', 'auto'],
+                        body: tableBody
+                    }
+                },
+                { text: 'Quét QR code ở dưới để thanh toán!', margin: [0, 10, 0, 0], alignment: 'center' },
+                {
+                    image: qrCodeUrl,
+                    width: 150,
+                    alignment: 'center',
+                    margin: [0, 20, 0, 0]
+                },
+                { text: 'Cảm ơn quý khách đã sử dụng dịch vụ của chúng tôi!', margin: [0, 10, 0, 0], alignment: 'center' },
+                { text: 'Hẹn gặp lại ở Nhà hàng Madame Lân!', margin: [0, 5, 0, 0], alignment: 'center' }
+            ],
+            styles: {
+                title: {
+                    fontSize: 18,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 10]
+                },
+                subtitle: {
+                    fontSize: 16,
+                    bold: true,
+                    alignment: 'center',
+                    margin: [0, 0, 0, 10]
+                }
+            }
+        };
+
+        console.log('Document definition:', documentDefinition);
+
+        const formattedDate = format(new Date(invoiceData.date), 'dd-MM-yyyy');
+        const pdfDoc = pdfMake.createPdf(documentDefinition);
+        pdfDoc.download(`HoaDon_Khu:${invoiceData.table.area}_Bàn:${invoiceData.table.tableNumber}_Ngày:${formattedDate}.pdf`);
+
+        try {
+            await fetch('http://localhost:3000/api/v1/invoices', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    area: invoiceData.table.area,
+                    tableNumber: invoiceData.table.tableNumber,
+                    date: invoiceData.date,
+                    total: finalTotal,
+                    username: invoiceData.currentUser.username,
+                    customerName: invoiceData.customerName,
+                    selectedItems: tableData
+                }),
+            });
+            console.log('Invoice saved to database');
+        } catch (invoiceError) {
+            console.error('Failed to save invoice to database:', invoiceError);
+        }
+
+        try {
+            await axios.patch(`http://localhost:3000/api/v1/tables/${selectedTable._id}`, {
+                status: 'Còn Trống'
+            });
+            console.log('Table status updated to "Còn Trống"');
+        } catch (tableError) {
+            console.error('Failed to update table status:', tableError);
+        }
+
+        setTables(prevTables => prevTables.map(table => {
+            if (table._id === selectedTable._id) {
+                return {
+                    ...table,
+                    status: 'Còn Trống'
+                };
+            }
+            return table;
+        }));
+
+        setTableOrders(prevTableOrders => ({
+            ...prevTableOrders,
+            [selectedTable._id]: []
+        }));
+
+        setSelectedMenuItems([]);
+        setShowMenu(false);
+        setTableHasOrder(false);
+        setSelectedTable(null);
+        setOpenInvoice(false);
+
+        console.log('PDF exported successfully.');
     } catch (error) {
-      console.error('Error exporting PDF:', error);
-      // Handle error, e.g., show user-friendly error message
+        console.error('Failed to export PDF:', error);
     }
-  };
+};
+
+
   
   
   const formatCurrency = (value) => {
@@ -402,13 +438,11 @@ const InvoiceDetails = () => {
   const handleDeteledatatable = async () => {
     if (selectedTable) {
       try {
-        // Update table status to "Còn trống"
         await axios.patch(`http://localhost:3000/api/v1/tables/${selectedTable._id}`, {
           status: 'Còn Trống',
           items: []
         });
   
-        // Update the local state
         const updatedTables = tables.map(table => {
           if (table._id === selectedTable._id) {
             return {
@@ -429,6 +463,10 @@ const InvoiceDetails = () => {
         setShowMenu(false);
         setTableHasOrder(false);
         setSelectedTable(null);
+        setCustomerNames(prevNames => ({
+          ...prevNames,
+          [selectedTable._id]: ''
+        }));
   
         console.log('Table status updated and orders cleared successfully');
       } catch (error) {
@@ -468,33 +506,32 @@ const InvoiceDetails = () => {
     if (!selectedTable || isChangingTable) return;
   
     setIsChangingTable(true);
-    
-    // Lấy thông tin khách hàng và các món ăn từ bàn cũ
-    const customerName = inputCustomerName;
+  
+    const customerName = customerNames[selectedTable._id] || '';
     const items = tableOrders[selectedTable._id] || [];
   
     try {
       setShowMenu(false);
       setTableHasOrder(false);
       setSelectedTable(null);
-      // Cập nhật trạng thái bàn cũ là 'Còn trống'
       await updateTableStatus(selectedTable._id, 'Còn Trống');
   
-      // Cập nhật thông tin khách hàng và các món ăn sang bàn mới
       setSelectedTable(newTable);
-      setInputCustomerName(customerName);
       setTableOrders((prevOrders) => ({
         ...prevOrders,
         [newTable._id]: items,
-        [selectedTable._id]: [], // Đặt thông tin món ăn ở bàn cũ về rỗng
+        [selectedTable._id]: [],
       }));
       setSelectedMenuItems(items);
       setTableHasOrder(true);
+      setCustomerNames((prevNames) => ({
+        ...prevNames,
+        [newTable._id]: customerName,
+        [selectedTable._id]: ''
+      }));
   
-      // Cập nhật trạng thái bàn mới là 'Đang phục vụ'
       await updateTableStatus(newTable._id, 'Đang phục vụ');
   
-      // Hiển thị thông báo đổi bàn thành công
       alert("Đã đổi bàn thành công");
     } catch (error) {
       console.error('Error changing table:', error);
@@ -502,6 +539,13 @@ const InvoiceDetails = () => {
       setIsChangingTable(false);
       setSelectingNewTable(false);
     }
+  };
+  const handleCustomerNameChange = (e) => {
+    const newName = e.target.value;
+    setCustomerNames((prevNames) => ({
+      ...prevNames,
+      [selectedTable._id]: newName
+    }));
   };
   
   const handleTableSelection = (table) => {
@@ -635,8 +679,8 @@ const InvoiceDetails = () => {
                   <input
                     type="text"
                     className="border border-gray-300 px-3 py-2 rounded-md w-64"
-                    value={inputCustomerName}
-                    onChange={(e) => setInputCustomerName(e.target.value)}
+                    value={customerNames[selectedTable._id] || ''}
+                    onChange={handleCustomerNameChange}
                   />
                 </div>
                 <div className="text-lg font-semibold mb-4">Các món ăn đã chọn</div>
@@ -710,53 +754,62 @@ const InvoiceDetails = () => {
       </div>
       
       {openInvoice && (
-        <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white shadow-lg rounded-md p-8 max-w-3xl w-full">
-            <div className="text-xl font-bold mb-4">Hóa đơn thanh toán</div>
-            <div className="mb-4">
-              <div className="text-lg">Nhà hàng Madame Lân</div>
-              <div>Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng</div>
-            </div>
-            <div className="mb-4">
-              <div className="text-lg font-semibold mb-2">Thông tin hóa đơn</div>
-              <div><span className="font-semibold">Khu:</span> {invoiceData.table.area}</div>
-              <div><span className="font-semibold">Bàn:</span> {invoiceData.table.tableNumber}</div>
-              <div><span className="font-semibold">Ngày:</span> {invoiceData.displayDate}</div>
-              <div><span className="font-semibold">Nhân viên thu ngân:</span> {invoiceData.currentUser.username}</div>
-              <div><span className="font-semibold">Tên khách hàng:</span> {invoiceData.customerName}</div>
-            </div>
-            <div className="mb-4">
-              <div className="text-lg font-semibold mb-2">Các món đã chọn</div>
-              {invoiceData.items.map((item) => (
-                <div key={item._id} className="flex justify-between my-1">
-                  <div>{item.itemName} x {item.quantity}</div>
-                  <div>{formatCurrency(item.price * item.quantity)}</div>
+            <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
+                <div className="bg-white shadow-lg rounded-md p-8 max-w-3xl w-full">
+                    <div className="text-xl font-bold mb-4">Hóa đơn thanh toán</div>
+                    <div className="mb-4">
+                        <div className="text-lg">Nhà hàng Madame Lân</div>
+                        <div>Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng</div>
+                    </div>
+                    <div className="mb-4">
+                        <div className="text-lg font-semibold mb-2">Thông tin hóa đơn</div>
+                        <div><span className="font-semibold">Khu:</span> {invoiceData.table.area}</div>
+                        <div><span className="font-semibold">Bàn:</span> {invoiceData.table.tableNumber}</div>
+                        <div><span className="font-semibold">Ngày:</span> {invoiceData.displayDate}</div>
+                        <div><span className="font-semibold">Nhân viên thu ngân:</span> {invoiceData.currentUser.username}</div>
+                        <div><span className="font-semibold">Tên khách hàng:</span> {invoiceData.customerName}</div>
+                    </div>
+                    <div className="mb-4">
+                        <div className="text-lg font-semibold mb-2">Các món đã chọn</div>
+                        {invoiceData.items.map((item) => (
+                            <div key={item._id} className="flex justify-between my-1">
+                                <div>{item.itemName} x {item.quantity}</div>
+                                <div>{formatCurrency(item.price * item.quantity)}</div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="mb-4">
+                        <div className="flex justify-between font-semibold">
+                            <div>Tổng tiền:</div>
+                            <div>{formatCurrency(invoiceData.total)}</div>
+                        </div>
+                        <div className="flex justify-between font-semibold">
+                            <div>VAT ({invoiceData.table.area === 'VIP' ? '8% + Phụ phí' : '8%'}):</div>
+                            <div>{formatCurrency(invoiceData.vat)}</div>
+                        </div>
+                        <div className="flex justify-between font-semibold">
+                            <div>Tổng tiền (đã bao gồm VAT):</div>
+                            <div>{formatCurrency(invoiceData.totalWithVAT)}</div>
+                        </div>
+                        {invoiceData.deposit > 0 && (
+                            <div className="flex justify-between font-semibold">
+                                <div>Trừ tiền cọc:</div>
+                                <div>{formatCurrency(-invoiceData.deposit)}</div>
+                            </div>
+                        )}
+                        <div className="flex justify-between font-semibold">
+                            <div>Tổng tiền thanh toán:</div>
+                            <div>{formatCurrency(invoiceData.finalTotal)}</div>
+                        </div>
+                    </div>
+                    <div className="flex justify-end">
+                        <button className="bg-green-500 text-white px-4 py-2 rounded-md mr-4" onClick={exportPDF}>Xuất PDF</button>
+                        <button className="bg-blue-500 text-white px-4 py-2 rounded-md" onClick={handlePrint}>In hóa đơn</button>
+                        <button className="bg-gray-500 text-white px-4 py-2 rounded-md ml-4" onClick={handleInvoiceClose}>Đóng</button>
+                    </div>
                 </div>
-              ))}
             </div>
-            <div className="mb-4">
-              <div className="flex justify-between font-semibold">
-                <div>Tổng tiền:</div>
-                <div>{formatCurrency(invoiceData.total)}</div>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <div>VAT ({invoiceData.table.area === 'VIP' ? '10% + Phụ phí' : '10%'}):</div>
-                <div>{formatCurrency(invoiceData.vat)}</div>
-              </div>
-              <div className="flex justify-between font-semibold">
-                <div>Tổng tiền (đã bao gồm VAT):</div>
-                <div>{formatCurrency(invoiceData.totalWithVAT)}</div>
-              </div>
-            </div>
-            <div className="flex justify-end">
-              <button className="bg-green-500 text-white px-4 py-2 rounded-md mr-4" onClick={exportPDF}>Xuất PDF</button>
-              <button className="bg-blue-500 text-white px-4 py-2 rounded-md" onClick={handlePrint}>In hóa đơn</button>
-              <button className="bg-gray-500 text-white px-4 py-2 rounded-md ml-4" onClick={handleInvoiceClose}>Đóng</button>
-            </div>
-          </div>
-        </div>
-      )}
-
+        )}
       {renderMenuItems()}
     </div>
   );
