@@ -752,19 +752,17 @@ const [tablesWithReservation, setTablesWithReservation] = useState({});
           </div>
         </div>
       </div>
-      
       {openInvoice && (
             <div className="fixed top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex items-center justify-center">
                 <div className="bg-white shadow-lg rounded-md p-8 max-w-3xl w-full">
-                    <div className="text-xl font-bold mb-4">Hóa đơn thanh toán</div>
+                    <div className="text-2xl font-bold mb-4 text-center">Hóa đơn thanh toán</div>
                     <div className="mb-4">
-                        <div className="text-lg">Nhà hàng Madame Lân</div>
+                        <div className=" text-xl text-center mb-5">Nhà hàng Madame Lân</div>
                         <div>Địa chỉ: Số 04 Bạch Đằng, Phường, Quận Hải Châu, TP. Đà Nẵng</div>
                     </div>
                     <div className="mb-4">
                         <div className="text-lg font-semibold mb-2">Thông tin hóa đơn</div>
-                        <div><span className="font-semibold">Khu:</span> {invoiceData.table.area}</div>
-                        <div><span className="font-semibold">Bàn:</span> {invoiceData.table.tableNumber}</div>
+                        <div><span className="font-semibold">Khu:</span> {invoiceData.table.area} - Bàn: {invoiceData.table.tableNumber}</div>
                         <div><span className="font-semibold">Ngày:</span> {invoiceData.displayDate}</div>
                         <div><span className="font-semibold">Nhân viên thu ngân:</span> {invoiceData.currentUser.username}</div>
                         <div><span className="font-semibold">Tên khách hàng:</span> {invoiceData.customerName}</div>

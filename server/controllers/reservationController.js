@@ -102,7 +102,7 @@ const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: 'madamelann@gmail.com',
-    pass: 'k t x f p b z g e j b k y z b j' // Sử dụng mật khẩu ứng dụng ở đây
+    pass: 'k t x f p b z g e j b k y z b j' 
   }
 });
 
@@ -193,10 +193,10 @@ const cancelReservation = async (req, res) => {
       from: 'madamelann@gmail.com',
       to: deletedReservation.email,
       subject: 'Huỷ đặt bàn',
-      text: `Xin chào ${deletedReservation.fullName},\n\nĐặt bàn của bạn vào ngày ${new Date(deletedReservation.bookingDate).toLocaleDateString()} lúc ${deletedReservation.bookingTime} đã được huỷ.\n\nLý do: ${cancelReason}\n\nCảm ơn bạn đã sử dụng dịch vụ của chúng tôi!\n\nBest regards,\nYour Restaurant`,
+      text: `Xin chào ${deletedReservation.fullName},\n\nĐặt bàn của bạn vào ngày ${new Date(deletedReservation.bookingDate).toLocaleDateString()} lúc ${deletedReservation.bookingTime} đã bị huỷ.\n\nLý do: ${cancelReason}\n\nCảm ơn bạn đã sử dụng dịch vụ của chúng tôi!\n\nBest regards,\nYour Restaurant`,
       html: `
         <p>Xin chào ${deletedReservation.fullName},</p>
-        <p>Đặt bàn của bạn vào ngày ${new Date(deletedReservation.bookingDate).toLocaleDateString()} lúc ${deletedReservation.bookingTime} đã được huỷ.</p>
+        <p>Đặt bàn của bạn vào ngày ${new Date(deletedReservation.bookingDate).toLocaleDateString()} lúc ${deletedReservation.bookingTime} đã bị huỷ.</p>
         <p>Lý do: ${cancelReason}</p>
         <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
         <p>Best regards,<br>Your Restaurant</p>
