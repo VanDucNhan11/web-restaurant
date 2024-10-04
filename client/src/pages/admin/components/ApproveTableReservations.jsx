@@ -3,8 +3,10 @@ import { useSelector } from 'react-redux';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import * as pdfFonts from 'pdfmake/build/vfs_fonts';
 import { useNavigate } from 'react-router-dom';
+
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
 
 const ApproveTableReservations = () => {
   const currentUser = useSelector(state => state.user.currentUser);
